@@ -101,6 +101,31 @@
         app:layout_constraintStart_toEndOf="@id/otpBox3"
         app:layout_constraintTop_toTopOf="@+id/guideline7" />
 
+    <ImageView
+        android:id="@+id/ivOtpErrorIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginTop="4dp"
+        android:src="@drawable/warning"
+        app:layout_constraintEnd_toStartOf="@+id/tvOtpError"
+        app:layout_constraintTop_toBottomOf="@+id/otpBox1" />
+
+    <TextView
+        android:id="@+id/tvOtpError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:paddingStart="4dp"
+        android:fontFamily="@font/poppinsmedium"
+        android:text="Otp cannot be empty"
+        android:textColor="#B12F24"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/guideline5"
+        app:layout_constraintTop_toBottomOf="@+id/otpBox1" />
+
+
     <Button
         android:id="@+id/btnVerify"
         android:layout_width="0dp"
