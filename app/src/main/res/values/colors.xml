@@ -3,6 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="background">#191919</color>
-    <color name="foreground">#5D5D5D</color>
+    <color name="foreground_field">#5D5D5D</color>
     <color name="theme_color">#7E60BF</color>
+    <color name="foreground">#242424</color>
 </resources>

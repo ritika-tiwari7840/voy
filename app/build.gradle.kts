@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.storage.CacheResetOnProcessCanceled.enabled
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -27,6 +29,10 @@ android {
             )
         }
     }
+    buildFeatures {
+        viewBinding =true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -44,10 +50,11 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
 
     // Location Services
-    implementation("com.google.android.gms:play-services-location:21.0.1") // Check for the latest version
+    implementation("com.google.android.gms:play-services-location:21.3.0") // Check for the latest version
 
     // Testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation (libs.material.v190)
 }

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/continue_with_email"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context=".ContinueWithEmail">
+
+    <ImageView
+        android:id="@+id/continue_with_email_image"
+        android:layout_width="240dp"
+        android:layout_height="90dp"
+        android:src="@drawable/voy_splash_screen"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guide_one"
+        app:layout_constraintBottom_toTopOf="@+id/voy_tag"
+        />
+
+
+    <TextView
+        android:id="@+id/voy_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/medium"
+        android:text="Start Ride with Voy!"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/continue_with_email_image"
+        app:layout_constraintBottom_toTopOf="@+id/guide_one_one"
+
+        />
+
+
+    <ImageView
+        android:id="@+id/car_backgound_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/car_background"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guide_two" />
+
+    <Button
+        android:id="@+id/continue_with_email_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corner"
+        android:text="Continue with Email"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/guide_three"
+        app:layout_constraintBottom_toTopOf="@id/guide_four"
+
+        />
+
+    <TextView
+        android:id="@+id/continue_with_terms_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="By Signing up you agree to our Terms of Use"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/guide_four" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_one"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.103" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_one_one"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.233" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_two"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.365" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_three"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.74" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_four"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.815" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_left"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.048" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_right"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.952" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
