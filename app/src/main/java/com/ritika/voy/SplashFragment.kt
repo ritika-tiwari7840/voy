@@ -25,7 +25,7 @@ class SplashFragment : Fragment() {
 
         Handler(Looper.getMainLooper()).postDelayed({
             parentFragmentManager.beginTransaction()
-                .replace(R.id.splash,CreateAccount())
+                .replace(R.id.splash,ContinueWithEmail())
 //                .addToBackStack(null)
                 .commit()
         }, 2000)

@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.ritika.voy.R
 import com.ritika.voy.databinding.FragmentContinueWithEmailBinding
+import com.ritika.voy.signup.CreateAccount
 
 class ContinueWithEmail : Fragment() {
     private var _binding: FragmentContinueWithEmailBinding? = null
@@ -57,6 +58,12 @@ class ContinueWithEmail : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.continueWithEmailButton.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.main, CreateAccount())
+                .addToBackStack(null)
+                .commit()
+        }
 
     }
 
