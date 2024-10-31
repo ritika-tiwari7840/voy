@@ -2,13 +2,10 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-<<<<<<< HEAD
     <color name="background">#191919</color>
     <color name="foreground_field">#5D5D5D</color>
     <color name="theme_color">#7E60BF</color>
     <color name="foreground">#242424</color>
     <color name="red">#B00020</color>
-=======
     <color name="grey">#191919</color>
->>>>>>> 1d59f23e6d0f053c55abeac125fedf18fc5ebd9a
 </resources>
