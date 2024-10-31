@@ -8,9 +8,17 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+<<<<<<< HEAD
 
 
 
 
+=======
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainer"
+        android:name="com.ritika.voy.authentication.OtpFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+>>>>>>> 1d59f23e6d0f053c55abeac125fedf18fc5ebd9a
 
 </androidx.constraintlayout.widget.ConstraintLayout>
