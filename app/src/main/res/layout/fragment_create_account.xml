@@ -65,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:hint="Enter your email"
+            android:hint="@string/enter_your_email"
             android:textColorHint="@color/white">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -97,7 +97,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:hint="Enter your password"
+            android:hint="@string/enter_your_password"
             android:textColorHint="@color/white"
             app:endIconMode="password_toggle"
             app:endIconTint="@color/white">
@@ -131,7 +131,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:hint="Confirm your password"
+            android:hint="@string/confirm_password"
             android:textColorHint="@color/white"
             app:endIconMode="password_toggle"
             app:endIconTint="@color/white">
