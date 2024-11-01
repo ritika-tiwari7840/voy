@@ -9,12 +9,12 @@
     tools:context=".ContinueWithEmail">
 
     <ImageView
-        android:id="@+id/continue_with_email_image"
+        android:id="@+id/voy_image"
         android:layout_width="240dp"
         android:layout_height="90dp"
         android:src="@drawable/voy_splash_screen"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
         app:layout_constraintTop_toBottomOf="@id/guide_one"
         app:layout_constraintBottom_toTopOf="@+id/voy_tag"
         />
@@ -27,10 +27,10 @@
         android:fontFamily="@font/medium"
         android:text="Start Ride with Voy!"
         android:textColor="@color/white"
-        android:textSize="14sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/continue_with_email_image"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/voy_image"
         app:layout_constraintBottom_toTopOf="@+id/guide_one_one"
 
         />
@@ -43,15 +43,20 @@
         android:src="@drawable/car_background"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guide_two" />
+        app:layout_constraintTop_toBottomOf="@id/guide_two"
+        />
 
     <Button
         android:id="@+id/continue_with_email_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/button_background"
-        android:text="Continue with Email"
-        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:text="Continue With Email"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        android:padding="16dp"
+        android:fontFamily="@font/medium"
         app:layout_constraintLeft_toLeftOf="@id/guide_left"
         app:layout_constraintRight_toRightOf="@id/guide_right"
         app:layout_constraintTop_toBottomOf="@id/guide_three"
@@ -65,7 +70,7 @@
         android:layout_height="wrap_content"
         android:text="By Signing up you agree to our Terms of Use"
         android:textColor="@color/white"
-        android:textSize="14sp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="@id/guide_left"
         app:layout_constraintRight_toRightOf="@id/guide_right"

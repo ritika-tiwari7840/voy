@@ -16,10 +16,18 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
+import com.ritika.voy.databinding.FragmentVerifyPhoneBinding
 
-class VerifyPhoneFragment : Fragment() {
+class VerifyPhoneFragment : BaseFragment() {
+    private var _binding: FragmentVerifyPhoneBinding? = null
+    private val binding get() = _binding!!
+    private lateinit var navController: NavController
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +40,8 @@ class VerifyPhoneFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_verify_phone, container, false)
+        _binding = FragmentVerifyPhoneBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -117,6 +126,22 @@ class VerifyPhoneFragment : Fragment() {
         }
         otpFields.forEach { it.addTextChangedListener(textWatcher) }
 
+
+        navController = Navigation.findNavController(view)
+
+        resendTextview.setOnClickListener {
+            Toast.makeText(requireContext(), "Resend OTP", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.btnVerify.setOnClickListener {
+            Toast.makeText(requireContext(), "Registration Successful", Toast.LENGTH_SHORT).show()
+            navController.navigate(R.id.continueWithEmail)
+        }
+
+        binding.btnBack.setOnClickListener {
+            navController.popBackStack()
+        }
+
     }
     fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
         currentBox.addTextChangedListener(object : TextWatcher {
@@ -149,5 +174,9 @@ class VerifyPhoneFragment : Fragment() {
                 false
             }
         }
+    }
+
+    override fun onBackPressed() {
+        navController.navigate(R.id.verifyEmailFragment)
     }
 }

@@ -16,10 +16,19 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
+import com.ritika.voy.databinding.FragmentVerifyEmailBinding
 
-class VerifyEmailFragment : Fragment() {
+class VerifyEmailFragment : BaseFragment() {
+
+    private var _binding: FragmentVerifyEmailBinding? = null
+    private val binding get() = _binding!!
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +39,8 @@ class VerifyEmailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_verify_email, container, false)
+        _binding = FragmentVerifyEmailBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -115,6 +125,21 @@ class VerifyEmailFragment : Fragment() {
         }
         otpFields.forEach { it.addTextChangedListener(textWatcher) }
 
+
+        navController = Navigation.findNavController(view)
+        resendTextview.setOnClickListener {
+            Toast.makeText(requireContext(), "Resend OTP", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.btnBack.setOnClickListener{
+            navController.popBackStack()
+        }
+
+        binding.btnVerify.setOnClickListener {
+            Toast.makeText(requireContext(), "Email Verified", Toast.LENGTH_SHORT).show()
+            navController.navigate(R.id.verifyPhoneFragment)
+        }
+
     }
 
     fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
@@ -148,6 +173,10 @@ class VerifyEmailFragment : Fragment() {
                 false
             }
         }
+    }
+
+    override fun onBackPressed() {
+        navController.navigate(R.id.createAccount)
     }
 
 

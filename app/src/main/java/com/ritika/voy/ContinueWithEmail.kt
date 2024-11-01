@@ -10,13 +10,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import com.ritika.voy.R
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import com.ritika.voy.databinding.FragmentContinueWithEmailBinding
-import com.ritika.voy.signup.CreateAccount
+import com.ritika.voy.authentication.CreateAccount
 
-class ContinueWithEmail : Fragment() {
+class ContinueWithEmail : BaseFragment() {
     private var _binding: FragmentContinueWithEmailBinding? = null
     private val binding get() = _binding!!
+    private lateinit var navController: NavController
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +47,6 @@ class ContinueWithEmail : Fragment() {
         spannableString.setSpan(
             ForegroundColorSpan(termsColor), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
-
         continueWithTermsText.text = spannableString
 
 
@@ -57,11 +58,10 @@ class ContinueWithEmail : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        navController = Navigation.findNavController(view)
+
         binding.continueWithEmailButton.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.main, CreateAccount())
-                .addToBackStack(null)
-                .commit()
+            navController.navigate(R.id.loginFragment)
         }
 
     }
@@ -72,8 +72,9 @@ class ContinueWithEmail : Fragment() {
         _binding = null  // Prevent memory leaks
     }
 
-    companion object {
-
+    override fun onBackPressed() {
+        requireActivity().finish()
     }
+
 }
 

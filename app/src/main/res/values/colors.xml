@@ -8,4 +8,5 @@
     <color name="foreground">#242424</color>
     <color name="red">#B00020</color>
     <color name="grey">#191919</color>
+    <color name="helper_text">#B0B0B0</color>
 </resources>

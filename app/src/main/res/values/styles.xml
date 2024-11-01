@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomHelperTextAppearance" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textSize">11.67sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+</resources>
