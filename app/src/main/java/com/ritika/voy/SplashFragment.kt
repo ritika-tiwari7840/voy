@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.ritika.voy.R
+import com.ritika.voy.authentication.VerifyEmailFragment
+import com.ritika.voy.authentication.VerifyPhoneFragment
 import com.ritika.voy.signup.CreateAccount
 
 class SplashFragment : Fragment() {
@@ -25,8 +27,7 @@ class SplashFragment : Fragment() {
 
         Handler(Looper.getMainLooper()).postDelayed({
             parentFragmentManager.beginTransaction()
-                .replace(R.id.splash,ContinueWithEmail())
-//                .addToBackStack(null)
+                .replace(R.id.splash,VerifyEmailFragment())
                 .commit()
         }, 2000)
     }

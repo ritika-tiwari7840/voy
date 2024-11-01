@@ -19,8 +19,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.ritika.voy.R
 
-class OtpFragment : Fragment() {
-
+class VerifyEmailFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,11 +30,12 @@ class OtpFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_otp, container, false)
+        return inflater.inflate(R.layout.fragment_verify_email, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         val screenHeight = resources.displayMetrics.heightPixels
         val topMargin = (screenHeight * 0.304).toInt()
@@ -116,6 +116,7 @@ class OtpFragment : Fragment() {
         otpFields.forEach { it.addTextChangedListener(textWatcher) }
 
     }
+
     fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
         currentBox.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -148,4 +149,6 @@ class OtpFragment : Fragment() {
             }
         }
     }
+
+
 }

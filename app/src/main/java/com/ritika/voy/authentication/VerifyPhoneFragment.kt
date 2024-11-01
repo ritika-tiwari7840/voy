@@ -19,11 +19,12 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.ritika.voy.R
 
-class OtpFragment : Fragment() {
+class VerifyPhoneFragment : Fragment() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
     }
 
     override fun onCreateView(
@@ -31,11 +32,12 @@ class OtpFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_otp, container, false)
+        return inflater.inflate(R.layout.fragment_verify_phone, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         val screenHeight = resources.displayMetrics.heightPixels
         val topMargin = (screenHeight * 0.304).toInt()
