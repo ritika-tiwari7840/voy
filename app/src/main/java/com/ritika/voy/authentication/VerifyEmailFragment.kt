@@ -22,14 +22,13 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
-import com.ritika.voy.databinding.FragmentOtpBinding
+import com.ritika.voy.databinding.FragmentVerifyEmailBinding
 
-class OtpFragment : BaseFragment() {
+class VerifyEmailFragment : BaseFragment() {
 
-    private lateinit var navController: NavController
-    private var _binding: FragmentOtpBinding? = null
+    private var _binding: FragmentVerifyEmailBinding? = null
     private val binding get() = _binding!!
-
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,14 +37,15 @@ class OtpFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentOtpBinding.inflate(inflater, container, false)
+        _binding = FragmentVerifyEmailBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         val screenHeight = resources.displayMetrics.heightPixels
         val topMargin = (screenHeight * 0.304).toInt()
@@ -125,22 +125,23 @@ class OtpFragment : BaseFragment() {
         }
         otpFields.forEach { it.addTextChangedListener(textWatcher) }
 
+
         navController = Navigation.findNavController(view)
-
-        //navigation
-
-        binding.btnVerify.setOnClickListener {
-            Toast.makeText(requireContext(), "Otp Verified", Toast.LENGTH_SHORT).show()
-            navController.navigate(R.id.resetPassword)
+        resendTextview.setOnClickListener {
+            Toast.makeText(requireContext(), "Resend OTP", Toast.LENGTH_SHORT).show()
         }
-        binding.btnBack.setOnClickListener {
+
+        binding.btnBack.setOnClickListener{
             navController.popBackStack()
         }
-        binding.resendTextView.setOnClickListener {
-            Toast.makeText(requireContext(), "Resend Otp", Toast.LENGTH_SHORT).show()
+
+        binding.btnVerify.setOnClickListener {
+            Toast.makeText(requireContext(), "Email Verified", Toast.LENGTH_SHORT).show()
+            navController.navigate(R.id.verifyPhoneFragment)
         }
 
     }
+
     fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
         currentBox.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -175,6 +176,8 @@ class OtpFragment : BaseFragment() {
     }
 
     override fun onBackPressed() {
-        navController.navigate(R.id.forgotPasswordFragment)
+        navController.navigate(R.id.createAccount)
     }
+
+
 }

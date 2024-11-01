@@ -50,6 +50,12 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
 
+    //navigation dependencies
+    val nav_version = "2.8.3"
+
+    implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
+    implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
+
     // Location Services
     implementation("com.google.android.gms:play-services-location:21.3.0") // Check for the latest version
 

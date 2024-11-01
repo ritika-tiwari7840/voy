@@ -7,10 +7,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.ritika.voy.R
-import com.ritika.voy.signup.CreateAccount
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+
+import com.ritika.voy.authentication.CreateAccount
 
 class SplashFragment : Fragment() {
+
+    private lateinit var navController: NavController
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -23,11 +27,12 @@ class SplashFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        navController = Navigation.findNavController(view)
+
         Handler(Looper.getMainLooper()).postDelayed({
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.splash,ContinueWithEmail())
-//                .addToBackStack(null)
-                .commit()
-        }, 2000)
+            navController.navigate(R.id.action_splashFragment_to_continueWithEmail)
+        }, 2500)
+
+
     }
 }

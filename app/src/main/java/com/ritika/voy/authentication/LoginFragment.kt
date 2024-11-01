@@ -14,19 +14,28 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
+import com.ritika.voy.databinding.FragmentLoginBinding
 
-class LoginFragment : Fragment() {
+class LoginFragment : BaseFragment() {
+
+    private lateinit var navController: NavController
+    private var _binding: FragmentLoginBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_login, container, false)
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -99,5 +108,28 @@ class LoginFragment : Fragment() {
 
             override fun afterTextChanged(s: Editable?) {}
         })
+
+        navController = Navigation.findNavController(view)
+
+        registerTextview.setOnClickListener {
+            navController.navigate(R.id.createAccount)
+        }
+
+        binding.btnBack.setOnClickListener {
+            navController.navigate(R.id.continueWithEmail)
+        }
+
+        binding.btnLogin.setOnClickListener {
+            Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.tvForgotPassword.setOnClickListener {
+            navController.navigate(R.id.forgotPasswordFragment)
+        }
+
+    }
+
+    override fun onBackPressed() {
+        navController.navigate(R.id.continueWithEmail)
     }
 }
