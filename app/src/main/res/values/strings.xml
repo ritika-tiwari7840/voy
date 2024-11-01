@@ -4,4 +4,12 @@
     <string name="enter_your_email">Enter your email</string>
     <string name="enter_your_password">Enter your password</string>
     <string name="confirm_password">Confirm your password</string>
+
+    <!-- New strings used in CreateAccount fragment -->
+    <string name="already_member">Already a member?</string>
+    <string name="log_in">Log in</string>
+    <string name="invalid_email_format">Invalid email format</string>
+    <string name="invalid_password_format">Password must contain 8 characters, including uppercase, lowercase, number, and special character</string>
+    <string name="password_mismatch">Passwords do not match</string>
+    <string name="enter_your_phone">+91</string>
 </resources>

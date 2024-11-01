@@ -45,7 +45,6 @@ class ContinueWithEmail : Fragment() {
         spannableString.setSpan(
             ForegroundColorSpan(termsColor), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
-
         continueWithTermsText.text = spannableString
 
 

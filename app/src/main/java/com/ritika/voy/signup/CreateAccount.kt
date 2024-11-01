@@ -16,6 +16,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.ritika.voy.R
 import com.ritika.voy.ResetPassword
+import com.ritika.voy.authentication.ForgotPasswordFragment
 import com.ritika.voy.databinding.FragmentCreateAccountBinding
 
 class CreateAccount : Fragment() {
@@ -31,7 +32,7 @@ class CreateAccount : Fragment() {
         setupSpannableText()
         setupValidation()
 
-        binding.createAccountButton.setOnClickListener {
+        binding.signUpButton.setOnClickListener {
             parentFragmentManager.beginTransaction().replace(R.id.main, ResetPassword())
                 .addToBackStack(null).commit()
         }
@@ -56,25 +57,24 @@ class CreateAccount : Fragment() {
     }
 
     private fun setupValidation() {
-        // Email field validation
+        // Email TextWatcher
         val emailEditText = binding.enterEmail
-        val emailInputLayout = binding.email
+        val emailInputLayout = binding.emailLayout
 
         emailEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val email = s.toString()
-                if (!isValidEmail(email)) {
-                    emailInputLayout.error = "Invalid email format"
-                    emailInputLayout.boxStrokeColor =
-                        ContextCompat.getColor(requireContext(), R.color.red)
-                } else {
-                    emailInputLayout.error = null
-                    emailInputLayout.boxStrokeColor =
-                        ContextCompat.getColor(requireContext(), R.color.theme_color)
+                when {
+                    email.isEmpty() -> resetToDefault(emailInputLayout, emailEditText)
+                    !isValidEmail(email) -> setErrorState(
+                        emailInputLayout, "Invalid email format", emailEditText
+                    )
+                    else -> setValidState(emailInputLayout)
                 }
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (!s.isNullOrEmpty()) {
                     emailInputLayout.hint = ""
@@ -85,29 +85,31 @@ class CreateAccount : Fragment() {
         emailEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 emailInputLayout.hint = ""
-            } else if (emailEditText.text.isNullOrEmpty()) {
-                emailInputLayout.hint = getString(R.string.enter_your_email)
+                emailInputLayout.helperText = "You’ll need to verify that you own this email."
+            } else {
+                if (emailEditText.text.isNullOrEmpty()) {
+                    emailInputLayout.hint = getString(R.string.enter_your_email)
+                }
+                emailInputLayout.helperText = null
             }
         }
 
-        // Password field validation
+        // Password TextWatcher
         val passwordEditText = binding.password
         val passwordInputLayout = binding.passwordLayout
 
         passwordEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val password = s.toString()
-                if (!isValidPassword(password)) {
-                    passwordInputLayout.error =
-                        "Password must contain 8 characters, including uppercase, lowercase, number, and special character"
-                    passwordInputLayout.boxStrokeColor =
-                        ContextCompat.getColor(requireContext(), R.color.red)
-                } else {
-                    passwordInputLayout.error = null
-                    passwordInputLayout.boxStrokeColor =
-                        ContextCompat.getColor(requireContext(), R.color.theme_color)
+                when {
+                    password.isEmpty() -> resetToDefault(passwordInputLayout, passwordEditText)
+                    !isValidPassword(password) -> setErrorState(
+                        passwordInputLayout,
+                        "Password must contain 8 characters, including uppercase, lowercase, number, and special character",
+                        passwordEditText
+                    )
+                    else -> setValidState(passwordInputLayout)
                 }
-                // Validate confirm password if it's already entered
                 validateConfirmPassword()
             }
 
@@ -127,7 +129,7 @@ class CreateAccount : Fragment() {
             }
         }
 
-        // Confirm Password field validation
+        // Confirm Password TextWatcher
         val confirmPasswordEditText = binding.confirmPassword
         val confirmPasswordInputLayout = binding.confirmPasswordLayout
 
@@ -151,22 +153,80 @@ class CreateAccount : Fragment() {
                 confirmPasswordInputLayout.hint = getString(R.string.confirm_password)
             }
         }
+
+        // Phone TextWatcher
+        val phoneEditText = binding.phone
+        val phoneInputLayout = binding.phoneLayout
+
+        phoneEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val phone = s.toString()
+                when {
+                    phone.isEmpty() -> resetToDefault(phoneInputLayout, phoneEditText)
+                    !isValidPhone(phone) -> setErrorState(
+                        phoneInputLayout, "Invalid phone number", phoneEditText
+                    )
+                    else -> setValidState(phoneInputLayout)
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (!s.isNullOrEmpty()) {
+                    phoneInputLayout.hint = ""
+                }
+            }
+        })
+
+        phoneEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                phoneInputLayout.hint = ""
+            } else if (phoneEditText.text.isNullOrEmpty()) {
+                phoneInputLayout.hint = getString(R.string.enter_your_phone)
+            }
+        }
     }
 
     private fun validateConfirmPassword() {
         val password = binding.password.text.toString()
         val confirmPassword = binding.confirmPassword.text.toString()
         val confirmPasswordInputLayout = binding.confirmPasswordLayout
+        val confirmPasswordEditText = binding.confirmPassword
 
-        if (confirmPassword.isNotEmpty() && confirmPassword != password) {
-            confirmPasswordInputLayout.error = "Passwords do not match"
-            confirmPasswordInputLayout.boxStrokeColor =
-                ContextCompat.getColor(requireContext(), R.color.red)
-        } else {
-            confirmPasswordInputLayout.error = null
-            confirmPasswordInputLayout.boxStrokeColor =
-                ContextCompat.getColor(requireContext(), R.color.theme_color)
+        when {
+            confirmPassword.isEmpty() -> resetToDefault(
+                confirmPasswordInputLayout, confirmPasswordEditText
+            )
+            confirmPassword != password -> setErrorState(
+                confirmPasswordInputLayout, "Passwords do not match", confirmPasswordEditText
+            )
+            else -> setValidState(confirmPasswordInputLayout)
         }
+    }
+
+    private fun setErrorState(
+        inputLayout: TextInputLayout,
+        errorMessage: String,
+        editText: TextInputEditText,
+    ) {
+        inputLayout.helperText = errorMessage
+        inputLayout.setHelperTextColor(
+            ContextCompat.getColorStateList(requireContext(), R.color.red)
+        )
+        editText.background =
+            ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background_error)
+    }
+
+    private fun setValidState(inputLayout: TextInputLayout) {
+        inputLayout.helperText = null
+        inputLayout.setHelperTextColor(null)
+    }
+
+    private fun resetToDefault(inputLayout: TextInputLayout, editText: TextInputEditText) {
+        inputLayout.helperText = null
+        inputLayout.setHelperTextColor(null)
+        editText.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corner)
     }
 
     private fun isValidEmail(email: String): Boolean {
@@ -175,9 +235,13 @@ class CreateAccount : Fragment() {
     }
 
     private fun isValidPassword(password: String): Boolean {
-        val passwordRegex =
-            "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$".toRegex()
+        val passwordRegex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$".toRegex()
         return password.matches(passwordRegex)
+    }
+
+    private fun isValidPhone(phone: String): Boolean {
+        val phoneRegex = "^\\d{10}$".toRegex() // Assuming a 10-digit phone number format
+        return phone.matches(phoneRegex)
     }
 
     override fun onDestroyView() {
