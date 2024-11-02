@@ -32,7 +32,6 @@ class VerifyPhoneFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
@@ -146,7 +145,6 @@ class VerifyPhoneFragment : BaseFragment() {
     fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
         currentBox.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {

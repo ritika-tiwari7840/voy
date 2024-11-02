@@ -7,7 +7,6 @@ import android.text.Spanned
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.view.Gravity
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,15 +27,16 @@ class CreateAccount : BaseFragment() {
     private val binding get() = _binding!!
     private lateinit var navController: NavController
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentCreateAccountBinding.inflate(inflater, container, false)
 
+
         setupSpannableText()
         setupValidation()
-
         return binding.root
     }
 
@@ -207,6 +207,7 @@ class CreateAccount : BaseFragment() {
             else -> setValidState(confirmPasswordInputLayout)
         }
     }
+
     private fun setupPasswordValidation(editText: TextInputEditText, inputLayout: TextInputLayout) {
         val popupView = layoutInflater.inflate(R.layout.password_criteria_popup, null)
         val passwordPopup = PopupWindow(
