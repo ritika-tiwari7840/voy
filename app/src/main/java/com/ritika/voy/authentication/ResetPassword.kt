@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupWindow
+import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -17,6 +19,7 @@ import com.google.android.material.textfield.TextInputLayout
 import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
 import com.ritika.voy.databinding.FragmentResetPasswordBinding
+
 class ResetPassword : BaseFragment() {
     private var _binding: FragmentResetPasswordBinding? = null
     private val binding get() = _binding!!
@@ -25,7 +28,7 @@ class ResetPassword : BaseFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentResetPasswordBinding.inflate(inflater, container, false)
 
@@ -35,8 +38,6 @@ class ResetPassword : BaseFragment() {
     }
 
     private fun setupValidation() {
-        // Password TextWatcher
-        setupPasswordValidation(binding.newPassword, binding.newPasswordLabel)
 
         // New Password TextWatcher
         setupPasswordValidation(binding.newPassword, binding.newPasswordLabel)
@@ -67,37 +68,66 @@ class ResetPassword : BaseFragment() {
         }
     }
 
+
     private fun setupPasswordValidation(editText: TextInputEditText, inputLayout: TextInputLayout) {
+        val popupView = layoutInflater.inflate(R.layout.password_criteria_popup, null)
+        val passwordPopup = PopupWindow(
+            popupView,
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        passwordPopup.isOutsideTouchable = false
+        passwordPopup.isFocusable = false
+
+        val criteriaLength = popupView.findViewById<TextView>(R.id.criteria_length)
+        val criteriaUpper = popupView.findViewById<TextView>(R.id.criteria_upper)
+        val criteriaLower = popupView.findViewById<TextView>(R.id.criteria_lower)
+        val criteriaDigit = popupView.findViewById<TextView>(R.id.criteria_digit)
+        val criteriaSpecial = popupView.findViewById<TextView>(R.id.criteria_special)
+
+        val unmetColor = ContextCompat.getColor(requireContext(), R.color.black)
+        val metColor = ContextCompat.getColor(requireContext(), R.color.green)
+
+        editText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                inputLayout.hint=""
+                editText.post {
+                    passwordPopup.width = editText.width
+                    passwordPopup.showAsDropDown(editText, 0, 0)
+                }
+
+            }
+            else if (editText.text.isNullOrEmpty()) {
+                editText.hint = getString(R.string.enter_your_password)
+            }
+            else {
+                passwordPopup.dismiss()
+            }
+        }
         editText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val password = s.toString()
-                when {
-                    password.isEmpty() -> resetToDefault(inputLayout, editText)
-                    !isValidPassword(password) -> setErrorState(
-                        inputLayout,
-                        "Password must contain 8 characters, including uppercase, lowercase, number, and special character",
-                        editText
-                    )
-                    else -> setValidState(inputLayout)
+
+                criteriaLength.setTextColor(if (password.length >= 8) metColor else unmetColor)
+                criteriaUpper.setTextColor(if (password.any { it.isUpperCase() }) metColor else unmetColor)
+                criteriaLower.setTextColor(if (password.any { it.isLowerCase() }) metColor else unmetColor)
+                criteriaDigit.setTextColor(if (password.any { it.isDigit() }) metColor else unmetColor)
+                criteriaSpecial.setTextColor(if (password.any { !it.isLetterOrDigit() }) metColor else unmetColor)
+
+                val isPasswordValid = isValidPassword(password)
+                if (isPasswordValid) {
+                    passwordPopup.dismiss()
+                    setValidState(inputLayout)
+                    resetToDefault(inputLayout, editText)
                 }
-                validateConfirmPassword()
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (!s.isNullOrEmpty()) {
-                    inputLayout.hint = ""
-                }
+                if (!s.isNullOrEmpty()) inputLayout.hint = ""
             }
         })
-
-        editText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                inputLayout.hint = ""
-            } else if (editText.text.isNullOrEmpty()) {
-                inputLayout.hint = getString(R.string.enter_your_password)
-            }
-        }
     }
 
     private fun validateConfirmPassword() {
@@ -107,7 +137,10 @@ class ResetPassword : BaseFragment() {
         val confirmPasswordEditText = binding.confirmPassword
 
         when {
-            confirmPassword.isEmpty() -> resetToDefault(confirmPasswordInputLayout, confirmPasswordEditText)
+            confirmPassword.isEmpty() -> resetToDefault(
+                confirmPasswordInputLayout,
+                confirmPasswordEditText
+            )
 
             confirmPassword != password -> setErrorState(
                 confirmPasswordInputLayout, "Passwords do not match", confirmPasswordEditText
@@ -126,7 +159,7 @@ class ResetPassword : BaseFragment() {
     private fun setErrorState(
         inputLayout: TextInputLayout,
         errorMessage: String,
-        editText: TextInputEditText
+        editText: TextInputEditText,
     ) {
         inputLayout.helperText = errorMessage
         inputLayout.setHelperTextColor(
@@ -166,7 +199,8 @@ class ResetPassword : BaseFragment() {
         navController = Navigation.findNavController(view)
 
         binding.doneButton.setOnClickListener {
-            Toast.makeText(requireContext(), "Password Changed Successfully", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Password Changed Successfully", Toast.LENGTH_SHORT)
+                .show()
         }
 
         binding.btnBack.setOnClickListener {

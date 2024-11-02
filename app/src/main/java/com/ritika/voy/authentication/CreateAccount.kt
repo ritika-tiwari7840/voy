@@ -6,10 +6,12 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -52,7 +54,7 @@ class CreateAccount : BaseFragment() {
 
         navController = Navigation.findNavController(view)
 
-        binding.btnBack.setOnClickListener{
+        binding.btnBack.setOnClickListener {
             navController.navigate(R.id.loginFragment)
         }
 
@@ -98,6 +100,7 @@ class CreateAccount : BaseFragment() {
                     !isValidEmail(email) -> setErrorState(
                         emailInputLayout, "Invalid email format", emailEditText
                     )
+
                     else -> setValidState(emailInputLayout)
                 }
             }
@@ -114,7 +117,6 @@ class CreateAccount : BaseFragment() {
         emailEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 emailInputLayout.hint = ""
-                emailInputLayout.helperText = "You’ll need to verify that you own this email."
             } else {
                 if (emailEditText.text.isNullOrEmpty()) {
                     emailInputLayout.hint = getString(R.string.enter_your_email)
@@ -126,37 +128,8 @@ class CreateAccount : BaseFragment() {
         // Password TextWatcher
         val passwordEditText = binding.password
         val passwordInputLayout = binding.passwordLayout
+        setupPasswordValidation(passwordEditText, passwordInputLayout)
 
-        passwordEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                val password = s.toString()
-                when {
-                    password.isEmpty() -> resetToDefault(passwordInputLayout, passwordEditText)
-                    !isValidPassword(password) -> setErrorState(
-                        passwordInputLayout,
-                        "Password must contain 8 characters, including uppercase, lowercase, number, and special character",
-                        passwordEditText
-                    )
-                    else -> setValidState(passwordInputLayout)
-                }
-                validateConfirmPassword()
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (!s.isNullOrEmpty()) {
-                    passwordInputLayout.hint = ""
-                }
-            }
-        })
-
-        passwordEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                passwordInputLayout.hint = ""
-            } else if (passwordEditText.text.isNullOrEmpty()) {
-                passwordInputLayout.hint = getString(R.string.enter_your_password)
-            }
-        }
 
         // Confirm Password TextWatcher
         val confirmPasswordEditText = binding.confirmPassword
@@ -195,6 +168,7 @@ class CreateAccount : BaseFragment() {
                     !isValidPhone(phone) -> setErrorState(
                         phoneInputLayout, "Invalid phone number", phoneEditText
                     )
+
                     else -> setValidState(phoneInputLayout)
                 }
             }
@@ -233,6 +207,76 @@ class CreateAccount : BaseFragment() {
             else -> setValidState(confirmPasswordInputLayout)
         }
     }
+    private fun setupPasswordValidation(editText: TextInputEditText, inputLayout: TextInputLayout) {
+        val popupView = layoutInflater.inflate(R.layout.password_criteria_popup, null)
+        val passwordPopup = PopupWindow(
+            popupView,
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        passwordPopup.isOutsideTouchable = false
+        passwordPopup.isFocusable = false
+
+        val criteriaLength = popupView.findViewById<TextView>(R.id.criteria_length)
+        val criteriaUpper = popupView.findViewById<TextView>(R.id.criteria_upper)
+        val criteriaLower = popupView.findViewById<TextView>(R.id.criteria_lower)
+        val criteriaDigit = popupView.findViewById<TextView>(R.id.criteria_digit)
+        val criteriaSpecial = popupView.findViewById<TextView>(R.id.criteria_special)
+
+        val unmetColor = ContextCompat.getColor(requireContext(), R.color.black)
+        val metColor = ContextCompat.getColor(requireContext(), R.color.green)
+
+        editText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                editText.post {
+                    // Calculate the position of the EditText
+                    val location = IntArray(2)
+                    editText.getLocationOnScreen(location)
+                    val editTextY = location[1]
+
+                    // Calculate the height of the popup
+                    popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                    val popupHeight = popupView.measuredHeight
+
+                    // Show the popup above the EditText
+                    passwordPopup.width = editText.width
+                    passwordPopup.showAtLocation(
+                        editText,
+                        Gravity.NO_GRAVITY,
+                        location[0],
+                        editTextY - popupHeight
+                    )
+                }
+            } else {
+                passwordPopup.dismiss()
+            }
+        }
+
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val password = s.toString()
+
+                criteriaLength.setTextColor(if (password.length >= 8) metColor else unmetColor)
+                criteriaUpper.setTextColor(if (password.any { it.isUpperCase() }) metColor else unmetColor)
+                criteriaLower.setTextColor(if (password.any { it.isLowerCase() }) metColor else unmetColor)
+                criteriaDigit.setTextColor(if (password.any { it.isDigit() }) metColor else unmetColor)
+                criteriaSpecial.setTextColor(if (password.any { !it.isLetterOrDigit() }) metColor else unmetColor)
+
+                val isPasswordValid = isValidPassword(password)
+                if (isPasswordValid) {
+                    passwordPopup.dismiss()
+                    setValidState(inputLayout)
+                    resetToDefault(inputLayout, editText)
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (!s.isNullOrEmpty()) inputLayout.hint = ""
+            }
+        })
+    }
 
     private fun setErrorState(
         inputLayout: TextInputLayout,
@@ -264,7 +308,8 @@ class CreateAccount : BaseFragment() {
     }
 
     private fun isValidPassword(password: String): Boolean {
-        val passwordRegex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$".toRegex()
+        val passwordRegex =
+            "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$".toRegex()
         return password.matches(passwordRegex)
     }
 
