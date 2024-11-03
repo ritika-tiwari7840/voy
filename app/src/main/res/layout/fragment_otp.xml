@@ -25,7 +25,7 @@
         android:fontFamily="@font/poppinsmedium"
         android:text="Enter Verification Code"
         android:textColor="@color/white"
-        android:textSize="24sp"
+        android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/btnBack"
         app:layout_constraintStart_toEndOf="@+id/btnBack"

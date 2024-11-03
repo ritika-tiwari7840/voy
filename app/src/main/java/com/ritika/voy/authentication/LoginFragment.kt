@@ -1,5 +1,6 @@
 package com.ritika.voy.authentication
 
+import android.app.ProgressDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
@@ -41,7 +42,6 @@ class LoginFragment : BaseFragment() {
     private lateinit var navController: NavController
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private var isLoginInProgress =false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -149,24 +149,34 @@ class LoginFragment : BaseFragment() {
 
     }
 
-    private fun login(email : String, password: String) {
+    private fun login(email: String, password: String) {
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Loading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
         lifecycleScope.launch {
             try {
                 val response = RetrofitInstance.api.login(LoginRequest(email, password))
-                response.tokens?.let {
-                    saveTokens(it.access!!, it.refresh!!)
+                if (response.success) {
+                    response.tokens?.let {
+                        saveTokens(it.access!!, it.refresh!!)
+                    }
+                    Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), "Invalid email or password", Toast.LENGTH_SHORT).show()
                 }
-                Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
-            }
-            catch (e: HttpException) {
+            } catch (e: HttpException) {
                 Toast.makeText(requireContext(), "Invalid email or password", Toast.LENGTH_SHORT).show()
-            }
-            catch (e: IOException){
+            } catch (e: IOException) {
                 Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT).show()
+            } finally {
+                progressDialog.dismiss()
             }
         }
     }
-
     private suspend fun saveTokens(accessToken: String, refreshToken: String) {
         val dataStore = PreferenceDataStoreFactory.create {
             requireContext().preferencesDataStoreFile("tokens")
