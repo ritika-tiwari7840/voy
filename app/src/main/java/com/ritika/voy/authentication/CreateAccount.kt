@@ -49,7 +49,7 @@ class CreateAccount : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        userPreferences = UserPreferences(requireContext())
+        userPreferences = UserPreferences.getInstance(requireContext())
 
         val screenHeight = resources.displayMetrics.heightPixels
         val topMargin = (screenHeight * 0.203).toInt()
