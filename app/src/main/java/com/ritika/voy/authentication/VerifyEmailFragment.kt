@@ -15,9 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.addCallback
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -26,8 +24,6 @@ import com.ritika.voy.R
 import com.ritika.voy.api.AuthService
 import com.ritika.voy.api.dataclasses.VerifyRequest
 import com.ritika.voy.api.dataclasses.VerifyResponse
-import com.ritika.voy.api.datamodels.UserData
-import com.ritika.voy.api.datamodels.UserPreferences
 import com.ritika.voy.databinding.FragmentVerifyEmailBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,9 +34,8 @@ class VerifyEmailFragment : BaseFragment() {
 
     private var _binding: FragmentVerifyEmailBinding? = null
     private val binding get() = _binding!!
-    private lateinit var userPreferences: UserPreferences
-    private lateinit var userData: UserData
     private lateinit var navController: NavController
+    private var UserId: String? = null
 
     private val otpFields: List<EditText> by lazy {
         listOf(
@@ -53,10 +48,6 @@ class VerifyEmailFragment : BaseFragment() {
         )
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -67,10 +58,14 @@ class VerifyEmailFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        userPreferences = UserPreferences.getInstance(requireContext())
-        userData = UserData.getInstance(requireContext())
         navController = Navigation.findNavController(requireView())
+        UserId = arguments?.getString("user_id")
 
+        if (UserId == null) {
+            showToast("User ID is missing")
+            navController.navigateUp()
+            return
+        }
 
         setupLayoutMargins(view)
         setupResendTextView()
@@ -83,46 +78,11 @@ class VerifyEmailFragment : BaseFragment() {
         navController.navigate(R.id.createAccount)
     }
 
-    private fun verifyEmailOtp(otp: String) {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val tempUserId = userPreferences.getUserToken()
-
-                if (tempUserId == null) {
-                    showToast("User token is missing")
-                    return@launch
-                }
-
-                val request = VerifyRequest(
-                    email_otp = otp,
-                    phone_otp = "012637", // This should be dynamic as per your requirements
-                    temp_user_id = tempUserId
-                )
-
-                // Make the API call using Retrofit
-                val response = Retrofit.api.create(AuthService::class.java).verifyOTP(request).awaitResponse()
-                handleApiResponse(response)
-
-            } catch (e: Exception) {
-                Log.e("VerifyEmailFragment", "Error during email verification", e)
-                showToast("An error occurred: ${e.message}")
-            }
-        }
-    }
-
     private suspend fun handleApiResponse(response: retrofit2.Response<VerifyResponse>) {
         withContext(Dispatchers.Main) {
             if (response.isSuccessful && response.body() != null) {
                 val verifyResponse = response.body()!!
                 if (verifyResponse.success) {
-                    userData.saveVerificationResponse(
-                        verifyResponse.tokens.access,
-                        verifyResponse.tokens.refresh,
-                        verifyResponse.user.id.toString(),
-                        verifyResponse.user.email,
-                        verifyResponse.user.full_name,
-                        verifyResponse.user.created_at
-                    )
                     showToast("Email Verified")
                     navController.navigate(R.id.verifyPhoneFragment)
                 } else {
@@ -133,6 +93,30 @@ class VerifyEmailFragment : BaseFragment() {
                 Log.e("VerifyEmailFragment", "Verification failed: $errorMessage")
                 showToast("Verification failed: $errorMessage")
                 binding.tvForgotSubtitle.text = errorMessage
+            }
+        }
+    }
+
+    private fun verifyEmailOtp(otp: String) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                if (UserId == null) {
+                    showToast("User ID is missing")
+                    return@launch
+                }
+
+                val request = VerifyRequest(
+                    email_otp = otp,
+                    phone_otp = "012637", // This should be dynamic as per your requirements
+                    temp_user_id = UserId!!
+                )
+
+                val response = Retrofit.api.create(AuthService::class.java).verifyOTP(request).awaitResponse()
+                handleApiResponse(response)
+
+            } catch (e: Exception) {
+                Log.e("VerifyEmailFragment", "Error during email verification", e)
+                showToast("An error occurred: ${e.message}")
             }
         }
     }
@@ -239,5 +223,6 @@ class VerifyEmailFragment : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+
     }
 }

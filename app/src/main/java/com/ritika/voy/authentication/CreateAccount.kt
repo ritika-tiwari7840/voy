@@ -26,20 +26,19 @@ import com.ritika.voy.R
 import com.ritika.voy.api.AuthService
 import com.ritika.voy.api.dataclasses.SignUpRequest
 import com.ritika.voy.api.dataclasses.SignUpResponse
-import com.ritika.voy.api.datamodels.UserPreferences
 import com.ritika.voy.databinding.FragmentCreateAccountBinding
 import kotlinx.coroutines.launch
 import retrofit2.Call
-
+import retrofit2.HttpException
 
 class CreateAccount : BaseFragment() {
     private var _binding: FragmentCreateAccountBinding? = null
     private val binding get() = _binding!!
     private lateinit var navController: NavController
-    private lateinit var userPreferences: UserPreferences
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentCreateAccountBinding.inflate(inflater, container, false)
         setupSpannableText()
@@ -49,7 +48,7 @@ class CreateAccount : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        userPreferences = UserPreferences.getInstance(requireContext())
+        navController = Navigation.findNavController(view)
 
         val screenHeight = resources.displayMetrics.heightPixels
         val topMargin = (screenHeight * 0.203).toInt()
@@ -59,26 +58,15 @@ class CreateAccount : BaseFragment() {
         params.topMargin = topMargin
         bottomSection.layoutParams = params
 
-        navController = Navigation.findNavController(view)
-
         binding.signUpButton.setOnClickListener {
             lifecycleScope.launch {
                 try {
-                    val existingToken = userPreferences.getUserToken()
-                    if (existingToken != null) {
-                        Toast.makeText(
-                            requireContext(),
-                            "You are already registered. Redirecting to verification of email",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        navController.navigate(R.id.verifyEmailFragment)
-                    } else if (areAllFieldsValid()) {
+                    if (areAllFieldsValid()) {
                         val email = binding.enterEmail.text.toString()
                         val password = binding.password.text.toString()
                         val confirmPassword = binding.confirmPassword.text.toString()
                         val phone = binding.phone.text.toString()
                         apiCall(confirmPassword, email, password, phone)
-
                     } else {
                         Toast.makeText(
                             requireContext(),
@@ -87,11 +75,8 @@ class CreateAccount : BaseFragment() {
                         ).show()
                     }
                 } catch (e: Exception) {
-                    // Handle any potential issues with fetching token or other errors
                     Toast.makeText(
-                        requireContext(),
-                        "$e An error occurred. Please try again.",
-                        Toast.LENGTH_SHORT
+                        requireContext(), "An error occurred: ${e.message}", Toast.LENGTH_SHORT
                     ).show()
                     Log.e("CreateAccount", "Error: ${e.message}", e)
                 }
@@ -116,53 +101,76 @@ class CreateAccount : BaseFragment() {
             phone_number = phoneNumber
         )
         val authService = Retrofit.api.create(AuthService::class.java)
-        authService.signUp(requestBody).enqueue(object : retrofit2.Callback<SignUpResponse> {
-            override fun onResponse(
-                call: Call<SignUpResponse>,
-                response: retrofit2.Response<SignUpResponse>,
-            ) {
-                if (response.isSuccessful) {
-                    val signUpResponse = response.body()
-                    if (signUpResponse != null && signUpResponse.success) {
-                        // User signed up successfully
-                        Toast.makeText(
-                            context,
-                            "User profile created successfully! Token: ${signUpResponse.temp_user_id}",
-                            Toast.LENGTH_SHORT
-                        ).show()
 
-                        // Save the token using UserPreferences
-                        lifecycleScope.launch {
-                            userPreferences.saveUserToken(signUpResponse.temp_user_id ?: "")
-                            // Navigate only after saving the token
-                            navController.navigate(R.id.verifyEmailFragment)
+        try {
+            authService.signUp(requestBody).enqueue(object : retrofit2.Callback<SignUpResponse> {
+                override fun onResponse(
+                    call: Call<SignUpResponse>,
+                    response: retrofit2.Response<SignUpResponse>,
+                ) {
+                    if (response.isSuccessful) {
+                        val signUpResponse = response.body()
+                        if (signUpResponse != null && signUpResponse.success) {
+                            Toast.makeText(
+                                context, "User profile created successfully!", Toast.LENGTH_SHORT
+                            ).show()
+
+                            // Pass user_id to the verifyEmailFragment using Bundle
+                            val bundle = Bundle()
+                            bundle.putString("user_id", signUpResponse.user_id.toString())
+                            navController.navigate(R.id.verifyEmailFragment, bundle)
+
+                        } else {
+                            handleErrorResponse(signUpResponse)
                         }
-
                     } else {
-                        // Handle error message returned from the server
+                        // Handle HTTP error codes
+                        val errorResponse = response.errorBody()?.string()
+                        Log.e("CreateAccount", "Error Response: $errorResponse")
                         Toast.makeText(
                             context,
-                            signUpResponse?.message ?: "Sign-up failed!",
+                            "Sign-up failed with error code: ${response.code()}",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                } else {
-                    // Handle failure to get a successful response
-                    Toast.makeText(
-                        context,
-                        "Sign-up failed with error code: ${response.code()}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                }
+
+                override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
+                    Log.e("API Error", "Network error: ${t.message}", t)
+                    Toast.makeText(context, "Network error: ${t.message}", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            })
+        } catch (e: Exception) {
+            Log.e("CreateAccount", "Error during API call: ${e.message}", e)
+            Toast.makeText(context, "An unexpected error occurred.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun handleErrorResponse(signUpResponse: SignUpResponse?) {
+        if (signUpResponse != null && !signUpResponse.success) {
+            val emailErrors = signUpResponse.errors?.email
+            val phoneErrors = signUpResponse.errors?.phone_number
+
+            emailErrors?.let {
+                // Check if the email error message is present
+                if (it.isNotEmpty()) {
+                    Toast.makeText(context, it.joinToString(", "), Toast.LENGTH_SHORT).show()
+                    // Redirect to verifyEmailFragment if the email already exists
+                    navController.navigate(R.id.verifyEmailFragment)
                 }
             }
 
-            override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
-                // Handle failure to execute the call
-                Log.e("API Error", "Network error: ${t.message}", t)
-                Toast.makeText(context, "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
+            phoneErrors?.let {
+                if (it.isNotEmpty()) {
+                    Toast.makeText(context, it.joinToString(", "), Toast.LENGTH_SHORT).show()
+                }
             }
-        })
+        } else {
+            Toast.makeText(context, "Sign-up failed! Please try again.", Toast.LENGTH_SHORT).show()
+        }
     }
+
 
     private fun areAllFieldsValid(): Boolean {
         val email = binding.enterEmail.text.toString()
@@ -211,26 +219,10 @@ class CreateAccount : BaseFragment() {
     }
 
     private fun setupValidation() {
-        // Email TextWatcher
-        val emailEditText = binding.enterEmail
-        val emailInputLayout = binding.emailLayout
-        setupEmailValidation(emailEditText, emailInputLayout)
-
-        // Password TextWatcher
-        val passwordEditText = binding.password
-        val passwordInputLayout = binding.passwordLayout
-        setupPasswordValidation(passwordEditText, passwordInputLayout)
-
-
-        // Confirm Password TextWatcher
-        val confirmPasswordEditText = binding.confirmPassword
-        val confirmPasswordInputLayout = binding.confirmPasswordLayout
-        setupConfirmPasswordValidation(confirmPasswordEditText, confirmPasswordInputLayout)
-
-        // Phone TextWatcher
-        val phoneEditText = binding.phone
-        val phoneInputLayout = binding.phoneLayout
-        setupPhoneValidation(phoneEditText, phoneInputLayout)
+        setupEmailValidation(binding.enterEmail, binding.emailLayout)
+        setupPasswordValidation(binding.password, binding.passwordLayout)
+        setupConfirmPasswordValidation(binding.confirmPassword, binding.confirmPasswordLayout)
+        setupPhoneValidation(binding.phone, binding.phoneLayout)
     }
 
     private fun setupPhoneValidation(

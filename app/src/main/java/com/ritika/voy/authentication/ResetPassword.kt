@@ -1,7 +1,6 @@
 package com.ritika.voy.authentication
 
 import android.os.Bundle
-import android.os.Vibrator
 import android.text.Editable
 import android.text.TextWatcher
 import androidx.core.content.ContextCompat
@@ -25,24 +24,20 @@ class ResetPassword : BaseFragment() {
     private val binding get() = _binding!!
 
     private lateinit var navController: NavController
+    private lateinit var passwordPopup: PopupWindow
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentResetPasswordBinding.inflate(inflater, container, false)
-
         setupValidation()
-
         return binding.root
     }
 
     private fun setupValidation() {
-
-        // New Password TextWatcher
         setupPasswordValidation(binding.newPassword, binding.newPasswordLabel)
 
-        // Confirm Password TextWatcher
         val confirmPasswordEditText = binding.confirmPassword
         val confirmPasswordInputLayout = binding.confirmPasswordLabel
 
@@ -62,22 +57,24 @@ class ResetPassword : BaseFragment() {
         confirmPasswordEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 confirmPasswordInputLayout.hint = ""
+                if (::passwordPopup.isInitialized && passwordPopup.isShowing) {
+                    passwordPopup.dismiss()
+                }
             } else if (confirmPasswordEditText.text.isNullOrEmpty()) {
                 confirmPasswordInputLayout.hint = getString(R.string.confirm_password)
             }
         }
     }
 
-
     private fun setupPasswordValidation(editText: TextInputEditText, inputLayout: TextInputLayout) {
         val popupView = layoutInflater.inflate(R.layout.password_criteria_popup, null)
-        val passwordPopup = PopupWindow(
+        passwordPopup = PopupWindow(
             popupView,
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
 
-        passwordPopup.isOutsideTouchable = false
+        passwordPopup.isOutsideTouchable = true
         passwordPopup.isFocusable = false
 
         val criteriaLength = popupView.findViewById<TextView>(R.id.criteria_length)
@@ -91,20 +88,19 @@ class ResetPassword : BaseFragment() {
 
         editText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                inputLayout.hint=""
+                inputLayout.hint = ""
                 editText.post {
                     passwordPopup.width = editText.width
                     passwordPopup.showAsDropDown(editText, 0, 0)
                 }
-
-            }
-            else if (editText.text.isNullOrEmpty()) {
-                editText.hint = getString(R.string.enter_your_password)
-            }
-            else {
+            } else {
                 passwordPopup.dismiss()
+                if (editText.text.isNullOrEmpty()) {
+                    editText.hint = getString(R.string.enter_your_password)
+                }
             }
         }
+
         editText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val password = s.toString()
@@ -191,6 +187,9 @@ class ResetPassword : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        if (::passwordPopup.isInitialized && passwordPopup.isShowing) {
+            passwordPopup.dismiss()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
