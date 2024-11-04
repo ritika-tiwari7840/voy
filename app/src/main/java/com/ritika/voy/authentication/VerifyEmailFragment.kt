@@ -8,158 +8,195 @@ import android.text.SpannableString
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
+import android.util.Log
 import android.view.KeyEvent
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
+import com.ritika.voy.api.AuthService
+import com.ritika.voy.api.dataclasses.VerifyRequest
+import com.ritika.voy.api.dataclasses.VerifyResponse
 import com.ritika.voy.databinding.FragmentVerifyEmailBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.awaitResponse
 
 class VerifyEmailFragment : BaseFragment() {
 
     private var _binding: FragmentVerifyEmailBinding? = null
     private val binding get() = _binding!!
     private lateinit var navController: NavController
+    private var UserId: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private val otpFields: List<EditText> by lazy {
+        listOf(
+            binding.otpBox1,
+            binding.otpBox2,
+            binding.otpBox3,
+            binding.otpBox4,
+            binding.otpBox5,
+            binding.otpBox6
+        )
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    ): View {
         _binding = FragmentVerifyEmailBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        navController = Navigation.findNavController(requireView())
+        UserId = arguments?.getString("user_id")
 
+        if (UserId == null) {
+            showToast("User ID is missing")
+            navController.navigateUp()
+            return
+        }
 
+        setupLayoutMargins(view)
+        setupResendTextView()
+        setupOtpInputs()
+        setupTextWatchers()
+        setupButtonListeners()
+    }
+
+    override fun onBackPressed() {
+        navController.navigate(R.id.createAccount)
+    }
+
+    private suspend fun handleApiResponse(response: retrofit2.Response<VerifyResponse>) {
+        withContext(Dispatchers.Main) {
+            if (response.isSuccessful && response.body() != null) {
+                val verifyResponse = response.body()!!
+                if (verifyResponse.success) {
+                    showToast("Email Verified")
+                    navController.navigate(R.id.verifyPhoneFragment)
+                } else {
+                    showToast(verifyResponse.message)
+                }
+            } else {
+                val errorMessage = response.errorBody()?.string() ?: "Unknown error"
+                Log.e("VerifyEmailFragment", "Verification failed: $errorMessage")
+                showToast("Verification failed: $errorMessage")
+                binding.tvForgotSubtitle.text = errorMessage
+            }
+        }
+    }
+
+    private fun verifyEmailOtp(otp: String) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                if (UserId == null) {
+                    showToast("User ID is missing")
+                    return@launch
+                }
+
+                val request = VerifyRequest(
+                    email_otp = otp,
+                    phone_otp = "012637", // This should be dynamic as per your requirements
+                    temp_user_id = UserId!!
+                )
+
+                val response = Retrofit.api.create(AuthService::class.java).verifyOTP(request).awaitResponse()
+                handleApiResponse(response)
+
+            } catch (e: Exception) {
+                Log.e("VerifyEmailFragment", "Error during email verification", e)
+                showToast("An error occurred: ${e.message}")
+            }
+        }
+    }
+
+    private fun setupLayoutMargins(view: View) {
         val screenHeight = resources.displayMetrics.heightPixels
         val topMargin = (screenHeight * 0.304).toInt()
-
-
         val bottomSection: View = view.findViewById(R.id.bottomSection)
         val params = bottomSection.layoutParams as ConstraintLayout.LayoutParams
         params.topMargin = topMargin
         bottomSection.layoutParams = params
+    }
 
-        val resendTextview = view.findViewById<TextView>(R.id.resendTextView)
+    private fun setupResendTextView() {
+        val resendTextView = binding.resendTextView
         val resendText = "Didn’t receive any code? Resend Code"
-        val spannable = SpannableString(resendText)
-        spannable.setSpan(
-            ForegroundColorSpan(Color.WHITE),
-            0,
-            24,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
+        val spannable = SpannableString(resendText).apply {
+            setSpan(ForegroundColorSpan(Color.WHITE), 0, 24, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(ForegroundColorSpan(Color.parseColor("#7e60bf")), 25, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(UnderlineSpan(), 25, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        resendTextView.text = spannable
+        resendTextView.setOnClickListener {
+            showToast("Resend OTP functionality to be implemented")
+            // Call your resend OTP API here
+        }
+    }
 
-        spannable.setSpan(
-            ForegroundColorSpan(Color.parseColor("#7e60bf")),
-            25,
-            resendText.length,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        spannable.setSpan(
-            UnderlineSpan(),
-            25,
-            resendText.length,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        resendTextview.text = spannable
+    private fun setupOtpInputs() {
+        for (i in 0 until otpFields.size - 1) {
+            setupOtpInput(otpFields[i], otpFields[i + 1])
+            setupBackspace(otpFields[i + 1], otpFields[i])
+        }
+    }
 
+    private fun setupTextWatchers() {
+        val otpErrorTextView = binding.tvOtpError
+        val otpErrorIcon = binding.ivOtpErrorIcon
 
-        val otpBox1: EditText = view.findViewById(R.id.otpBox1)
-        val otpBox2: EditText = view.findViewById(R.id.otpBox2)
-        val otpBox3: EditText = view.findViewById(R.id.otpBox3)
-        val otpBox4: EditText = view.findViewById(R.id.otpBox4)
-        val otpBox5: EditText = view.findViewById(R.id.otpBox5)
-        val otpBox6: EditText = view.findViewById(R.id.otpBox6)
-
-        setupOtpInput(otpBox1, otpBox2)
-        setupOtpInput(otpBox2, otpBox3)
-        setupOtpInput(otpBox3, otpBox4)
-        setupOtpInput(otpBox4, otpBox5)
-        setupOtpInput(otpBox5, otpBox6)
-
-        setupBackspace(otpBox2, otpBox1)
-        setupBackspace(otpBox3, otpBox2)
-        setupBackspace(otpBox4, otpBox3)
-        setupBackspace(otpBox5, otpBox4)
-        setupBackspace(otpBox6, otpBox5)
-
-
-        val otpErrorTextView = view.findViewById<TextView>(R.id.tvOtpError)
-        val otpErrorIcon = view.findViewById<ImageView>(R.id.ivOtpErrorIcon)
-
-        val otpFields = listOf(otpBox1, otpBox2, otpBox3, otpBox4, otpBox5, otpBox6)
-
-        val textWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val isAnyFieldEmpty = otpFields.any { it.text.isEmpty() }
-                val areAllFieldsEmpty = otpFields.all { it.text.isEmpty() }
-                if (isAnyFieldEmpty && !areAllFieldsEmpty) {
-                    otpErrorTextView.visibility = View.VISIBLE
-                    otpErrorIcon.visibility = View.VISIBLE
-                } else {
-                    otpErrorTextView.visibility = View.GONE
-                    otpErrorIcon.visibility = View.GONE
+        otpFields.forEach { field ->
+            field.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    val isAnyFieldEmpty = otpFields.any { it.text.isEmpty() }
+                    otpErrorTextView.visibility = if (isAnyFieldEmpty) View.VISIBLE else View.GONE
+                    otpErrorIcon.visibility = if (isAnyFieldEmpty) View.VISIBLE else View.GONE
                 }
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
+                override fun afterTextChanged(s: Editable?) {}
+            })
         }
-        otpFields.forEach { it.addTextChangedListener(textWatcher) }
+    }
 
-
-        navController = Navigation.findNavController(view)
-        resendTextview.setOnClickListener {
-            Toast.makeText(requireContext(), "Resend OTP", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.btnBack.setOnClickListener{
+    private fun setupButtonListeners() {
+        binding.btnBack.setOnClickListener {
             navController.popBackStack()
         }
 
         binding.btnVerify.setOnClickListener {
-            Toast.makeText(requireContext(), "Email Verified", Toast.LENGTH_SHORT).show()
-            navController.navigate(R.id.verifyPhoneFragment)
+            if (areAllFieldsFilled()) {
+                val enteredOtp = otpFields.joinToString("") { it.text.toString() }
+                verifyEmailOtp(enteredOtp)
+            } else {
+                showToast("Please fill all fields")
+            }
         }
-
     }
 
-    fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
+    private fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
         currentBox.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s.toString().length == 1) {
                     nextBox.requestFocus()
                 }
             }
-
-            override fun afterTextChanged(s: Editable?) {
-            }
+            override fun afterTextChanged(s: Editable?) {}
         })
     }
 
-    fun setupBackspace(currentBox: EditText, previousBox: EditText) {
+    private fun setupBackspace(currentBox: EditText, previousBox: EditText) {
         currentBox.setOnKeyListener { _, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_DEL && event.action == KeyEvent.ACTION_DOWN) {
                 if (currentBox.text.isNotEmpty()) {
@@ -175,9 +212,17 @@ class VerifyEmailFragment : BaseFragment() {
         }
     }
 
-    override fun onBackPressed() {
-        navController.navigate(R.id.createAccount)
+    private fun areAllFieldsFilled(): Boolean {
+        return otpFields.all { it.text.isNotEmpty() }
     }
 
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+
+    }
 }

@@ -2,6 +2,8 @@ package com.ritika.voy.api
 
 import com.ritika.voy.api.dataclasses.SignUpRequest
 import com.ritika.voy.api.dataclasses.SignUpResponse
+import com.ritika.voy.api.dataclasses.VerifyRequest
+import com.ritika.voy.api.dataclasses.VerifyResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -10,4 +12,6 @@ import retrofit2.http.POST
 interface AuthService {
     @POST("register/")
     fun signUp(@Body request: SignUpRequest): Call<SignUpResponse>
+    @POST("verify-registration/")
+    fun verifyOTP(@Body request: VerifyRequest): Call<VerifyResponse>
 }
