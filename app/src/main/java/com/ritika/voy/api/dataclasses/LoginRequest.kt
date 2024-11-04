@@ -1,7 +1,6 @@
 package com.ritika.voy.api.dataclasses
 
-data class VerifyRequest(
+data class LoginRequest(
     val email: String,
-    val otp: String
-
+    val password: String
 )

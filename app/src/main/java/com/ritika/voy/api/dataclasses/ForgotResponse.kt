@@ -1,6 +1,6 @@
 package com.ritika.voy.api.dataclasses
 
-data class VerifyResponse(
+data class ForgotResponse(
     val message: String,
     val success: Boolean
 )

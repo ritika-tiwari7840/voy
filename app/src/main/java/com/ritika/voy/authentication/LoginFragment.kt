@@ -1,5 +1,6 @@
 package com.ritika.voy.authentication
 
+import android.app.ProgressDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
@@ -17,12 +18,24 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.datastore.preferences.core.MutablePreferences
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
 import com.ritika.voy.databinding.FragmentLoginBinding
+import com.ritika.voy.api.ApiService
+import com.ritika.voy.api.RetrofitInstance
+import com.ritika.voy.api.dataclasses.LoginRequest
+import kotlinx.coroutines.launch
+import java.io.IOException
+import retrofit2.HttpException
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.preferencesDataStoreFile
 
 class LoginFragment : BaseFragment() {
 
@@ -33,7 +46,7 @@ class LoginFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -120,7 +133,14 @@ class LoginFragment : BaseFragment() {
         }
 
         binding.btnLogin.setOnClickListener {
-            Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
+            val email = emailEditText.text.toString()
+            val password = passwordEditText.text.toString()
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(requireContext(), "Please fill all the fields", Toast.LENGTH_SHORT).show()
+            } else {
+               login(email, password)
+            }
         }
 
         binding.tvForgotPassword.setOnClickListener {
@@ -128,6 +148,49 @@ class LoginFragment : BaseFragment() {
         }
 
     }
+
+    private fun login(email: String, password: String) {
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Loading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.login(LoginRequest(email, password))
+                if (response.success) {
+                    response.tokens?.let {
+                        saveTokens(it.access!!, it.refresh!!)
+                    }
+                    Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
+                    navController.navigate(R.id.homeActivity)
+                } else {
+                    Toast.makeText(requireContext(), "Invalid email or password", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: HttpException) {
+                Toast.makeText(requireContext(), "Invalid email or password", Toast.LENGTH_SHORT).show()
+            } catch (e: IOException) {
+                Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT).show()
+            } finally {
+                progressDialog.dismiss()
+            }
+        }
+    }
+    private suspend fun saveTokens(accessToken: String, refreshToken: String) {
+        val dataStore = PreferenceDataStoreFactory.create {
+            requireContext().preferencesDataStoreFile("tokens")
+        }
+        val accessTokenKey = stringPreferencesKey("access")
+        val refreshTokenKey = stringPreferencesKey("refresh")
+
+        dataStore.edit { preferences: MutablePreferences ->
+            preferences[accessTokenKey] = accessToken
+            preferences[refreshTokenKey] = refreshToken
+        }
+    }
+
 
     override fun onBackPressed() {
         navController.navigate(R.id.continueWithEmail)
