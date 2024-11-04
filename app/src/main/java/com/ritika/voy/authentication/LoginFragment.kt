@@ -163,6 +163,7 @@ class LoginFragment : BaseFragment() {
                         saveTokens(it.access!!, it.refresh!!)
                     }
                     Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
+                    navController.navigate(R.id.homeActivity)
                 } else {
                     Toast.makeText(requireContext(), "Invalid email or password", Toast.LENGTH_SHORT).show()
                 }

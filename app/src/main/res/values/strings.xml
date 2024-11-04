@@ -11,4 +11,8 @@
     <string name="invalid_password_format">Password must contain 8 characters, including uppercase, lowercase, number, and special character</string>
     <string name="password_mismatch">Passwords do not match</string>
     <string name="enter_your_phone">+91</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>

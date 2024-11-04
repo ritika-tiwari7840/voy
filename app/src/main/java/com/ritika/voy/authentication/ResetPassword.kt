@@ -1,5 +1,6 @@
 package com.ritika.voy.authentication
 
+import android.app.ProgressDialog
 import android.os.Bundle
 import android.os.Vibrator
 import android.text.Editable
@@ -10,13 +11,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
+import com.ritika.voy.api.RetrofitInstance
+import com.ritika.voy.api.dataclasses.ResetRequest
 import com.ritika.voy.databinding.FragmentResetPasswordBinding
+import kotlinx.coroutines.launch
+
 class ResetPassword : BaseFragment() {
     private var _binding: FragmentResetPasswordBinding? = null
     private val binding get() = _binding!!
@@ -166,11 +172,40 @@ class ResetPassword : BaseFragment() {
         navController = Navigation.findNavController(view)
 
         binding.doneButton.setOnClickListener {
-            Toast.makeText(requireContext(), "Password Changed Successfully", Toast.LENGTH_SHORT).show()
+            val newPassword = binding.newPassword.text.toString()
+            val confirmPassword = binding.confirmPassword.text.toString()
+            val otp = arguments?.getString("otp").toString()
+            val email = arguments?.getString("email").toString()
+            resetPassword(email, otp, newPassword, confirmPassword)
         }
 
         binding.btnBack.setOnClickListener {
             navController.popBackStack()
+        }
+    }
+
+    private fun resetPassword(email : String, otp : String, new_password : String, confirm_password : String){
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("$email $otp")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.resetPassword(ResetRequest(email, otp, new_password, confirm_password))
+                if (response.success){
+                    Toast.makeText(requireContext(), "Password reset successfully", Toast.LENGTH_SHORT).show()
+                    navController.navigate(R.id.loginFragment)
+                }
+                else{
+                    Toast.makeText(requireContext(), "Failed to reset password: ${response.message}", Toast.LENGTH_SHORT).show()
+                }
+            }catch (e: Exception) {
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
+                    .show()
+            } finally {
+                progressDialog.dismiss()
+            }
         }
     }
 
