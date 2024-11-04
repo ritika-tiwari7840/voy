@@ -36,6 +36,9 @@
         <action
             android:id="@+id/action_loginFragment_to_continueWithEmail"
             app:destination="@id/continueWithEmail" />
+        <action
+            android:id="@+id/action_loginFragment_to_homeActivity"
+            app:destination="@id/homeActivity" />
     </fragment>
     <fragment
         android:id="@+id/forgotPasswordFragment"
@@ -107,5 +110,13 @@
         <action
             android:id="@+id/action_verifyPhoneFragment_to_verifyEmailFragment"
             app:destination="@id/verifyEmailFragment" />
+        <action
+            android:id="@+id/action_verifyPhoneFragment_to_homeActivity"
+            app:destination="@id/homeActivity" />
     </fragment>
+    <activity
+        android:id="@+id/homeActivity"
+        android:name="com.ritika.voy.home.HomeActivity"
+        android:label="activity_home"
+        tools:layout="@layout/activity_home" />
 </navigation>

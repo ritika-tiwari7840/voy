@@ -60,6 +60,14 @@ dependencies {
     // Location Services
     implementation("com.google.android.gms:play-services-location:21.3.0") // Check for the latest version
 
+
+    //retrofit and datastore
+
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("androidx.datastore:datastore-preferences:1.0.0")
+
+
     // Testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
