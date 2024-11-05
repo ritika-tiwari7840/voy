@@ -1,5 +1,6 @@
 package com.ritika.voy.authentication
 
+import android.app.ProgressDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
@@ -18,11 +19,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
+import com.ritika.voy.api.RetrofitInstance
+import com.ritika.voy.api.dataclasses.SignUpVerifyRequest
+import com.ritika.voy.api.dataclasses.VerifyRequest
 import com.ritika.voy.databinding.FragmentVerifyPhoneBinding
+import kotlinx.coroutines.launch
 
 class VerifyPhoneFragment : BaseFragment() {
     private var _binding: FragmentVerifyPhoneBinding? = null
@@ -133,14 +139,52 @@ class VerifyPhoneFragment : BaseFragment() {
         }
 
         binding.btnVerify.setOnClickListener {
-            Toast.makeText(requireContext(), "Registration Successful", Toast.LENGTH_SHORT).show()
-            navController.navigate(R.id.continueWithEmail)
+            val phone_otp = otpBox1.text.toString() +
+                    otpBox2.text.toString() +
+                    otpBox3.text.toString() +
+                    otpBox4.text.toString() +
+                    otpBox5.text.toString() +
+                    otpBox6.text.toString()
+
+            val user_id = arguments?.getString("user_id")
+            val email_otp = arguments?.getString("email_otp")
+
+            if (phone_otp.length != 6) {
+                Toast.makeText(requireContext(), "Please enter a valid otp", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            } else {
+                signUpVerify(user_id ?: "", email_otp ?: "", phone_otp)
+            }
         }
 
         binding.btnBack.setOnClickListener {
             navController.popBackStack()
         }
 
+    }
+
+    private fun signUpVerify(user_id : String, email_otp : String, phone_otp : String){
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Loading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.signUpVerify(SignUpVerifyRequest(user_id, email_otp, phone_otp))
+                if (response.success){
+                    Toast.makeText(requireContext(), "Otp verified", Toast.LENGTH_SHORT).show()
+                }
+                else {
+                    Toast.makeText(requireContext(), "Failed to verify otp: ${response.message}", Toast.LENGTH_SHORT).show()
+                }
+            }catch (e: Exception) {
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
+                    .show()
+            } finally {
+                progressDialog.dismiss()
+            }
+        }
     }
     fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
         currentBox.addTextChangedListener(object : TextWatcher {

@@ -6,8 +6,11 @@ import com.ritika.voy.api.dataclasses.LoginRequest
 import com.ritika.voy.api.dataclasses.LoginResponse
 import com.ritika.voy.api.dataclasses.ResetRequest
 import com.ritika.voy.api.dataclasses.ResetResponse
+import com.ritika.voy.api.dataclasses.SignUpVerifyRequest
+import com.ritika.voy.api.dataclasses.SignUpVerifyResponse
 import com.ritika.voy.api.dataclasses.VerifyRequest
 import com.ritika.voy.api.dataclasses.VerifyResponse
+import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -24,4 +27,7 @@ interface ApiService {
 
     @POST("reset-password/")
     suspend fun resetPassword(@Body resetRequest: ResetRequest): ResetResponse
+
+    @POST("verify-registration/")
+    suspend fun signUpVerify(@Body request: SignUpVerifyRequest): Call<SignUpVerifyResponse>
 }

@@ -8,7 +8,6 @@ import android.text.SpannableString
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -16,19 +15,11 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
-import com.ritika.voy.api.AuthService
-import com.ritika.voy.api.dataclasses.VerifyRequest
-import com.ritika.voy.api.dataclasses.VerifyResponse
 import com.ritika.voy.databinding.FragmentVerifyEmailBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import retrofit2.awaitResponse
 
 class VerifyEmailFragment : BaseFragment() {
 
@@ -78,48 +69,7 @@ class VerifyEmailFragment : BaseFragment() {
         navController.navigate(R.id.createAccount)
     }
 
-    private suspend fun handleApiResponse(response: retrofit2.Response<VerifyResponse>) {
-        withContext(Dispatchers.Main) {
-            if (response.isSuccessful && response.body() != null) {
-                val verifyResponse = response.body()!!
-                if (verifyResponse.success) {
-                    showToast("Email Verified")
-                    navController.navigate(R.id.verifyPhoneFragment)
-                } else {
-                    showToast(verifyResponse.message)
-                }
-            } else {
-                val errorMessage = response.errorBody()?.string() ?: "Unknown error"
-                Log.e("VerifyEmailFragment", "Verification failed: $errorMessage")
-                showToast("Verification failed: $errorMessage")
-                binding.tvForgotSubtitle.text = errorMessage
-            }
-        }
-    }
 
-    private fun verifyEmailOtp(otp: String) {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                if (UserId == null) {
-                    showToast("User ID is missing")
-                    return@launch
-                }
-
-                val request = VerifyRequest(
-                    email_otp = otp,
-                    phone_otp = "012637", // This should be dynamic as per your requirements
-                    temp_user_id = UserId!!
-                )
-
-                val response = Retrofit.api.create(AuthService::class.java).verifyOTP(request).awaitResponse()
-                handleApiResponse(response)
-
-            } catch (e: Exception) {
-                Log.e("VerifyEmailFragment", "Error during email verification", e)
-                showToast("An error occurred: ${e.message}")
-            }
-        }
-    }
 
     private fun setupLayoutMargins(view: View) {
         val screenHeight = resources.displayMetrics.heightPixels
@@ -141,7 +91,6 @@ class VerifyEmailFragment : BaseFragment() {
         resendTextView.text = spannable
         resendTextView.setOnClickListener {
             showToast("Resend OTP functionality to be implemented")
-            // Call your resend OTP API here
         }
     }
 
@@ -177,7 +126,11 @@ class VerifyEmailFragment : BaseFragment() {
         binding.btnVerify.setOnClickListener {
             if (areAllFieldsFilled()) {
                 val enteredOtp = otpFields.joinToString("") { it.text.toString() }
-                verifyEmailOtp(enteredOtp)
+                val bundle = Bundle().apply {
+                    putString("user_id", UserId)
+                    putString("email_otp", enteredOtp)
+                }
+                navController.navigate(R.id.verifyPhoneFragment, bundle)
             } else {
                 showToast("Please fill all fields")
             }
