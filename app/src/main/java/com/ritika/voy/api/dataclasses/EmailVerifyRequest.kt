@@ -1,7 +1,6 @@
 package com.ritika.voy.api.dataclasses
 
-data class SignUpVerifyRequest(
+data class EmailVerifyRequest(
     val user_id: String?,
     val email_otp: String,
-    val phone_otp: String
 )
