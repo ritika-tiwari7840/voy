@@ -1,8 +1,8 @@
 package com.ritika.voy.api.dataclasses
 
-data class SignUpVerifyResponse(
+data class PhoneVerifyResponse(
     val message: String,
     val success: Boolean,
-    val tokens: TokensX,
-    val user: UserX
+    val tokens: Tokens,
+    val user: User
 )

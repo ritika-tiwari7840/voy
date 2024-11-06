@@ -1,5 +1,6 @@
 package com.ritika.voy.authentication
 
+import android.app.ProgressDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
@@ -15,11 +16,16 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
+import com.ritika.voy.api.RetrofitInstance
+import com.ritika.voy.api.dataclasses.EmailVerifyRequest
+import com.ritika.voy.api.dataclasses.resendEmailRequest
 import com.ritika.voy.databinding.FragmentVerifyEmailBinding
+import kotlinx.coroutines.launch
 
 class VerifyEmailFragment : BaseFragment() {
 
@@ -58,6 +64,8 @@ class VerifyEmailFragment : BaseFragment() {
             return
         }
 
+        val enteredOtp = otpFields.joinToString("") { it.text.toString() }
+
         setupLayoutMargins(view)
         setupResendTextView()
         setupOtpInputs()
@@ -68,8 +76,6 @@ class VerifyEmailFragment : BaseFragment() {
     override fun onBackPressed() {
         navController.navigate(R.id.createAccount)
     }
-
-
 
     private fun setupLayoutMargins(view: View) {
         val screenHeight = resources.displayMetrics.heightPixels
@@ -126,13 +132,65 @@ class VerifyEmailFragment : BaseFragment() {
         binding.btnVerify.setOnClickListener {
             if (areAllFieldsFilled()) {
                 val enteredOtp = otpFields.joinToString("") { it.text.toString() }
-                val bundle = Bundle().apply {
-                    putString("user_id", UserId)
-                    putString("email_otp", enteredOtp)
-                }
-                navController.navigate(R.id.verifyPhoneFragment, bundle)
+                val user_id = arguments?.getString("user_id") ?: ""
+                emailVerify(user_id, enteredOtp)
             } else {
                 showToast("Please fill all fields")
+            }
+        }
+        binding.resendTextView.setOnClickListener {
+            val email = arguments?.getString("email") ?: ""
+            resendEmail(email)
+        }
+    }
+
+    private fun resendEmail(email: String) {
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Loading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.resendEmailOtp(resendEmailRequest(email))
+                if (response.success) {
+                    showToast("OTP sent successfully")
+                } else {
+                    showToast(response.message)
+                }
+            } catch (e: Exception) {
+                showToast("An unexpected error occurred")
+            } finally {
+                progressDialog.dismiss()
+            }
+        }
+    }
+
+    private fun emailVerify(user_id: String, otp: String) {
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Loading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.EmailVerify(EmailVerifyRequest(user_id, otp))
+                if (response.success) {
+                    val phone = arguments?.getString("phone") ?: ""
+                    val userBundle = Bundle().apply {
+                        putString("user_id", user_id)
+                        putString("phone", phone)
+
+                    }
+                    Toast.makeText(requireContext(), "Email verified Successfully, Please Verify Phone Number.", Toast.LENGTH_SHORT).show()
+                    navController.navigate(R.id.verifyPhoneFragment, userBundle)
+                } else {
+                    showToast(response.message)
+                }
+            } catch (e: Exception) {
+                showToast("An unexpected error occurred")
+            } finally {
+                progressDialog.dismiss()
             }
         }
     }
@@ -171,11 +229,5 @@ class VerifyEmailFragment : BaseFragment() {
 
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-
     }
 }

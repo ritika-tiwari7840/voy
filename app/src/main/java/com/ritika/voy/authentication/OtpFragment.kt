@@ -26,6 +26,7 @@ import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.VerifyRequest
+import com.ritika.voy.api.dataclasses.resendOTPRequest
 import com.ritika.voy.databinding.FragmentOtpBinding
 import kotlinx.coroutines.launch
 
@@ -132,6 +133,8 @@ class OtpFragment : BaseFragment() {
 
         navController = Navigation.findNavController(view)
 
+        val email = arguments?.getString("email").toString()
+
         //navigation
 
         binding.btnVerify.setOnClickListener {
@@ -143,7 +146,7 @@ class OtpFragment : BaseFragment() {
                     otpBox5.text.toString() +
                     otpBox6.text.toString()
 
-            val email = arguments?.getString("email").toString()
+
 
             if (otp.length != 6) {
                 Toast.makeText(requireContext(), "Please enter a valid otp", Toast.LENGTH_SHORT).show()
@@ -158,7 +161,8 @@ class OtpFragment : BaseFragment() {
             navController.popBackStack()
         }
         binding.resendTextView.setOnClickListener {
-            Toast.makeText(requireContext(), "Resend Otp", Toast.LENGTH_SHORT).show()
+            resendOTP(email)
+            Toast.makeText(requireContext(), "Otp sent", Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -192,6 +196,31 @@ class OtpFragment : BaseFragment() {
                 progressDialog.dismiss()
             }
         }
+    }
+
+    private fun resendOTP(email: String){
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Loading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.resendOtp(resendOTPRequest(email))
+                if (response.success){
+                    Toast.makeText(requireContext(), "Otp sent", Toast.LENGTH_SHORT).show()
+                }
+                else {
+                    Toast.makeText(requireContext(), "Failed to send otp: ${response.message}", Toast.LENGTH_SHORT).show()
+                }
+            }catch (e: Exception) {
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
+                    .show()
+            } finally {
+                progressDialog.dismiss()
+            }
+        }
+
     }
 
     fun setupOtpInput(currentBox: EditText, nextBox: EditText) {

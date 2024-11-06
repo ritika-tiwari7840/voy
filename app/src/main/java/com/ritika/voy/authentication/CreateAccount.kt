@@ -129,11 +129,11 @@ class CreateAccount : BaseFragment() {
                             } else if (!response.isSuccessful) {
                                 val signUpResponse = response.body()
                                 if (signUpResponse?.registration_status?.user_id != null) {
-                                    val bundle = Bundle()
-                                    bundle.putString(
-                                        "user_id",
-                                        signUpResponse?.registration_status?.user_id.toString()
-                                    )
+                                    val bundle = Bundle().apply {
+                                        putString("email", email)
+                                        putString("phoneNumber", phoneNumber)
+                                        putString("user_id", signUpResponse?.registration_status?.user_id.toString())
+                                    }
                                     navController.navigate(R.id.verifyEmailFragment, bundle)
                                     Toast.makeText(
                                         context, "User Already Exist", Toast.LENGTH_SHORT

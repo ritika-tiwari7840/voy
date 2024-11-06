@@ -10,7 +10,6 @@ import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 import android.view.KeyEvent
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,8 +24,9 @@ import androidx.navigation.Navigation
 import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
 import com.ritika.voy.api.RetrofitInstance
-import com.ritika.voy.api.dataclasses.SignUpVerifyRequest
-import com.ritika.voy.api.dataclasses.VerifyRequest
+import com.ritika.voy.api.dataclasses.EmailVerifyRequest
+import com.ritika.voy.api.dataclasses.PhoneVerifyRequest
+import com.ritika.voy.api.dataclasses.resendPhoneRequest
 import com.ritika.voy.databinding.FragmentVerifyPhoneBinding
 import kotlinx.coroutines.launch
 
@@ -147,13 +147,14 @@ class VerifyPhoneFragment : BaseFragment() {
                     otpBox6.text.toString()
 
             val user_id = arguments?.getString("user_id")
-            val email_otp = arguments?.getString("email_otp")
+            val email = arguments?.getString("email")
+            val phone = arguments?.getString("phone")
 
             if (phone_otp.length != 6) {
                 Toast.makeText(requireContext(), "Please enter a valid otp", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             } else {
-                signUpVerify(user_id ?: "", email_otp ?: "", phone_otp)
+                phoneVerify(user_id ?: "", phone_otp)
             }
         }
 
@@ -161,9 +162,14 @@ class VerifyPhoneFragment : BaseFragment() {
             navController.popBackStack()
         }
 
+        binding.resendTextView.setOnClickListener {
+            val phone = arguments?.getString("phone") ?: ""
+            resendPhone(phone)
+        }
+
     }
 
-    private fun signUpVerify(user_id : String, email_otp : String, phone_otp : String){
+    private fun resendPhone(phone: String) {
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("Loading...")
         progressDialog.setCancelable(false)
@@ -171,14 +177,35 @@ class VerifyPhoneFragment : BaseFragment() {
 
         lifecycleScope.launch {
             try {
-                val response = RetrofitInstance.api.signUpVerify(SignUpVerifyRequest(user_id, email_otp, phone_otp))
-//                if (response.success){
-//                    Toast.makeText(requireContext(), "Otp verified", Toast.LENGTH_SHORT).show()
-//                }
-//
-//                else {
-//                    Toast.makeText(requireContext(), "Failed to verify otp: ${response.message}", Toast.LENGTH_SHORT).show()
-//                }
+                val response = RetrofitInstance.api.resendPhoneOtp(resendPhoneRequest(phone))
+                if (response.success) {
+                    Toast.makeText(requireContext(), "OTP sent successfully", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT).show()
+            } finally {
+                progressDialog.dismiss()
+            }
+        }
+    }
+
+    private fun phoneVerify(user_id : String, phone_otp : String){
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Loading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.PhoneVerify(PhoneVerifyRequest(user_id, phone_otp))
+                if (response.success){
+                    Toast.makeText(requireContext(), "Otp verified, Registration Successful", Toast.LENGTH_SHORT).show()
+                }
+                else {
+                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
+                }
             }catch (e: Exception) {
                 Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
                     .show()
