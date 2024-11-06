@@ -66,7 +66,6 @@
         android:id="@+id/phone_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="@string/enter_your_phone"
         android:textColorHint="@color/white"
         app:errorEnabled="true"
         app:helperTextEnabled="true"
@@ -75,8 +74,7 @@
         app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
         app:layout_constraintRight_toRightOf="@id/form_right_guide"
         app:layout_constraintBottom_toTopOf="@id/email_text_view"
-        app:helperText="You’ll need to verify that you own this phone number."
-        app:helperTextTextAppearance="@style/CustomHelperTextAppearance"
+
         >
 
         <com.google.android.material.textfield.TextInputEditText
@@ -120,8 +118,6 @@
         app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
         app:layout_constraintRight_toRightOf="@id/form_right_guide"
         app:layout_constraintBottom_toTopOf="@id/password_text_view"
-        app:helperText="You’ll need to verify that you own this email"
-        app:helperTextTextAppearance="@style/CustomHelperTextAppearance"
 
         >
 

@@ -214,6 +214,7 @@ class VerifyPhoneFragment : BaseFragment() {
             }
         }
     }
+
     fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
         currentBox.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
