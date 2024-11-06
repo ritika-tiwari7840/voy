@@ -23,6 +23,7 @@ import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.EmailVerifyRequest
+import com.ritika.voy.api.dataclasses.resendEmailRequest
 import com.ritika.voy.databinding.FragmentVerifyEmailBinding
 import kotlinx.coroutines.launch
 
@@ -137,6 +138,32 @@ class VerifyEmailFragment : BaseFragment() {
                 showToast("Please fill all fields")
             }
         }
+        binding.resendTextView.setOnClickListener {
+            val email = arguments?.getString("email") ?: ""
+            resendEmail(email)
+        }
+    }
+
+    private fun resendEmail(email: String) {
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Loading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.resendEmailOtp(resendEmailRequest(email))
+                if (response.success) {
+                    showToast("OTP sent successfully")
+                } else {
+                    showToast(response.message)
+                }
+            } catch (e: Exception) {
+                showToast("An unexpected error occurred")
+            } finally {
+                progressDialog.dismiss()
+            }
+        }
     }
 
     private fun emailVerify(user_id: String, otp: String) {
@@ -149,8 +176,11 @@ class VerifyEmailFragment : BaseFragment() {
             try {
                 val response = RetrofitInstance.api.EmailVerify(EmailVerifyRequest(user_id, otp))
                 if (response.success) {
+                    val phone = arguments?.getString("phone") ?: ""
                     val userBundle = Bundle().apply {
                         putString("user_id", user_id)
+                        putString("phone", phone)
+
                     }
                     Toast.makeText(requireContext(), "Email verified Successfully, Please Verify Phone Number.", Toast.LENGTH_SHORT).show()
                     navController.navigate(R.id.verifyPhoneFragment, userBundle)

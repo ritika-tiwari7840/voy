@@ -80,13 +80,16 @@ class ForgotPasswordFragment : BaseFragment() {
 
         binding.btnContinue.setOnClickListener {
             val email = emailEditText.text.toString()
+            val emailBundle = Bundle().apply {
+                putString("email", email)
+            }
             if (email.isNotEmpty() && email.contains("@")) {
                 forgotpassword(email)
             } else {
                 emailEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background_error)
                 emailErrorTextView.visibility = View.VISIBLE
             }
-            navController.navigate(R.id.otpFragment)
+            navController.navigate(R.id.otpFragment, emailBundle)
         }
 
         binding.btnBack.setOnClickListener {

@@ -26,6 +26,7 @@ import com.ritika.voy.R
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.EmailVerifyRequest
 import com.ritika.voy.api.dataclasses.PhoneVerifyRequest
+import com.ritika.voy.api.dataclasses.resendPhoneRequest
 import com.ritika.voy.databinding.FragmentVerifyPhoneBinding
 import kotlinx.coroutines.launch
 
@@ -146,6 +147,8 @@ class VerifyPhoneFragment : BaseFragment() {
                     otpBox6.text.toString()
 
             val user_id = arguments?.getString("user_id")
+            val email = arguments?.getString("email")
+            val phone = arguments?.getString("phone")
 
             if (phone_otp.length != 6) {
                 Toast.makeText(requireContext(), "Please enter a valid otp", Toast.LENGTH_SHORT).show()
@@ -159,6 +162,33 @@ class VerifyPhoneFragment : BaseFragment() {
             navController.popBackStack()
         }
 
+        binding.resendTextView.setOnClickListener {
+            val phone = arguments?.getString("phone") ?: ""
+            resendPhone(phone)
+        }
+
+    }
+
+    private fun resendPhone(phone: String) {
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Loading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.resendPhoneOtp(resendPhoneRequest(phone))
+                if (response.success) {
+                    Toast.makeText(requireContext(), "OTP sent successfully", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT).show()
+            } finally {
+                progressDialog.dismiss()
+            }
+        }
     }
 
     private fun phoneVerify(user_id : String, phone_otp : String){

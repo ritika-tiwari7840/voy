@@ -116,8 +116,11 @@ class CreateAccount : BaseFragment() {
                             ).show()
 
                             // Pass user_id to the verifyEmailFragment using Bundle
-                            val bundle = Bundle()
-                            bundle.putString("user_id", signUpResponse.user_id.toString())
+                            val bundle = Bundle().apply {
+                                putString("email", email)
+                                putString("phoneNumber", phoneNumber)
+                                putInt("user_id", signUpResponse.user_id!!)
+                            }
                             navController.navigate(R.id.verifyEmailFragment, bundle)
 
                         } else {
