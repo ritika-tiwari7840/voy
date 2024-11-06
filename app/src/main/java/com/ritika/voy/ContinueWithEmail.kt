@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
+import android.text.style.UnderlineSpan
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -43,7 +44,9 @@ class ContinueWithEmail : BaseFragment() {
         val end = start + termsText.length
 
         val termsColor = ContextCompat.getColor(requireContext(), R.color.theme_color)
-
+        spannableString.setSpan(
+            UnderlineSpan(),start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
         spannableString.setSpan(
             ForegroundColorSpan(termsColor), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
@@ -61,7 +64,7 @@ class ContinueWithEmail : BaseFragment() {
         navController = Navigation.findNavController(view)
 
         binding.continueWithEmailButton.setOnClickListener {
-            navController.navigate(R.id.loginFragment)
+            navController.navigate(R.id.action_continueWithEmail_to_loginFragment)
         }
 
     }

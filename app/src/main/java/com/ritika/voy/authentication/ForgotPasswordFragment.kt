@@ -1,5 +1,6 @@
 package com.ritika.voy.authentication
 
+import android.app.ProgressDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -8,14 +9,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
+import com.ritika.voy.api.RetrofitInstance
+import com.ritika.voy.api.dataclasses.ForgotRequest
 import com.ritika.voy.databinding.FragmentForgotPasswordBinding
+import kotlinx.coroutines.launch
 
 class ForgotPasswordFragment : BaseFragment() {
 
@@ -24,15 +30,14 @@ class ForgotPasswordFragment : BaseFragment() {
 
     private lateinit var navController: NavController
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View{
+    ): View {
         _binding = FragmentForgotPasswordBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -42,7 +47,6 @@ class ForgotPasswordFragment : BaseFragment() {
 
         val screenHeight = resources.displayMetrics.heightPixels
         val topMargin = (screenHeight * 0.304).toInt()
-
 
         val bottomSection: View = view.findViewById(R.id.bottomSection)
         val params = bottomSection.layoutParams as ConstraintLayout.LayoutParams
@@ -60,11 +64,10 @@ class ForgotPasswordFragment : BaseFragment() {
                 if (email.contains("@")) {
                     emailEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background)
                     emailErrorTextView.visibility = View.GONE
-                } else if(email.isEmpty()){
+                } else if (email.isEmpty()) {
                     emailEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background)
                     emailErrorTextView.visibility = View.GONE
-                }
-                else{
+                } else {
                     emailEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background_error)
                     emailErrorTextView.visibility = View.VISIBLE
                 }
@@ -76,7 +79,17 @@ class ForgotPasswordFragment : BaseFragment() {
         navController = Navigation.findNavController(view)
 
         binding.btnContinue.setOnClickListener {
-            navController.navigate(R.id.otpFragment)
+            val email = emailEditText.text.toString()
+            val emailBundle = Bundle().apply {
+                putString("email", email)
+            }
+            if (email.isNotEmpty() && email.contains("@")) {
+                forgotpassword(email)
+            } else {
+                emailEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background_error)
+                emailErrorTextView.visibility = View.VISIBLE
+            }
+            navController.navigate(R.id.otpFragment, emailBundle)
         }
 
         binding.btnBack.setOnClickListener {
@@ -84,8 +97,40 @@ class ForgotPasswordFragment : BaseFragment() {
         }
     }
 
+    private fun clearFields() {
+        binding.etEmail.text?.clear()
+    }
+
+
+    private fun forgotpassword(email : String){
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Loading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.forgotPassword(ForgotRequest(email))
+                if (response.success) {
+                    val emailBundle = Bundle().apply {
+                        putString("email", email)
+                    }
+                    Toast.makeText(requireContext(), "Password reset email sent", Toast.LENGTH_SHORT).show()
+                    navController.navigate(R.id.otpFragment, emailBundle)
+                } else {
+                    Toast.makeText(requireContext(), "Failed to send reset email: ${response.message}", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT).show()
+            } finally {
+                progressDialog.dismiss()
+                clearFields()
+            }
+        }
+
+    }
+
     override fun onBackPressed() {
         navController.navigate(R.id.loginFragment)
     }
-
 }

@@ -30,7 +30,7 @@
         android:text="Sign Up"
         android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="26.67sp"
+        android:textSize="28sp"
         android:layout_marginStart="16dp"
         app:layout_constraintBottom_toBottomOf="@+id/btn_back"
         app:layout_constraintStart_toEndOf="@+id/btn_back"
@@ -66,7 +66,6 @@
         android:id="@+id/phone_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="@string/enter_your_phone"
         android:textColorHint="@color/white"
         app:errorEnabled="true"
         app:helperTextEnabled="true"
@@ -75,8 +74,7 @@
         app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
         app:layout_constraintRight_toRightOf="@id/form_right_guide"
         app:layout_constraintBottom_toTopOf="@id/email_text_view"
-        app:helperText="You’ll need to verify that you own this phone number."
-        app:helperTextTextAppearance="@style/CustomHelperTextAppearance"
+
         >
 
         <com.google.android.material.textfield.TextInputEditText
@@ -120,8 +118,6 @@
         app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
         app:layout_constraintRight_toRightOf="@id/form_right_guide"
         app:layout_constraintBottom_toTopOf="@id/password_text_view"
-        app:helperText="You’ll need to verify that you own this email"
-        app:helperTextTextAppearance="@style/CustomHelperTextAppearance"
 
         >
 
@@ -182,6 +178,81 @@
             android:textSize="15sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/passwordCriteriaLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:background="@drawable/criteria_background"
+        app:layout_constraintBottom_toTopOf="@id/password_text_view"
+        app:layout_constraintEnd_toStartOf="@+id/form_right_guide"
+        app:layout_constraintStart_toStartOf="@+id/form_left_guide">
+
+        <TextView
+            android:id="@+id/criteria_heading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:text="Password must contain:"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/criteria_length"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:text="• At least 8 characters"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/criteria_heading" />
+
+        <TextView
+            android:id="@+id/criteria_upper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:text="• At least one uppercase letter"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/criteria_length" />
+
+        <TextView
+            android:id="@+id/criteria_lower"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:text="• At least one lowercase letter"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/criteria_upper" />
+
+        <TextView
+            android:id="@+id/criteria_digit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:text="• At least one digit"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/criteria_lower" />
+
+        <TextView
+            android:id="@+id/criteria_special"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingBottom="16dp"
+            android:text="• At least one special character"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/criteria_digit" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <TextView
         android:id="@+id/confirm_password_text_view"
@@ -296,5 +367,5 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent=".95" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
 
+</androidx.constraintlayout.widget.ConstraintLayout>

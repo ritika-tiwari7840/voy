@@ -1,14 +1,23 @@
 <resources>
     <string name="app_name">VOY</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="enter_your_email">Enter your email</string>
-    <string name="enter_your_password">Enter your password</string>
-    <string name="confirm_password">Confirm your password</string>
+    <string name="enter_your_email">Enter email address</string>
+    <string name="enter_your_password">Enter your Password</string>
+    <string name="confirm_password">Confirm your Password</string>
 
     <string name="already_member">Already a member?</string>
     <string name="log_in">Log in</string>
-    <string name="invalid_email_format">Invalid email format</string>
-    <string name="invalid_password_format">Password must contain 8 characters, including uppercase, lowercase, number, and special character</string>
-    <string name="password_mismatch">Passwords do not match</string>
+    <string name="invalid_email_format">Invalid Email!</string>
+    <string name="invalid_phone_format"> Please enter a valid phone number.</string>
+
+    <string name="invalid_password_format">Invalid Password!</string>
+    <string name="password_mismatch">Password do not match</string>
     <string name="enter_your_phone">+91</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="phone_helper_text">You’ll need to verify that you own this phone number.</string>
+    <string name="email_helper_text">You’ll need to verify that you own this email.</string>
+
 </resources>

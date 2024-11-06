@@ -1,5 +1,6 @@
 package com.ritika.voy.authentication
 
+import android.app.ProgressDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
@@ -8,6 +9,7 @@ import android.text.SpannableString
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
+import android.util.Log
 import android.view.KeyEvent
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -18,11 +20,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
+import com.ritika.voy.api.RetrofitInstance
+import com.ritika.voy.api.dataclasses.VerifyRequest
+import com.ritika.voy.api.dataclasses.resendOTPRequest
 import com.ritika.voy.databinding.FragmentOtpBinding
+import kotlinx.coroutines.launch
 
 class OtpFragment : BaseFragment() {
 
@@ -127,20 +134,107 @@ class OtpFragment : BaseFragment() {
 
         navController = Navigation.findNavController(view)
 
+        val email = arguments?.getString("email").toString()
+
         //navigation
 
         binding.btnVerify.setOnClickListener {
-            Toast.makeText(requireContext(), "Otp Verified", Toast.LENGTH_SHORT).show()
-            navController.navigate(R.id.resetPassword)
+
+            val otp = otpBox1.text.toString() +
+                    otpBox2.text.toString() +
+                    otpBox3.text.toString() +
+                    otpBox4.text.toString() +
+                    otpBox5.text.toString() +
+                    otpBox6.text.toString()
+
+
+
+            if (otp.length != 6) {
+                Toast.makeText(requireContext(), "Please enter a valid otp", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }else{
+
+            verifyOTP(email, otp)
+            }
+
         }
         binding.btnBack.setOnClickListener {
             navController.popBackStack()
         }
         binding.resendTextView.setOnClickListener {
-            Toast.makeText(requireContext(), "Resend Otp", Toast.LENGTH_SHORT).show()
+            resendOTP(email)
         }
 
     }
+
+    private fun clearFields() {
+        binding.otpBox1.text?.clear()
+        binding.otpBox2.text?.clear()
+        binding.otpBox3.text?.clear()
+        binding.otpBox4.text?.clear()
+        binding.otpBox5.text?.clear()
+        binding.otpBox6.text?.clear()
+    }
+
+
+
+    private fun verifyOTP(email: String, otp: String){
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Loading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.verifyOtp(VerifyRequest(email, otp))
+                if (response.success){
+                    val otpBundle = Bundle().apply {
+                        putString("otp", otp)
+                        putString("email", email)
+                    }
+                    Toast.makeText(requireContext(), "Otp verified", Toast.LENGTH_SHORT).show()
+                    navController.navigate(R.id.resetPassword, otpBundle)
+                }
+                else {
+                    Toast.makeText(requireContext(), "Failed to verify otp: ${response.message}", Toast.LENGTH_SHORT).show()
+                }
+            }catch (e: Exception) {
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
+                    .show()
+            } finally {
+                progressDialog.dismiss()
+                clearFields()
+            }
+        }
+    }
+
+    private fun resendOTP(email: String){
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Loading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.resendOtp(resendOTPRequest(email))
+                if (response.success){
+                    Toast.makeText(requireContext(), "Otp sent", Toast.LENGTH_SHORT).show()
+                }
+                else {
+                    Toast.makeText(requireContext(), "Failed to send otp: ${response.message}", Toast.LENGTH_SHORT).show()
+                }
+            }catch (e: Exception) {
+                Log.e("API Error", "Error resending OTP: ${e.message}", e)
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
+                    .show()
+            } finally {
+                progressDialog.dismiss()
+                clearFields()
+            }
+        }
+
+    }
+
     fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
         currentBox.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {

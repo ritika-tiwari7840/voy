@@ -30,6 +30,11 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.fragmentContainer) as NavHostFragment
         navController = navHostFragment.navController
 
+        val navigateTo = intent.getStringExtra("navigateTo")
+        if (navigateTo == "ContinueWithEmailFragment") {
+            navController.navigate(R.id.continueWithEmail)
+        }
+
     }
 
 
