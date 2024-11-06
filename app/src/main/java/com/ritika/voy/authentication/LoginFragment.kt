@@ -126,11 +126,11 @@ class LoginFragment : BaseFragment() {
         navController = Navigation.findNavController(view)
 
         registerTextview.setOnClickListener {
-            navController.navigate(R.id.createAccount)
+            navController.navigate(R.id.action_loginFragment_to_createAccount)
         }
 
         binding.btnBack.setOnClickListener {
-            navController.navigate(R.id.continueWithEmail)
+            navController.navigate(R.id.action_loginFragment_to_continueWithEmail)
         }
 
         binding.btnLogin.setOnClickListener {
@@ -145,9 +145,32 @@ class LoginFragment : BaseFragment() {
         }
 
         binding.tvForgotPassword.setOnClickListener {
-            navController.navigate(R.id.forgotPasswordFragment)
+            navController.navigate(R.id.action_loginFragment_to_forgotPasswordFragment)
         }
 
+        emailEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                emailEditText.hint = ""
+            } else {
+                emailEditText.hint = getString(R.string.enter_your_email)
+            }
+        }
+
+        passwordEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                passwordEditText.hint = ""
+            } else {
+                passwordEditText.hint = getString(R.string.enter_your_password)
+            }
+        }
+
+
+
+    }
+
+    private fun clearFields() {
+        binding.etEmail.text?.clear()
+        binding.etPassword.text?.clear()
     }
 
     private fun login(email: String, password: String) {
@@ -164,18 +187,23 @@ class LoginFragment : BaseFragment() {
                         saveTokens(it.access!!, it.refresh!!)
                     }
                     Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
-                    navController.navigate(R.id.homeActivity)
+                    navController.navigate(R.id.action_loginFragment_to_homeActivity)
                 } else {
+                    Log.e("LoginFragment", "Error: ${response.message}")
                     Toast.makeText(requireContext(), "Invalid email or password", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: HttpException) {
+                Log.e("LoginFragment", "Error: ${e.message()}")
                 Toast.makeText(requireContext(), "Invalid email or password", Toast.LENGTH_SHORT).show()
             } catch (e: IOException) {
+                Log.e("LoginFragment", "Error: ${e.message}")
                 Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
+                Log.e("LoginFragment", "Error: ${e.message}")
                 Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT).show()
             } finally {
                 progressDialog.dismiss()
+                clearFields()
             }
         }
     }
@@ -194,6 +222,6 @@ class LoginFragment : BaseFragment() {
 
 
     override fun onBackPressed() {
-        navController.navigate(R.id.continueWithEmail)
+        navController.navigate(R.id.action_loginFragment_to_continueWithEmail)
     }
 }

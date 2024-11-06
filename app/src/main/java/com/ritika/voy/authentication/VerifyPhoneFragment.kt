@@ -9,6 +9,7 @@ import android.text.SpannableString
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -191,6 +192,15 @@ class VerifyPhoneFragment : BaseFragment() {
         }
     }
 
+    private fun clearFields() {
+        binding.otpBox1.text?.clear()
+        binding.otpBox2.text?.clear()
+        binding.otpBox3.text?.clear()
+        binding.otpBox4.text?.clear()
+        binding.otpBox5.text?.clear()
+        binding.otpBox6.text?.clear()
+    }
+
     private fun phoneVerify(user_id : String, phone_otp : String){
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("Loading...")
@@ -202,15 +212,19 @@ class VerifyPhoneFragment : BaseFragment() {
                 val response = RetrofitInstance.api.PhoneVerify(PhoneVerifyRequest(user_id, phone_otp))
                 if (response.success){
                     Toast.makeText(requireContext(), "Otp verified, Registration Successful", Toast.LENGTH_SHORT).show()
+                    navController.navigate(R.id.homeActivity)
                 }
                 else {
+                    Log.e("VerifyPhoneFragment", "Error: ${response.message}")
                     Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
                 }
             }catch (e: Exception) {
                 Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
                     .show()
+                Log.e("VerifyPhoneFragment", "Error: ${e.message}")
             } finally {
                 progressDialog.dismiss()
+                clearFields()
             }
         }
     }

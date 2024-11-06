@@ -217,6 +217,11 @@ class ResetPassword : BaseFragment() {
         }
     }
 
+    private fun clearFields() {
+        binding.newPassword.text?.clear()
+        binding.confirmPassword.text?.clear()
+    }
+
     private fun resetPassword(email : String, otp : String, new_password : String, confirm_password : String){
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("$email $otp")
@@ -238,6 +243,7 @@ class ResetPassword : BaseFragment() {
                     .show()
             } finally {
                 progressDialog.dismiss()
+                clearFields()
             }
         }
     }

@@ -64,7 +64,7 @@ class ContinueWithEmail : BaseFragment() {
         navController = Navigation.findNavController(view)
 
         binding.continueWithEmailButton.setOnClickListener {
-            navController.navigate(R.id.loginFragment)
+            navController.navigate(R.id.action_continueWithEmail_to_loginFragment)
         }
 
     }

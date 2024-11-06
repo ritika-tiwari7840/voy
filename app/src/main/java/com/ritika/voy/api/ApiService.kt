@@ -9,16 +9,15 @@ import com.ritika.voy.api.dataclasses.ResetResponse
 import com.ritika.voy.api.dataclasses.EmailVerifyRequest
 import com.ritika.voy.api.dataclasses.EmailVerifyResponse
 import com.ritika.voy.api.dataclasses.PhoneVerifyRequest
-import com.ritika.voy.api.dataclasses.PhoneVerifyResponse
 import com.ritika.voy.api.dataclasses.VerifyRequest
 import com.ritika.voy.api.dataclasses.VerifyResponse
+import com.ritika.voy.api.dataclasses.phoneVerifyResponseX
 import com.ritika.voy.api.dataclasses.resendEmailOTP
 import com.ritika.voy.api.dataclasses.resendEmailRequest
 import com.ritika.voy.api.dataclasses.resendForgotOTP
 import com.ritika.voy.api.dataclasses.resendOTPRequest
 import com.ritika.voy.api.dataclasses.resendPhoneOTP
 import com.ritika.voy.api.dataclasses.resendPhoneRequest
-import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -40,7 +39,7 @@ interface ApiService {
     suspend fun EmailVerify(@Body request: EmailVerifyRequest): EmailVerifyResponse
 
     @POST("verify-phone/")
-    suspend fun PhoneVerify(@Body request: PhoneVerifyRequest): PhoneVerifyResponse
+    suspend fun PhoneVerify(@Body request: PhoneVerifyRequest): phoneVerifyResponseX
 
     @POST("resend-otp/")
     suspend fun resendOtp(@Body request: resendOTPRequest): resendForgotOTP

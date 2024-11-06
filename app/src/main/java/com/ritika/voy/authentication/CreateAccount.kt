@@ -1,5 +1,6 @@
 package com.ritika.voy.authentication
 
+import android.app.ProgressDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
@@ -84,10 +85,52 @@ class CreateAccount : BaseFragment() {
                 }
             }
         }
+
+        binding.btnBack.setOnClickListener {
+            navController.navigate(R.id.loginFragment)
+        }
+
+        val passwordEditText = binding.password
+        val passwordCriteriaLayout = binding.passwordCriteriaLayout
+
+        passwordEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                passwordCriteriaLayout.visibility = View.VISIBLE
+            } else {
+                passwordCriteriaLayout.visibility = View.GONE
+            }
+        }
+
+        passwordEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val password = s.toString()
+                val unmetColor = ContextCompat.getColor(requireContext(), R.color.black)
+                val metColor = ContextCompat.getColor(requireContext(), R.color.green)
+
+                binding.criteriaLength.setTextColor(if (password.length >= 8) metColor else unmetColor)
+                binding.criteriaUpper.setTextColor(if (password.any { it.isUpperCase() }) metColor else unmetColor)
+                binding.criteriaLower.setTextColor(if (password.any { it.isLowerCase() }) metColor else unmetColor)
+                binding.criteriaDigit.setTextColor(if (password.any { it.isDigit() }) metColor else unmetColor)
+                binding.criteriaSpecial.setTextColor(if (password.any { !it.isLetterOrDigit() }) metColor else unmetColor)
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
     }
 
     override fun onBackPressed() {
         navController.navigate(R.id.loginFragment)
+    }
+
+
+    private fun clearFields() {
+        binding.enterEmail.text?.clear()
+        binding.password.text?.clear()
+        binding.confirmPassword.text?.clear()
+        binding.phone.text?.clear()
+        binding.phone.setText("+91 ")
+        binding.phone.setSelection(binding.phone.text?.length ?: 0)
     }
 
     private fun apiCall(
@@ -103,68 +146,67 @@ class CreateAccount : BaseFragment() {
             phone_number = phoneNumber
         )
         val authService = Retrofit.api.create(AuthService::class.java)
+
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Loading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
         lifecycleScope.launch {
             try {
-                authService.signUp(requestBody)
-                    .enqueue(object : retrofit2.Callback<SignUpResponse> {
-                        override fun onResponse(
-                            call: Call<SignUpResponse>,
-                            response: retrofit2.Response<SignUpResponse>,
-                        ) {
-                            if (response.isSuccessful) {
-                                val signUpResponse = response.body()
-                                if (signUpResponse != null && signUpResponse.success) {
-                                    Toast.makeText(
-                                        context,
-                                        "User profile created successfully!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    val bundle = Bundle()
-                                    bundle.putString(
-                                        "user_id",
-                                        signUpResponse.registration_status.user_id.toString()
-                                    )
-                                    navController.navigate(R.id.verifyEmailFragment, bundle)
-                                }
-                            } else if (!response.isSuccessful) {
-                                val signUpResponse = response.body()
-                                if (signUpResponse?.registration_status?.user_id != null) {
+                authService.signUp(requestBody).enqueue(object : retrofit2.Callback<SignUpResponse> {
+                    override fun onResponse(call: Call<SignUpResponse>, response: retrofit2.Response<SignUpResponse>) {
+                        progressDialog.dismiss()
+                        if (response.isSuccessful) {
+                            response.body()?.let { signUpResponse ->
+                                if (signUpResponse.success) {
+                                    Toast.makeText(requireContext(), "Registration Initiated, Please verify your Email and Phone Number", Toast.LENGTH_SHORT).show()
                                     val bundle = Bundle().apply {
                                         putString("email", email)
                                         putString("phoneNumber", phoneNumber)
-                                        putString("user_id", signUpResponse?.registration_status?.user_id.toString())
+                                        putString("user_id", signUpResponse.registration_status.user_id.toString())
                                     }
                                     navController.navigate(R.id.verifyEmailFragment, bundle)
-                                    Toast.makeText(
-                                        context, "User Already Exist", Toast.LENGTH_SHORT
-                                    ).show()
+                                } else {
+                                    handleUserExist(response)
                                 }
-                            } else {
-                                val errorResponse = response.errorBody()?.string()
-                                Log.e("CreateAccount", "Error Response: $errorResponse")
-                                Toast.makeText(
-                                    context,
-                                    "Sign-up failed with error code: ${response.code()}",
-                                    Toast.LENGTH_SHORT
-                                ).show()
                             }
+                        } else {
+                            handleUserExist(response)
                         }
+                    }
 
-                        override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
-                            Log.e("API Error", "Network error: ${t.message}", t)
-                        }
-                    })
-            } catch (e: HttpException) {
-                Toast.makeText(requireContext(), "Invalid email or password", Toast.LENGTH_SHORT)
-                    .show()
-            } catch (e: IOException) {
-                Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT).show()
+                    override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
+                        progressDialog.dismiss()
+                        Log.e("API Error", "Network error: ${t.message}", t)
+                        Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT).show()
+                    }
+                })
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
-                    .show()
+                progressDialog.dismiss()
+                Log.e("CreateAccount", "Error: ${e.message}", e)
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT).show()
             } finally {
-//            progressDialog.dismiss()
+                clearFields()
             }
+        }
+    }
+
+    private fun handleUserExist(response: retrofit2.Response<SignUpResponse>) {
+        response.body()?.registration_status?.user_id?.let {
+            val email = binding.enterEmail.text.toString()
+            val phoneNumber = binding.phone.text.toString().removePrefix("+91 ")
+            val bundle = Bundle().apply {
+                putString("email", email)
+                putString("phoneNumber", phoneNumber)
+                putString("user_id", it.toString())
+            }
+            navController.navigate(R.id.verifyEmailFragment, bundle)
+            Toast.makeText(context, "User Already Exist", Toast.LENGTH_SHORT).show()
+        } ?: run {
+            val errorResponse = response.errorBody()?.string()
+            Log.e("CreateAccount", "Error Response: $errorResponse")
+            Toast.makeText(context, "User with this credentials already exists", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -473,7 +515,7 @@ class CreateAccount : BaseFragment() {
         inputLayout.helperText = null
         editText.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corner)
         inputLayout.helperText = helperText
-        inputLayout.setHelperTextColor(context?.getColorStateList(R.color.helper_text))
+        inputLayout.setHelperTextColor(requireContext().getColorStateList(R.color.helper_text))
     }
 
     private fun resetToDefault(
@@ -486,7 +528,6 @@ class CreateAccount : BaseFragment() {
 
     private fun isValidEmail(email: String): Boolean {
         val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
-        return email.matches(emailRegex)
         return email.matches(emailRegex)
     }
 

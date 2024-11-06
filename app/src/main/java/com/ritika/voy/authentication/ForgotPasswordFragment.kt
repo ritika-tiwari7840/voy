@@ -97,6 +97,11 @@ class ForgotPasswordFragment : BaseFragment() {
         }
     }
 
+    private fun clearFields() {
+        binding.etEmail.text?.clear()
+    }
+
+
     private fun forgotpassword(email : String){
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("Loading...")
@@ -119,6 +124,7 @@ class ForgotPasswordFragment : BaseFragment() {
                 Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT).show()
             } finally {
                 progressDialog.dismiss()
+                clearFields()
             }
         }
 

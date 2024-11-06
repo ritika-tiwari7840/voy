@@ -9,6 +9,7 @@ import android.text.SpannableString
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
+import android.util.Log
 import android.view.KeyEvent
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -162,9 +163,17 @@ class OtpFragment : BaseFragment() {
         }
         binding.resendTextView.setOnClickListener {
             resendOTP(email)
-            Toast.makeText(requireContext(), "Otp sent", Toast.LENGTH_SHORT).show()
         }
 
+    }
+
+    private fun clearFields() {
+        binding.otpBox1.text?.clear()
+        binding.otpBox2.text?.clear()
+        binding.otpBox3.text?.clear()
+        binding.otpBox4.text?.clear()
+        binding.otpBox5.text?.clear()
+        binding.otpBox6.text?.clear()
     }
 
 
@@ -194,6 +203,7 @@ class OtpFragment : BaseFragment() {
                     .show()
             } finally {
                 progressDialog.dismiss()
+                clearFields()
             }
         }
     }
@@ -214,10 +224,12 @@ class OtpFragment : BaseFragment() {
                     Toast.makeText(requireContext(), "Failed to send otp: ${response.message}", Toast.LENGTH_SHORT).show()
                 }
             }catch (e: Exception) {
+                Log.e("API Error", "Error resending OTP: ${e.message}", e)
                 Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
                     .show()
             } finally {
                 progressDialog.dismiss()
+                clearFields()
             }
         }
 

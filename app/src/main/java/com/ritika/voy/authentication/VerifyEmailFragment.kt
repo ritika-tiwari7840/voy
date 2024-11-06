@@ -9,6 +9,7 @@ import android.text.SpannableString
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -159,11 +160,16 @@ class VerifyEmailFragment : BaseFragment() {
                     showToast(response.message)
                 }
             } catch (e: Exception) {
+                Log.e("VerifyEmailFragment", "Error: ${e.message}")
                 showToast("An unexpected error occurred")
             } finally {
                 progressDialog.dismiss()
             }
         }
+    }
+
+    private fun clearFields() {
+        otpFields.forEach { it.text.clear() }
     }
 
     private fun emailVerify(user_id: String, otp: String) {
@@ -191,6 +197,7 @@ class VerifyEmailFragment : BaseFragment() {
                 showToast("An unexpected error occurred")
             } finally {
                 progressDialog.dismiss()
+                clearFields()
             }
         }
     }
