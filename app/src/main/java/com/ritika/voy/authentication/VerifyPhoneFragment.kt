@@ -172,12 +172,13 @@ class VerifyPhoneFragment : BaseFragment() {
         lifecycleScope.launch {
             try {
                 val response = RetrofitInstance.api.signUpVerify(SignUpVerifyRequest(user_id, email_otp, phone_otp))
-                if (response.success){
-                    Toast.makeText(requireContext(), "Otp verified", Toast.LENGTH_SHORT).show()
-                }
-                else {
-                    Toast.makeText(requireContext(), "Failed to verify otp: ${response.message}", Toast.LENGTH_SHORT).show()
-                }
+//                if (response.success){
+//                    Toast.makeText(requireContext(), "Otp verified", Toast.LENGTH_SHORT).show()
+//                }
+//
+//                else {
+//                    Toast.makeText(requireContext(), "Failed to verify otp: ${response.message}", Toast.LENGTH_SHORT).show()
+//                }
             }catch (e: Exception) {
                 Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
                     .show()
@@ -186,6 +187,7 @@ class VerifyPhoneFragment : BaseFragment() {
             }
         }
     }
+
     fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
         currentBox.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {

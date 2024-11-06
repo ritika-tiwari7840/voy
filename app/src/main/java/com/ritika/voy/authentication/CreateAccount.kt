@@ -2,6 +2,7 @@ package com.ritika.voy.authentication
 
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextWatcher
@@ -30,6 +31,7 @@ import com.ritika.voy.databinding.FragmentCreateAccountBinding
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.HttpException
+import java.io.IOException
 
 class CreateAccount : BaseFragment() {
     private var _binding: FragmentCreateAccountBinding? = null
@@ -65,7 +67,7 @@ class CreateAccount : BaseFragment() {
                         val email = binding.enterEmail.text.toString()
                         val password = binding.password.text.toString()
                         val confirmPassword = binding.confirmPassword.text.toString()
-                        val phone = binding.phone.text.toString()
+                        val phone = binding.phone.text.toString().removePrefix("+91 ")
                         apiCall(confirmPassword, email, password, phone)
                     } else {
                         Toast.makeText(
@@ -101,86 +103,80 @@ class CreateAccount : BaseFragment() {
             phone_number = phoneNumber
         )
         val authService = Retrofit.api.create(AuthService::class.java)
-
-        try {
-            authService.signUp(requestBody).enqueue(object : retrofit2.Callback<SignUpResponse> {
-                override fun onResponse(
-                    call: Call<SignUpResponse>,
-                    response: retrofit2.Response<SignUpResponse>,
-                ) {
-                    if (response.isSuccessful) {
-                        val signUpResponse = response.body()
-                        if (signUpResponse != null && signUpResponse.success) {
-                            Toast.makeText(
-                                context, "User profile created successfully!", Toast.LENGTH_SHORT
-                            ).show()
-
-                            // Pass user_id to the verifyEmailFragment using Bundle
-                            val bundle = Bundle()
-                            bundle.putString("user_id", signUpResponse.user_id.toString())
-                            navController.navigate(R.id.verifyEmailFragment, bundle)
-
-                        } else {
-                            handleErrorResponse(signUpResponse)
+        lifecycleScope.launch {
+            try {
+                authService.signUp(requestBody)
+                    .enqueue(object : retrofit2.Callback<SignUpResponse> {
+                        override fun onResponse(
+                            call: Call<SignUpResponse>,
+                            response: retrofit2.Response<SignUpResponse>,
+                        ) {
+                            if (response.isSuccessful) {
+                                val signUpResponse = response.body()
+                                if (signUpResponse != null && signUpResponse.success) {
+                                    Toast.makeText(
+                                        context,
+                                        "User profile created successfully!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    val bundle = Bundle()
+                                    bundle.putString(
+                                        "user_id",
+                                        signUpResponse.registration_status.user_id.toString()
+                                    )
+                                    navController.navigate(R.id.verifyEmailFragment, bundle)
+                                }
+                            } else if (!response.isSuccessful) {
+                                val signUpResponse = response.body()
+                                if (signUpResponse?.registration_status?.user_id != null) {
+                                    val bundle = Bundle()
+                                    bundle.putString(
+                                        "user_id",
+                                        signUpResponse?.registration_status?.user_id.toString()
+                                    )
+                                    navController.navigate(R.id.verifyEmailFragment, bundle)
+                                    Toast.makeText(
+                                        context, "User Already Exist", Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            } else {
+                                val errorResponse = response.errorBody()?.string()
+                                Log.e("CreateAccount", "Error Response: $errorResponse")
+                                Toast.makeText(
+                                    context,
+                                    "Sign-up failed with error code: ${response.code()}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
-                    } else {
-                        // Handle HTTP error codes
-                        val errorResponse = response.errorBody()?.string()
-                        Log.e("CreateAccount", "Error Response: $errorResponse")
-                        Toast.makeText(
-                            context,
-                            "Sign-up failed with error code: ${response.code()}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
 
-                override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
-                    Log.e("API Error", "Network error: ${t.message}", t)
-                    Toast.makeText(context, "Network error: ${t.message}", Toast.LENGTH_SHORT)
-                        .show()
-                }
-            })
-        } catch (e: Exception) {
-            Log.e("CreateAccount", "Error during API call: ${e.message}", e)
-            Toast.makeText(context, "An unexpected error occurred.", Toast.LENGTH_SHORT).show()
+                        override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
+                            Log.e("API Error", "Network error: ${t.message}", t)
+                        }
+                    })
+            } catch (e: HttpException) {
+                Toast.makeText(requireContext(), "Invalid email or password", Toast.LENGTH_SHORT)
+                    .show()
+            } catch (e: IOException) {
+                Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
+                    .show()
+            } finally {
+//            progressDialog.dismiss()
+            }
         }
     }
-
-    private fun handleErrorResponse(signUpResponse: SignUpResponse?) {
-        if (signUpResponse != null && !signUpResponse.success) {
-            val emailErrors = signUpResponse.errors?.email
-            val phoneErrors = signUpResponse.errors?.phone_number
-
-            emailErrors?.let {
-                // Check if the email error message is present
-                if (it.isNotEmpty()) {
-                    Toast.makeText(context, it.joinToString(", "), Toast.LENGTH_SHORT).show()
-                    // Redirect to verifyEmailFragment if the email already exists
-                    navController.navigate(R.id.verifyEmailFragment)
-                }
-            }
-
-            phoneErrors?.let {
-                if (it.isNotEmpty()) {
-                    Toast.makeText(context, it.joinToString(", "), Toast.LENGTH_SHORT).show()
-                }
-            }
-        } else {
-            Toast.makeText(context, "Sign-up failed! Please try again.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
 
     private fun areAllFieldsValid(): Boolean {
         val email = binding.enterEmail.text.toString()
         val password = binding.password.text.toString()
         val confirmPassword = binding.confirmPassword.text.toString()
-        val phone = binding.phone.text.toString()
+        val phone = binding.phone.text.toString().removePrefix("+91 ")
 
         val emailValid = isValidEmail(email)
         val passwordValid = isValidPassword(password)
-        val confirmPasswordValid = confirmPassword == password // Confirm password must match
+        val confirmPasswordValid = confirmPassword == password
         val phoneValid = isValidPhone(phone)
 
         if (!emailValid) {
@@ -229,36 +225,44 @@ class CreateAccount : BaseFragment() {
         phoneEditText: TextInputEditText,
         phoneInputLayout: TextInputLayout,
     ) {
+        phoneEditText.filters = arrayOf(InputFilter.LengthFilter(14))
+        phoneEditText.setText("+91 ")
+        phoneEditText.setSelection(phoneEditText.text?.length ?: 0)
+
         phoneEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                val phone = s.toString()
+                val phone = s.toString().removePrefix("+91 ")
                 when {
-                    phone.isEmpty() -> resetToDefault(phoneInputLayout, phoneEditText)
-                    !isValidPhone(phone) -> setErrorState(
-                        phoneInputLayout, "Invalid phone number", phoneEditText
+                    phone.isEmpty() -> resetToDefault(
+                        phoneInputLayout, phoneEditText
                     )
 
-                    else -> setValidState(phoneInputLayout, phoneEditText)
+                    !isValidPhone(phone) -> setErrorState(
+                        phoneInputLayout, "Please enter a valid phone number.", phoneEditText
+                    )
 
+                    else -> setValidState(
+                        phoneInputLayout, getString(R.string.phone_helper_text), phoneEditText
+                    )
                 }
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int,
+            ) {
+            }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (!s.isNullOrEmpty()) {
-                    phoneInputLayout.hint = ""
+                if (!s.isNullOrEmpty() && !s.startsWith("+91 ")) {
+                    phoneEditText.setText("+91 ${s.toString().removePrefix("+91 ")}")
+                    phoneEditText.setSelection(phoneEditText.text?.length ?: 0)
                 }
             }
         })
 
-        phoneEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                phoneInputLayout.hint = ""
-            } else if (phoneEditText.text.isNullOrEmpty()) {
-                phoneInputLayout.hint = getString(R.string.enter_your_phone)
-            }
-        }
     }
 
     private fun setupEmailValidation(
@@ -269,16 +273,27 @@ class CreateAccount : BaseFragment() {
             override fun afterTextChanged(s: Editable?) {
                 val email = s.toString()
                 when {
-                    email.isEmpty() -> resetToDefault(emailInputLayout, emailEditText)
+                    email.isEmpty() -> resetToDefault(
+                        emailInputLayout, emailEditText
+                    )
+
                     !isValidEmail(email) -> setErrorState(
                         emailInputLayout, "Invalid email format", emailEditText
                     )
 
-                    else -> setValidState(emailInputLayout, emailEditText)
+                    else -> setValidState(
+                        emailInputLayout, getString(R.string.email_helper_text), emailEditText
+                    )
                 }
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int,
+            ) {
+            }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (!s.isNullOrEmpty()) {
@@ -290,16 +305,16 @@ class CreateAccount : BaseFragment() {
         emailEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 emailInputLayout.hint = ""
-            } else {
-                if (emailEditText.text.isNullOrEmpty()) {
-                    emailInputLayout.hint = getString(R.string.enter_your_email)
-                }
-                emailInputLayout.helperText = null
+            } else if (emailEditText.text.isNullOrEmpty()) {
+                emailInputLayout.hint = getString(R.string.enter_your_email)
             }
         }
     }
 
-    private fun setupPasswordValidation(editText: TextInputEditText, inputLayout: TextInputLayout) {
+    private fun setupPasswordValidation(
+        editText: TextInputEditText,
+        inputLayout: TextInputLayout,
+    ) {
         val popupView = layoutInflater.inflate(R.layout.password_criteria_popup, null)
         val passwordPopup = PopupWindow(
             popupView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
@@ -319,6 +334,7 @@ class CreateAccount : BaseFragment() {
 
         editText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
+                inputLayout.hint = ""
                 editText.post {
                     // Calculate the position of the EditText
                     val location = IntArray(2)
@@ -326,7 +342,9 @@ class CreateAccount : BaseFragment() {
                     val editTextY = location[1]
 
                     // Calculate the height of the popup
-                    popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                    popupView.measure(
+                        View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED
+                    )
                     val popupHeight = popupView.measuredHeight
 
                     // Show the popup above the EditText
@@ -335,8 +353,13 @@ class CreateAccount : BaseFragment() {
                         editText, Gravity.NO_GRAVITY, location[0], editTextY - popupHeight
                     )
                 }
-            } else {
+            }else if(!editText.text.isNullOrEmpty() && !hasFocus){
                 passwordPopup.dismiss()
+                inputLayout.hint =""
+            }
+            else {
+                passwordPopup.dismiss()
+                inputLayout.hint = getString(R.string.enter_your_password)
             }
         }
 
@@ -353,15 +376,25 @@ class CreateAccount : BaseFragment() {
                 val isPasswordValid = isValidPassword(password)
                 if (isPasswordValid) {
                     passwordPopup.dismiss()
-                    setValidState(inputLayout, editText)
+                    setValidState(inputLayout, "", editText)
                     resetToDefault(inputLayout, editText)
                 }
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int,
+            ) {
+            }
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (!s.isNullOrEmpty()) inputLayout.hint = ""
+                else if (s.isNullOrEmpty() && editText.hasFocus()) inputLayout.hint = ""
+                else inputLayout.hint = getString(R.string.enter_your_password)
             }
+
         })
     }
 
@@ -375,7 +408,14 @@ class CreateAccount : BaseFragment() {
                 validateConfirmPassword()
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int,
+            ) {
+            }
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (!s.isNullOrEmpty()) {
                     confirmPasswordInputLayout.hint = ""
@@ -408,7 +448,7 @@ class CreateAccount : BaseFragment() {
                 confirmPasswordInputLayout, "Passwords do not match", confirmPasswordEditText
             )
 
-            else -> setValidState(confirmPasswordInputLayout, confirmPasswordEditText)
+            else -> setValidState(confirmPasswordInputLayout, "", confirmPasswordEditText)
         }
     }
 
@@ -425,20 +465,28 @@ class CreateAccount : BaseFragment() {
             ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background_error)
     }
 
-    private fun setValidState(inputLayout: TextInputLayout, editText: TextInputEditText) {
+    private fun setValidState(
+        inputLayout: TextInputLayout,
+        helperText: String,
+        editText: TextInputEditText,
+    ) {
         inputLayout.helperText = null
-        inputLayout.setHelperTextColor(null)
         editText.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corner)
+        inputLayout.helperText = helperText
+        inputLayout.setHelperTextColor(context?.getColorStateList(R.color.helper_text))
     }
 
-    private fun resetToDefault(inputLayout: TextInputLayout, editText: TextInputEditText) {
+    private fun resetToDefault(
+        inputLayout: TextInputLayout,
+        editText: TextInputEditText,
+    ) {
         inputLayout.helperText = null
-        inputLayout.setHelperTextColor(null)
         editText.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corner)
     }
 
     private fun isValidEmail(email: String): Boolean {
         val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
+        return email.matches(emailRegex)
         return email.matches(emailRegex)
     }
 
@@ -449,7 +497,7 @@ class CreateAccount : BaseFragment() {
     }
 
     private fun isValidPhone(phone: String): Boolean {
-        val phoneRegex = "^\\d{10}$".toRegex() // Assuming a 10-digit phone number format
+        val phoneRegex = "^\\d{10}$".toRegex()
         return phone.matches(phoneRegex)
     }
 
