@@ -72,62 +72,55 @@ class ResetPassword : BaseFragment() {
         }
     }
 
-    private fun setupPasswordValidation(editText: TextInputEditText, inputLayout: TextInputLayout) {
-        val popupView = layoutInflater.inflate(R.layout.password_criteria_popup, null)
-        passwordPopup = PopupWindow(
-            popupView,
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
+    private fun setupPasswordValidation(
+        passwordEditText: TextInputEditText,
+        passwordInputLayout: TextInputLayout,
+    ) {
+        val passwordCriteriaLayout = binding.passwordCriteriaLayout
 
-        passwordPopup.isOutsideTouchable = true
-        passwordPopup.isFocusable = false
 
-        val criteriaLength = popupView.findViewById<TextView>(R.id.criteria_length)
-        val criteriaUpper = popupView.findViewById<TextView>(R.id.criteria_upper)
-        val criteriaLower = popupView.findViewById<TextView>(R.id.criteria_lower)
-        val criteriaDigit = popupView.findViewById<TextView>(R.id.criteria_digit)
-        val criteriaSpecial = popupView.findViewById<TextView>(R.id.criteria_special)
-
-        val unmetColor = ContextCompat.getColor(requireContext(), R.color.black)
-        val metColor = ContextCompat.getColor(requireContext(), R.color.green)
-
-        editText.setOnFocusChangeListener { _, hasFocus ->
+        passwordEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                inputLayout.hint = ""
-                editText.post {
-                    passwordPopup.width = editText.width
-                    passwordPopup.showAsDropDown(editText, 0, 0)
-                }
+                passwordInputLayout.hint = ""
+                passwordCriteriaLayout.visibility = View.VISIBLE
             } else {
-                passwordPopup.dismiss()
-                if (editText.text.isNullOrEmpty()) {
-                    editText.hint = getString(R.string.enter_your_password)
+                passwordCriteriaLayout.visibility = View.GONE
+                if (passwordEditText.text.isNullOrEmpty()) {
+                    passwordInputLayout.hint = getString(R.string.enter_your_password)
                 }
             }
         }
 
-        editText.addTextChangedListener(object : TextWatcher {
+
+        val unmetColor = ContextCompat.getColor(requireContext(), R.color.white)
+        val metColor = ContextCompat.getColor(requireContext(), R.color.green)
+
+        passwordEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val password = s.toString()
-
-                criteriaLength.setTextColor(if (password.length >= 8) metColor else unmetColor)
-                criteriaUpper.setTextColor(if (password.any { it.isUpperCase() }) metColor else unmetColor)
-                criteriaLower.setTextColor(if (password.any { it.isLowerCase() }) metColor else unmetColor)
-                criteriaDigit.setTextColor(if (password.any { it.isDigit() }) metColor else unmetColor)
-                criteriaSpecial.setTextColor(if (password.any { !it.isLetterOrDigit() }) metColor else unmetColor)
+                binding.criteriaLength.setTextColor(if (password.length >= 8) metColor else unmetColor)
+                binding.criteriaUpper.setTextColor(if (password.any { it.isUpperCase() }) metColor else unmetColor)
+                binding.criteriaLower.setTextColor(if (password.any { it.isLowerCase() }) metColor else unmetColor)
+                binding.criteriaDigit.setTextColor(if (password.any { it.isDigit() }) metColor else unmetColor)
+                binding.criteriaSpecial.setTextColor(if (password.any { !it.isLetterOrDigit() }) metColor else unmetColor)
 
                 val isPasswordValid = isValidPassword(password)
                 if (isPasswordValid) {
-                    passwordPopup.dismiss()
-                    setValidState(inputLayout)
-                    resetToDefault(inputLayout, editText)
+                    passwordCriteriaLayout.visibility = View.GONE
+                    setValidState(passwordInputLayout)
+                    resetToDefault(passwordInputLayout, passwordEditText)
                 }
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (!s.isNullOrEmpty()) inputLayout.hint = ""
+                if (!s.isNullOrEmpty()) {
+                    passwordInputLayout.hint = ""
+                }
+                if (s.isNullOrEmpty() && !passwordEditText.hasFocus()) {
+                    passwordInputLayout.hint = getString(R.string.enter_your_password)
+                }
             }
         })
     }
@@ -222,7 +215,12 @@ class ResetPassword : BaseFragment() {
         binding.confirmPassword.text?.clear()
     }
 
-    private fun resetPassword(email : String, otp : String, new_password : String, confirm_password : String){
+    private fun resetPassword(
+        email: String,
+        otp: String,
+        new_password: String,
+        confirm_password: String,
+    ) {
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("$email $otp")
         progressDialog.setCancelable(false)
@@ -230,15 +228,29 @@ class ResetPassword : BaseFragment() {
 
         lifecycleScope.launch {
             try {
-                val response = RetrofitInstance.api.resetPassword(ResetRequest(email, otp, new_password, confirm_password))
-                if (response.success){
-                    Toast.makeText(requireContext(), "Password reset successfully", Toast.LENGTH_SHORT).show()
+                val response = RetrofitInstance.api.resetPassword(
+                    ResetRequest(
+                        email,
+                        otp,
+                        new_password,
+                        confirm_password
+                    )
+                )
+                if (response.success) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Password reset successfully",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     navController.navigate(R.id.loginFragment)
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Failed to reset password: ${response.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-                else{
-                    Toast.makeText(requireContext(), "Failed to reset password: ${response.message}", Toast.LENGTH_SHORT).show()
-                }
-            }catch (e: Exception) {
+            } catch (e: Exception) {
                 Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
                     .show()
             } finally {

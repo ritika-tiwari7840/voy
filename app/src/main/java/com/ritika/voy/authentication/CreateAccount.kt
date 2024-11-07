@@ -18,6 +18,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.isEmpty
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -89,34 +90,6 @@ class CreateAccount : BaseFragment() {
         binding.btnBack.setOnClickListener {
             navController.navigate(R.id.loginFragment)
         }
-
-        val passwordEditText = binding.password
-        val passwordCriteriaLayout = binding.passwordCriteriaLayout
-
-        passwordEditText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                passwordCriteriaLayout.visibility = View.VISIBLE
-            } else {
-                passwordCriteriaLayout.visibility = View.GONE
-            }
-        }
-
-        passwordEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                val password = s.toString()
-                val unmetColor = ContextCompat.getColor(requireContext(), R.color.black)
-                val metColor = ContextCompat.getColor(requireContext(), R.color.green)
-
-                binding.criteriaLength.setTextColor(if (password.length >= 8) metColor else unmetColor)
-                binding.criteriaUpper.setTextColor(if (password.any { it.isUpperCase() }) metColor else unmetColor)
-                binding.criteriaLower.setTextColor(if (password.any { it.isLowerCase() }) metColor else unmetColor)
-                binding.criteriaDigit.setTextColor(if (password.any { it.isDigit() }) metColor else unmetColor)
-                binding.criteriaSpecial.setTextColor(if (password.any { !it.isLetterOrDigit() }) metColor else unmetColor)
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
     }
 
     override fun onBackPressed() {
@@ -154,38 +127,51 @@ class CreateAccount : BaseFragment() {
 
         lifecycleScope.launch {
             try {
-                authService.signUp(requestBody).enqueue(object : retrofit2.Callback<SignUpResponse> {
-                    override fun onResponse(call: Call<SignUpResponse>, response: retrofit2.Response<SignUpResponse>) {
-                        progressDialog.dismiss()
-                        if (response.isSuccessful) {
-                            response.body()?.let { signUpResponse ->
-                                if (signUpResponse.success) {
-                                    Toast.makeText(requireContext(), "Registration Initiated, Please verify your Email and Phone Number", Toast.LENGTH_SHORT).show()
-                                    val bundle = Bundle().apply {
-                                        putString("email", email)
-                                        putString("phoneNumber", phoneNumber)
-                                        putString("user_id", signUpResponse.registration_status.user_id.toString())
+                authService.signUp(requestBody)
+                    .enqueue(object : retrofit2.Callback<SignUpResponse> {
+                        override fun onResponse(
+                            call: Call<SignUpResponse>,
+                            response: retrofit2.Response<SignUpResponse>,
+                        ) {
+                            progressDialog.dismiss()
+                            if (response.isSuccessful) {
+                                response.body()?.let { signUpResponse ->
+                                    if (signUpResponse.success) {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            "Registration Initiated, Please verify your Email and Phone Number",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        val bundle = Bundle().apply {
+                                            putString("email", email)
+                                            putString("phoneNumber", phoneNumber)
+                                            putString(
+                                                "user_id",
+                                                signUpResponse.registration_status.user_id.toString()
+                                            )
+                                        }
+                                        navController.navigate(R.id.verifyEmailFragment, bundle)
+                                    } else {
+                                        handleUserExist(response)
                                     }
-                                    navController.navigate(R.id.verifyEmailFragment, bundle)
-                                } else {
-                                    handleUserExist(response)
                                 }
+                            } else {
+                                handleUserExist(response)
                             }
-                        } else {
-                            handleUserExist(response)
                         }
-                    }
 
-                    override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
-                        progressDialog.dismiss()
-                        Log.e("API Error", "Network error: ${t.message}", t)
-                        Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT).show()
-                    }
-                })
+                        override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
+                            progressDialog.dismiss()
+                            Log.e("API Error", "Network error: ${t.message}", t)
+                            Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    })
             } catch (e: Exception) {
                 progressDialog.dismiss()
                 Log.e("CreateAccount", "Error: ${e.message}", e)
-                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
+                    .show()
             } finally {
                 clearFields()
             }
@@ -206,7 +192,8 @@ class CreateAccount : BaseFragment() {
         } ?: run {
             val errorResponse = response.errorBody()?.string()
             Log.e("CreateAccount", "Error Response: $errorResponse")
-            Toast.makeText(context, "User with this credentials already exists", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "User with this credentials already exists", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -280,7 +267,7 @@ class CreateAccount : BaseFragment() {
                     )
 
                     !isValidPhone(phone) -> setErrorState(
-                        phoneInputLayout, "Please enter a valid phone number.", phoneEditText
+                        phoneInputLayout, getString(R.string.invalid_phone_format), phoneEditText
                     )
 
                     else -> setValidState(
@@ -320,7 +307,7 @@ class CreateAccount : BaseFragment() {
                     )
 
                     !isValidEmail(email) -> setErrorState(
-                        emailInputLayout, "Invalid email format", emailEditText
+                        emailInputLayout, getString(R.string.invalid_email_format), emailEditText
                     )
 
                     else -> setValidState(
@@ -354,91 +341,60 @@ class CreateAccount : BaseFragment() {
     }
 
     private fun setupPasswordValidation(
-        editText: TextInputEditText,
-        inputLayout: TextInputLayout,
+        passwordEditText: TextInputEditText,
+        passwordInputLayout: TextInputLayout,
     ) {
-        val popupView = layoutInflater.inflate(R.layout.password_criteria_popup, null)
-        val passwordPopup = PopupWindow(
-            popupView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        )
 
-        passwordPopup.isOutsideTouchable = false
-        passwordPopup.isFocusable = false
+        val passwordEditText = binding.password
+        val passwordCriteriaLayout = binding.passwordCriteriaLayout
 
-        val criteriaLength = popupView.findViewById<TextView>(R.id.criteria_length)
-        val criteriaUpper = popupView.findViewById<TextView>(R.id.criteria_upper)
-        val criteriaLower = popupView.findViewById<TextView>(R.id.criteria_lower)
-        val criteriaDigit = popupView.findViewById<TextView>(R.id.criteria_digit)
-        val criteriaSpecial = popupView.findViewById<TextView>(R.id.criteria_special)
 
-        val unmetColor = ContextCompat.getColor(requireContext(), R.color.black)
-        val metColor = ContextCompat.getColor(requireContext(), R.color.green)
-
-        editText.setOnFocusChangeListener { _, hasFocus ->
+        passwordEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                inputLayout.hint = ""
-                editText.post {
-                    // Calculate the position of the EditText
-                    val location = IntArray(2)
-                    editText.getLocationOnScreen(location)
-                    val editTextY = location[1]
-
-                    // Calculate the height of the popup
-                    popupView.measure(
-                        View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED
-                    )
-                    val popupHeight = popupView.measuredHeight
-
-                    // Show the popup above the EditText
-                    passwordPopup.width = editText.width
-                    passwordPopup.showAtLocation(
-                        editText, Gravity.NO_GRAVITY, location[0], editTextY - popupHeight
-                    )
+                passwordInputLayout.hint = ""
+                passwordCriteriaLayout.visibility = View.VISIBLE
+            } else {
+                passwordCriteriaLayout.visibility = View.GONE
+                if (passwordEditText.text.isNullOrEmpty()) {
+                    passwordInputLayout.hint = getString(R.string.enter_your_password)
                 }
-            }else if(!editText.text.isNullOrEmpty() && !hasFocus){
-                passwordPopup.dismiss()
-                inputLayout.hint =""
-            }
-            else {
-                passwordPopup.dismiss()
-                inputLayout.hint = getString(R.string.enter_your_password)
             }
         }
 
-        editText.addTextChangedListener(object : TextWatcher {
+
+        val unmetColor = ContextCompat.getColor(requireContext(), R.color.white)
+        val metColor = ContextCompat.getColor(requireContext(), R.color.green)
+
+        passwordEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val password = s.toString()
-
-                criteriaLength.setTextColor(if (password.length >= 8) metColor else unmetColor)
-                criteriaUpper.setTextColor(if (password.any { it.isUpperCase() }) metColor else unmetColor)
-                criteriaLower.setTextColor(if (password.any { it.isLowerCase() }) metColor else unmetColor)
-                criteriaDigit.setTextColor(if (password.any { it.isDigit() }) metColor else unmetColor)
-                criteriaSpecial.setTextColor(if (password.any { !it.isLetterOrDigit() }) metColor else unmetColor)
+                binding.criteriaLength.setTextColor(if (password.length >= 8) metColor else unmetColor)
+                binding.criteriaUpper.setTextColor(if (password.any { it.isUpperCase() }) metColor else unmetColor)
+                binding.criteriaLower.setTextColor(if (password.any { it.isLowerCase() }) metColor else unmetColor)
+                binding.criteriaDigit.setTextColor(if (password.any { it.isDigit() }) metColor else unmetColor)
+                binding.criteriaSpecial.setTextColor(if (password.any { !it.isLetterOrDigit() }) metColor else unmetColor)
 
                 val isPasswordValid = isValidPassword(password)
                 if (isPasswordValid) {
-                    passwordPopup.dismiss()
-                    setValidState(inputLayout, "", editText)
-                    resetToDefault(inputLayout, editText)
+                    passwordCriteriaLayout.visibility = View.GONE
+                    setValidState(passwordInputLayout, "", passwordEditText)
+                    resetToDefault(passwordInputLayout, passwordEditText)
                 }
             }
 
-            override fun beforeTextChanged(
-                s: CharSequence?,
-                start: Int,
-                count: Int,
-                after: Int,
-            ) {
-            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (!s.isNullOrEmpty()) inputLayout.hint = ""
-                else if (s.isNullOrEmpty() && editText.hasFocus()) inputLayout.hint = ""
-                else inputLayout.hint = getString(R.string.enter_your_password)
+                if (!s.isNullOrEmpty()) {
+                    passwordInputLayout.hint = ""
+                }
+                if (s.isNullOrEmpty() && !passwordEditText.hasFocus()) {
+                    passwordInputLayout.hint = getString(R.string.enter_your_password)
+                }
             }
-
         })
     }
+
 
     private fun setupConfirmPasswordValidation(
         confirmPasswordEditText: TextInputEditText,
@@ -487,7 +443,9 @@ class CreateAccount : BaseFragment() {
             )
 
             confirmPassword != password -> setErrorState(
-                confirmPasswordInputLayout, "Passwords do not match", confirmPasswordEditText
+                confirmPasswordInputLayout,
+                getString(R.string.password_mismatch),
+                confirmPasswordEditText
             )
 
             else -> setValidState(confirmPasswordInputLayout, "", confirmPasswordEditText)
