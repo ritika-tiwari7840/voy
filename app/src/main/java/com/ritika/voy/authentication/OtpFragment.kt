@@ -196,7 +196,7 @@ class OtpFragment : BaseFragment() {
                     navController.navigate(R.id.resetPassword, otpBundle)
                 }
                 else {
-                    Toast.makeText(requireContext(), "Failed to verify otp: ${response.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
                 }
             }catch (e: Exception) {
                 Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)

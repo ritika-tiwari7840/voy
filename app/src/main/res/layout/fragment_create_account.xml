@@ -14,38 +14,37 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        app:srcCompat="@drawable/back_button"
         android:contentDescription="Back button"
         app:layout_constraintBottom_toTopOf="@+id/heading_text_bottom_guide"
         app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
-        app:layout_constraintTop_toBottomOf="@+id/heading_text_top_guide" />
+        app:layout_constraintTop_toBottomOf="@+id/heading_text_top_guide"
+        app:srcCompat="@drawable/back_button" />
 
 
     <TextView
         android:id="@+id/signup_heading_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:fontFamily="@font/semibold"
         android:gravity="center"
         android:text="Sign Up"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="28sp"
-        android:layout_marginStart="16dp"
         app:layout_constraintBottom_toBottomOf="@+id/btn_back"
         app:layout_constraintStart_toEndOf="@+id/btn_back"
-        app:layout_constraintTop_toTopOf="@+id/btn_back"
-     />
+        app:layout_constraintTop_toTopOf="@+id/btn_back" />
 
     <View
         android:id="@+id/bottomSection"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/form_background"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
@@ -57,10 +56,9 @@
         android:text="Phone Number"
         android:textColor="@color/white"
         android:textSize="16.67sp"
-        app:layout_constraintTop_toBottomOf="@id/form_guide_one"
-        app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
         app:layout_constraintBottom_toTopOf="@id/phone_layout"
-        />
+        app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
+        app:layout_constraintTop_toBottomOf="@id/form_guide_one" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/phone_layout"
@@ -69,11 +67,12 @@
         android:textColorHint="@color/white"
         app:errorEnabled="true"
         app:helperTextEnabled="true"
+        app:helperTextTextAppearance="@style/CustomHelperTextAppearance"
         app:helperTextTextColor="@color/helper_text"
-        app:layout_constraintTop_toBottomOf="@id/phone_text_view"
+        app:layout_constraintBottom_toTopOf="@id/email_text_view"
         app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
         app:layout_constraintRight_toRightOf="@id/form_right_guide"
-        app:layout_constraintBottom_toTopOf="@id/email_text_view"
+        app:layout_constraintTop_toBottomOf="@id/phone_text_view"
 
         >
 
@@ -86,8 +85,7 @@
             android:padding="16dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
-            android:textSize="15sp"
-            />
+            android:textSize="15sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -100,10 +98,9 @@
         android:text="Email"
         android:textColor="@color/white"
         android:textSize="16.67sp"
-        app:layout_constraintTop_toBottomOf="@id/phone_layout"
-        app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
         app:layout_constraintBottom_toTopOf="@id/email_layout"
-        />
+        app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
+        app:layout_constraintTop_toBottomOf="@id/phone_layout" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/email_layout"
@@ -113,11 +110,12 @@
         android:textColorHint="@color/white"
         app:errorEnabled="true"
         app:helperTextEnabled="true"
+        app:helperTextTextAppearance="@style/CustomHelperTextAppearance"
         app:helperTextTextColor="@color/helper_text"
-        app:layout_constraintTop_toBottomOf="@id/email_text_view"
+        app:layout_constraintBottom_toTopOf="@id/password_text_view"
         app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
         app:layout_constraintRight_toRightOf="@id/form_right_guide"
-        app:layout_constraintBottom_toTopOf="@id/password_text_view"
+        app:layout_constraintTop_toBottomOf="@id/email_text_view"
 
         >
 
@@ -130,8 +128,7 @@
             android:padding="16dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
-            android:textSize="15sp"
-            />
+            android:textSize="15sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -144,10 +141,9 @@
         android:text="Password"
         android:textColor="@color/white"
         android:textSize="16.67sp"
-        app:layout_constraintTop_toBottomOf="@id/email_layout"
-        app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
         app:layout_constraintBottom_toTopOf="@id/password_layout"
-        />
+        app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
+        app:layout_constraintTop_toBottomOf="@id/email_layout" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/password_layout"
@@ -159,10 +155,11 @@
         app:endIconTint="@color/white"
         app:errorEnabled="true"
         app:helperTextEnabled="true"
-        app:layout_constraintTop_toBottomOf="@id/password_text_view"
-        app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
+        app:helperTextTextAppearance="@style/CustomHelperTextAppearance"
         app:layout_constraintBottom_toTopOf="@id/confirm_password_text_view"
+        app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
         app:layout_constraintRight_toRightOf="@id/form_right_guide"
+        app:layout_constraintTop_toBottomOf="@id/password_text_view"
 
         >
 
@@ -183,8 +180,8 @@
         android:id="@+id/passwordCriteriaLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:background="@drawable/criteria_background"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/password_text_view"
         app:layout_constraintEnd_toStartOf="@+id/form_right_guide"
         app:layout_constraintStart_toStartOf="@+id/form_left_guide">
@@ -194,6 +191,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="16dp"
+            android:fontFamily="@font/poppinsmedium"
             android:paddingTop="16dp"
             android:paddingBottom="16dp"
             android:text="Password must contain:"
@@ -206,6 +204,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="16dp"
+            android:fontFamily="@font/poppinsmedium"
             android:text="• At least 8 characters"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
@@ -216,6 +215,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="16dp"
+            android:fontFamily="@font/poppinsmedium"
             android:text="• At least one uppercase letter"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
@@ -226,6 +226,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="16dp"
+            android:fontFamily="@font/poppinsmedium"
             android:text="• At least one lowercase letter"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
@@ -236,6 +237,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="16dp"
+            android:fontFamily="@font/poppinsmedium"
             android:text="• At least one digit"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
@@ -247,6 +249,7 @@
             android:layout_height="wrap_content"
             android:paddingStart="16dp"
             android:paddingBottom="16dp"
+            android:fontFamily="@font/poppinsmedium"
             android:text="• At least one special character"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
@@ -263,10 +266,9 @@
         android:text="Confirm Password"
         android:textColor="@color/white"
         android:textSize="16.67sp"
-        app:layout_constraintTop_toBottomOf="@id/password_layout"
-        app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
         app:layout_constraintBottom_toBottomOf="@id/confirm_password_layout"
-        />
+        app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
+        app:layout_constraintTop_toBottomOf="@id/password_layout" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/confirm_password_layout"
@@ -276,10 +278,11 @@
         android:textColorHint="@color/white"
         app:endIconMode="password_toggle"
         app:endIconTint="@color/white"
-        app:layout_constraintTop_toBottomOf="@id/confirm_password_text_view"
+        app:helperTextTextAppearance="@style/CustomHelperTextAppearance"
+        app:layout_constraintBottom_toTopOf="@id/sign_up_button"
         app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
         app:layout_constraintRight_toRightOf="@id/form_right_guide"
-        app:layout_constraintBottom_toTopOf="@id/sign_up_button"
+        app:layout_constraintTop_toBottomOf="@id/confirm_password_text_view"
 
         >
 
@@ -304,15 +307,14 @@
         android:background="@drawable/rounded_corner"
         android:backgroundTint="@color/theme_color"
         android:fontFamily="@font/medium"
+        android:padding="16dp"
         android:text="Sign up"
+        android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textSize="16.67sp"
-        android:padding="16dp"
-        android:textAllCaps="false"
-        app:layout_constraintTop_toBottomOf="@id/confirm_password_layout"
         app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
         app:layout_constraintRight_toRightOf="@id/form_right_guide"
-        />
+        app:layout_constraintTop_toBottomOf="@id/confirm_password_layout" />
 
     <TextView
         android:id="@+id/signed_up"
@@ -323,10 +325,9 @@
         android:text="Already a member? Log in"
         android:textColor="@color/white"
         android:textSize="13.33sp"
-        app:layout_constraintTop_toBottomOf="@id/sign_up_button"
         app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
         app:layout_constraintRight_toRightOf="@id/form_right_guide"
-        />
+        app:layout_constraintTop_toBottomOf="@id/sign_up_button" />
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -343,7 +344,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.145" />
-
 
 
     <androidx.constraintlayout.widget.Guideline
