@@ -194,6 +194,7 @@ class VerifyEmailFragment : BaseFragment() {
                     showToast(response.message)
                 }
             } catch (e: Exception) {
+                Log.e("VerifyEmailFragment", "Error: ${e.message}")
                 showToast("An unexpected error occurred")
             } finally {
                 progressDialog.dismiss()

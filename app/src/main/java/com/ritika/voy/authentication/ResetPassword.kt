@@ -107,7 +107,7 @@ class ResetPassword : BaseFragment() {
                 val isPasswordValid = isValidPassword(password)
                 if (isPasswordValid) {
                     passwordCriteriaLayout.visibility = View.GONE
-                    setValidState(passwordInputLayout)
+                    setValidState(passwordInputLayout, passwordEditText)
                     resetToDefault(passwordInputLayout, passwordEditText)
                 }
             }
@@ -130,24 +130,36 @@ class ResetPassword : BaseFragment() {
         val confirmPassword = binding.confirmPassword.text.toString()
         val confirmPasswordInputLayout = binding.confirmPasswordLabel
         val confirmPasswordEditText = binding.confirmPassword
+        val newPasswordInputLayout = binding.newPasswordLabel
+
+        val errorColor = ContextCompat.getColor(requireContext(), R.color.red)
+        val defaultColor = ContextCompat.getColor(requireContext(), R.color.white)
+        val newPasswordValidColor = ContextCompat.getColor(requireContext(), R.color.theme_color)
 
         when {
-            confirmPassword.isEmpty() -> resetToDefault(
-                confirmPasswordInputLayout,
-                confirmPasswordEditText
-            )
+            confirmPassword.isEmpty() -> {
+                resetToDefault(confirmPasswordInputLayout, confirmPasswordEditText)
+                confirmPasswordInputLayout.boxStrokeColor = defaultColor
+                newPasswordInputLayout.boxStrokeColor = defaultColor
+            }
 
-            confirmPassword != password -> setErrorState(
-                confirmPasswordInputLayout, "Passwords do not match", confirmPasswordEditText
-            )
+            confirmPassword != password -> {
+                setErrorState(confirmPasswordInputLayout, "Passwords do not match", confirmPasswordEditText)
+                confirmPasswordInputLayout.boxStrokeColor = errorColor
+                newPasswordInputLayout.boxStrokeColor = defaultColor
+            }
 
-            !isValidPassword(confirmPassword) -> setErrorState(
-                confirmPasswordInputLayout,
-                "Password must contain 8 characters, including uppercase, lowercase, number, and special character",
-                confirmPasswordEditText
-            )
+            !isValidPassword(confirmPassword) -> {
+                setErrorState(confirmPasswordInputLayout, "Password must contain 8 characters, including uppercase, lowercase, number, and special character", confirmPasswordEditText)
+                confirmPasswordInputLayout.boxStrokeColor = errorColor
+                newPasswordInputLayout.boxStrokeColor = defaultColor
+            }
 
-            else -> setValidState(confirmPasswordInputLayout)
+            else -> {
+                setValidState(confirmPasswordInputLayout, confirmPasswordEditText)
+                confirmPasswordInputLayout.boxStrokeColor = newPasswordValidColor
+                newPasswordInputLayout.boxStrokeColor = newPasswordValidColor
+            }
         }
     }
 
@@ -166,9 +178,12 @@ class ResetPassword : BaseFragment() {
             ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background_error)
     }
 
-    private fun setValidState(inputLayout: TextInputLayout) {
+    private fun setValidState(inputLayout: TextInputLayout, editText: TextInputEditText,) {
         inputLayout.helperText = null
         inputLayout.setHelperTextColor(null)
+        editText.background =
+            ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background)
+
     }
 
     private fun resetToDefault(inputLayout: TextInputLayout, editText: TextInputEditText) {
@@ -222,7 +237,7 @@ class ResetPassword : BaseFragment() {
         confirm_password: String,
     ) {
         val progressDialog = ProgressDialog(requireContext())
-        progressDialog.setMessage("$email $otp")
+        progressDialog.setMessage("Loading...")
         progressDialog.setCancelable(false)
         progressDialog.show()
 
