@@ -1,8 +1,10 @@
 package com.ritika.voy.authentication
 
 import android.app.ProgressDialog
+import android.content.IntentSender.OnFinished
 import android.graphics.Color
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
@@ -36,6 +38,7 @@ class OtpFragment : BaseFragment() {
     private lateinit var navController: NavController
     private var _binding: FragmentOtpBinding? = null
     private val binding get() = _binding!!
+    private lateinit var resendTimer: CountDownTimer
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +67,7 @@ class OtpFragment : BaseFragment() {
         bottomSection.layoutParams = params
 
         val resendTextview = view.findViewById<TextView>(R.id.resendTextView)
+        startResendTimer()
         val resendText = "Didn’t receive any code? Resend Code"
         val spannable = SpannableString(resendText)
         spannable.setSpan(
@@ -163,8 +167,68 @@ class OtpFragment : BaseFragment() {
         }
         binding.resendTextView.setOnClickListener {
             resendOTP(email)
+            startResendTimer()
         }
 
+    }
+
+    private fun startResendTimer() {
+        binding.resendTextView.isEnabled = false
+        resendTimer = object : CountDownTimer(30000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsRemaining = millisUntilFinished / 1000
+                binding.resendTextView.text = "Didn’t receive any code? Resend Code ($secondsRemaining)"
+                val resendText = "Didn’t receive any code? Resend Code ($secondsRemaining)"
+                val spannable = SpannableString(resendText)
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.WHITE),
+                    0,
+                    24,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.parseColor("#7e60bf")),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                spannable.setSpan(
+                    UnderlineSpan(),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                binding.resendTextView.text = spannable
+            }
+
+            override fun onFinish() {
+                binding.resendTextView.isEnabled = true
+                binding.resendTextView.text = "Didn’t receive any code? Resend Code"
+                val resendText = "Didn’t receive any code? Resend Code"
+                val spannable = SpannableString(resendText)
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.WHITE),
+                    0,
+                    24,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.parseColor("#7e60bf")),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                spannable.setSpan(
+                    UnderlineSpan(),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                binding.resendTextView.text = spannable
+            }
+        }.start()
     }
 
     private fun clearFields() {

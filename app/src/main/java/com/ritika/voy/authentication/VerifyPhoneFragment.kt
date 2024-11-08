@@ -3,6 +3,7 @@ package com.ritika.voy.authentication
 import android.app.ProgressDialog
 import android.graphics.Color
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
@@ -19,6 +20,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.datastore.preferences.core.MutablePreferences
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -35,6 +41,7 @@ class VerifyPhoneFragment : BaseFragment() {
     private var _binding: FragmentVerifyPhoneBinding? = null
     private val binding get() = _binding!!
     private lateinit var navController: NavController
+    private lateinit var resendTimer: CountDownTimer
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,6 +72,7 @@ class VerifyPhoneFragment : BaseFragment() {
 
         val resendTextview = view.findViewById<TextView>(R.id.resendTextView)
         val resendText = "Didn’t receive any code? Resend Code"
+        startResendTimer()
         val spannable = SpannableString(resendText)
         spannable.setSpan(
             ForegroundColorSpan(Color.WHITE),
@@ -135,9 +143,6 @@ class VerifyPhoneFragment : BaseFragment() {
 
         navController = Navigation.findNavController(view)
 
-        resendTextview.setOnClickListener {
-            Toast.makeText(requireContext(), "Resend OTP", Toast.LENGTH_SHORT).show()
-        }
 
         binding.btnVerify.setOnClickListener {
             val phone_otp = otpBox1.text.toString() +
@@ -166,8 +171,68 @@ class VerifyPhoneFragment : BaseFragment() {
         binding.resendTextView.setOnClickListener {
             val phone = arguments?.getString("phone") ?: ""
             resendPhone(phone)
+            startResendTimer()
         }
 
+    }
+
+    private fun startResendTimer() {
+        binding.resendTextView.isEnabled = false
+        resendTimer = object : CountDownTimer(30000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsRemaining = millisUntilFinished / 1000
+                binding.resendTextView.text = "Didn’t receive any code? Resend Code ($secondsRemaining)"
+                val resendText = "Didn’t receive any code? Resend Code ($secondsRemaining)"
+                val spannable = SpannableString(resendText)
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.WHITE),
+                    0,
+                    24,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.parseColor("#7e60bf")),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                spannable.setSpan(
+                    UnderlineSpan(),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                binding.resendTextView.text = spannable
+            }
+
+            override fun onFinish() {
+                binding.resendTextView.isEnabled = true
+                binding.resendTextView.text = "Didn’t receive any code? Resend Code"
+                val resendText = "Didn’t receive any code? Resend Code"
+                val spannable = SpannableString(resendText)
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.WHITE),
+                    0,
+                    24,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.parseColor("#7e60bf")),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                spannable.setSpan(
+                    UnderlineSpan(),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                binding.resendTextView.text = spannable
+            }
+        }.start()
     }
 
     private fun resendPhone(phone: String) {
@@ -211,6 +276,9 @@ class VerifyPhoneFragment : BaseFragment() {
             try {
                 val response = RetrofitInstance.api.PhoneVerify(PhoneVerifyRequest(user_id, phone_otp))
                 if (response.success){
+                    response.tokens?.let {
+                        saveTokens(it.access!!, it.refresh!!)
+                    }
                     Toast.makeText(requireContext(), "Otp verified, Registration Successful", Toast.LENGTH_SHORT).show()
                     navController.navigate(R.id.action_verifyPhoneFragment_to_homeActivity)
                 }
@@ -228,6 +296,21 @@ class VerifyPhoneFragment : BaseFragment() {
             }
         }
     }
+
+    private suspend fun saveTokens(accessToken: String, refreshToken: String) {
+        val dataStore = PreferenceDataStoreFactory.create {
+            requireContext().preferencesDataStoreFile("tokens")
+        }
+        val accessTokenKey = stringPreferencesKey("access")
+        val refreshTokenKey = stringPreferencesKey("refresh")
+
+        dataStore.edit { preferences: MutablePreferences ->
+            preferences[accessTokenKey] = accessToken
+            preferences[refreshTokenKey] = refreshToken
+        }
+    }
+
+
 
     fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
         currentBox.addTextChangedListener(object : TextWatcher {
