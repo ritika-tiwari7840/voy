@@ -221,7 +221,7 @@ class ResetPassword : BaseFragment() {
         }
 
         binding.btnBack.setOnClickListener {
-            navController.popBackStack()
+            navController.navigate(R.id.action_resetPassword_to_otpFragment)
         }
     }
 
@@ -257,7 +257,7 @@ class ResetPassword : BaseFragment() {
                         "Password reset successfully",
                         Toast.LENGTH_SHORT
                     ).show()
-                    navController.navigate(R.id.loginFragment)
+                    navController.navigate(R.id.action_resetPassword_to_loginFragment)
                 } else {
                     Toast.makeText(
                         requireContext(),
@@ -276,6 +276,6 @@ class ResetPassword : BaseFragment() {
     }
 
     override fun onBackPressed() {
-        navController.navigate(R.id.otpFragment)
+        navController.navigate(R.id.action_resetPassword_to_otpFragment)
     }
 }

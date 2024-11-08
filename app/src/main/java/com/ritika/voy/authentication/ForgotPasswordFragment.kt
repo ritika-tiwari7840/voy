@@ -89,11 +89,10 @@ class ForgotPasswordFragment : BaseFragment() {
                 emailEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background_error)
                 emailErrorTextView.visibility = View.VISIBLE
             }
-            navController.navigate(R.id.otpFragment, emailBundle)
         }
 
         binding.btnBack.setOnClickListener {
-            navController.navigate(R.id.loginFragment)
+            navController.navigate(R.id.action_forgotPasswordFragment_to_loginFragment)
         }
     }
 
@@ -116,7 +115,7 @@ class ForgotPasswordFragment : BaseFragment() {
                         putString("email", email)
                     }
                     Toast.makeText(requireContext(), "Password reset email sent", Toast.LENGTH_SHORT).show()
-                    navController.navigate(R.id.otpFragment, emailBundle)
+                    navController.navigate(R.id.action_forgotPasswordFragment_to_otpFragment, emailBundle)
                 } else {
                     Toast.makeText(requireContext(), "Failed to send reset email: ${response.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -131,6 +130,6 @@ class ForgotPasswordFragment : BaseFragment() {
     }
 
     override fun onBackPressed() {
-        navController.navigate(R.id.loginFragment)
+        navController.navigate(R.id.action_forgotPasswordFragment_to_loginFragment)
     }
 }

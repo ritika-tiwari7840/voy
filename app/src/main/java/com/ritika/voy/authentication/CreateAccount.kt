@@ -88,12 +88,12 @@ class CreateAccount : BaseFragment() {
         }
 
         binding.btnBack.setOnClickListener {
-            navController.navigate(R.id.loginFragment)
+            navController.navigate(R.id.action_createAccount_to_loginFragment)
         }
     }
 
     override fun onBackPressed() {
-        navController.navigate(R.id.loginFragment)
+        navController.navigate(R.id.action_createAccount_to_loginFragment)
     }
 
 
@@ -150,7 +150,7 @@ class CreateAccount : BaseFragment() {
                                                 signUpResponse.registration_status.user_id.toString()
                                             )
                                         }
-                                        navController.navigate(R.id.verifyEmailFragment, bundle)
+                                        navController.navigate(R.id.action_createAccount_to_verifyEmailFragment, bundle)
                                     } else {
                                         handleUserExist(response)
                                     }
@@ -187,7 +187,7 @@ class CreateAccount : BaseFragment() {
                 putString("phoneNumber", phoneNumber)
                 putString("user_id", it.toString())
             }
-            navController.navigate(R.id.verifyEmailFragment, bundle)
+            navController.navigate(R.id.action_createAccount_to_verifyEmailFragment, bundle)
             Toast.makeText(context, "User Already Exist", Toast.LENGTH_SHORT).show()
         } ?: run {
             val errorResponse = response.errorBody()?.string()

@@ -159,7 +159,7 @@ class OtpFragment : BaseFragment() {
 
         }
         binding.btnBack.setOnClickListener {
-            navController.popBackStack()
+            navController.navigate(R.id.action_otpFragment_to_forgotPasswordFragment)
         }
         binding.resendTextView.setOnClickListener {
             resendOTP(email)
@@ -193,7 +193,7 @@ class OtpFragment : BaseFragment() {
                         putString("email", email)
                     }
                     Toast.makeText(requireContext(), "Otp verified", Toast.LENGTH_SHORT).show()
-                    navController.navigate(R.id.resetPassword, otpBundle)
+                    navController.navigate(R.id.action_otpFragment_to_resetPassword, otpBundle)
                 }
                 else {
                     Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
@@ -269,6 +269,6 @@ class OtpFragment : BaseFragment() {
     }
 
     override fun onBackPressed() {
-        navController.navigate(R.id.forgotPasswordFragment)
+        navController.navigate(R.id.action_otpFragment_to_forgotPasswordFragment)
     }
 }

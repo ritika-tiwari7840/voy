@@ -127,7 +127,7 @@ class VerifyEmailFragment : BaseFragment() {
 
     private fun setupButtonListeners() {
         binding.btnBack.setOnClickListener {
-            navController.popBackStack()
+            navController.navigate(R.id.action_verifyEmailFragment_to_createAccount)
         }
 
         binding.btnVerify.setOnClickListener {
@@ -189,7 +189,7 @@ class VerifyEmailFragment : BaseFragment() {
 
                     }
                     Toast.makeText(requireContext(), "Email verified Successfully, Please Verify Phone Number.", Toast.LENGTH_SHORT).show()
-                    navController.navigate(R.id.verifyPhoneFragment, userBundle)
+                    navController.navigate(R.id.action_verifyEmailFragment_to_verifyPhoneFragment, userBundle)
                 } else {
                     showToast(response.message)
                 }

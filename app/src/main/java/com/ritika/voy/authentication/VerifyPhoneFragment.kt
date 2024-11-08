@@ -160,7 +160,7 @@ class VerifyPhoneFragment : BaseFragment() {
         }
 
         binding.btnBack.setOnClickListener {
-            navController.popBackStack()
+            navController.navigate(R.id.action_verifyPhoneFragment_to_verifyEmailFragment)
         }
 
         binding.resendTextView.setOnClickListener {
@@ -212,7 +212,7 @@ class VerifyPhoneFragment : BaseFragment() {
                 val response = RetrofitInstance.api.PhoneVerify(PhoneVerifyRequest(user_id, phone_otp))
                 if (response.success){
                     Toast.makeText(requireContext(), "Otp verified, Registration Successful", Toast.LENGTH_SHORT).show()
-                    navController.navigate(R.id.homeActivity)
+                    navController.navigate(R.id.action_verifyPhoneFragment_to_homeActivity)
                 }
                 else {
                     Log.e("VerifyPhoneFragment", "Error: ${response.message}")
