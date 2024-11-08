@@ -1,6 +1,6 @@
 package com.ritika.voy.api.dataclasses
 
-data class resendPhoneOTP(
+data class GetUserResponse(
     val success: Boolean,
-    val message: String
+    val user: UserXX
 )

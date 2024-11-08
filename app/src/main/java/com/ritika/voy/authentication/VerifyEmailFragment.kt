@@ -3,6 +3,7 @@ package com.ritika.voy.authentication
 import android.app.ProgressDialog
 import android.graphics.Color
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
@@ -33,6 +34,7 @@ class VerifyEmailFragment : BaseFragment() {
     private var _binding: FragmentVerifyEmailBinding? = null
     private val binding get() = _binding!!
     private lateinit var navController: NavController
+    private lateinit var resendTimer: CountDownTimer
     private var UserId: String? = null
 
     private val otpFields: List<EditText> by lazy {
@@ -90,6 +92,7 @@ class VerifyEmailFragment : BaseFragment() {
     private fun setupResendTextView() {
         val resendTextView = binding.resendTextView
         val resendText = "Didn’t receive any code? Resend Code"
+        startResendTimer()
         val spannable = SpannableString(resendText).apply {
             setSpan(ForegroundColorSpan(Color.WHITE), 0, 24, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             setSpan(ForegroundColorSpan(Color.parseColor("#7e60bf")), 25, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -127,7 +130,7 @@ class VerifyEmailFragment : BaseFragment() {
 
     private fun setupButtonListeners() {
         binding.btnBack.setOnClickListener {
-            navController.popBackStack()
+            navController.navigate(R.id.action_verifyEmailFragment_to_createAccount)
         }
 
         binding.btnVerify.setOnClickListener {
@@ -142,7 +145,67 @@ class VerifyEmailFragment : BaseFragment() {
         binding.resendTextView.setOnClickListener {
             val email = arguments?.getString("email") ?: ""
             resendEmail(email)
+            startResendTimer()
         }
+    }
+
+    private fun startResendTimer() {
+        binding.resendTextView.isEnabled = false
+        resendTimer = object : CountDownTimer(30000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsRemaining = millisUntilFinished / 1000
+                binding.resendTextView.text = "Didn’t receive any code? Resend Code ($secondsRemaining)"
+                val resendText = "Didn’t receive any code? Resend Code ($secondsRemaining)"
+                val spannable = SpannableString(resendText)
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.WHITE),
+                    0,
+                    24,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.parseColor("#7e60bf")),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                spannable.setSpan(
+                    UnderlineSpan(),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                binding.resendTextView.text = spannable
+            }
+
+            override fun onFinish() {
+                binding.resendTextView.isEnabled = true
+                binding.resendTextView.text = "Didn’t receive any code? Resend Code"
+                val resendText = "Didn’t receive any code? Resend Code"
+                val spannable = SpannableString(resendText)
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.WHITE),
+                    0,
+                    24,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.parseColor("#7e60bf")),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                spannable.setSpan(
+                    UnderlineSpan(),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                binding.resendTextView.text = spannable
+            }
+        }.start()
     }
 
     private fun resendEmail(email: String) {
@@ -182,14 +245,15 @@ class VerifyEmailFragment : BaseFragment() {
             try {
                 val response = RetrofitInstance.api.EmailVerify(EmailVerifyRequest(user_id, otp))
                 if (response.success) {
-                    val phone = arguments?.getString("phone") ?: ""
+                    val phoneNumber = arguments?.getString("phoneNumber") ?: ""
                     val userBundle = Bundle().apply {
                         putString("user_id", user_id)
-                        putString("phone", phone)
+                        putString("phoneNumber", phoneNumber)
 
                     }
+                    Log.e("VerifyEmailFragment", "Phone Number : $phoneNumber")
                     Toast.makeText(requireContext(), "Email verified Successfully, Please Verify Phone Number.", Toast.LENGTH_SHORT).show()
-                    navController.navigate(R.id.verifyPhoneFragment, userBundle)
+                    navController.navigate(R.id.action_verifyEmailFragment_to_verifyPhoneFragment, userBundle)
                 } else {
                     showToast(response.message)
                 }

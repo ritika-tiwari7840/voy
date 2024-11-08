@@ -3,6 +3,7 @@ package com.ritika.voy.authentication
 import android.app.ProgressDialog
 import android.graphics.Color
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
@@ -24,8 +25,8 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
+import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.RetrofitInstance
-import com.ritika.voy.api.dataclasses.EmailVerifyRequest
 import com.ritika.voy.api.dataclasses.PhoneVerifyRequest
 import com.ritika.voy.api.dataclasses.resendPhoneRequest
 import com.ritika.voy.databinding.FragmentVerifyPhoneBinding
@@ -35,17 +36,12 @@ class VerifyPhoneFragment : BaseFragment() {
     private var _binding: FragmentVerifyPhoneBinding? = null
     private val binding get() = _binding!!
     private lateinit var navController: NavController
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private lateinit var resendTimer: CountDownTimer
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         _binding = FragmentVerifyPhoneBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -53,10 +49,8 @@ class VerifyPhoneFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         val screenHeight = resources.displayMetrics.heightPixels
         val topMargin = (screenHeight * 0.304).toInt()
-
 
         val bottomSection: View = view.findViewById(R.id.bottomSection)
         val params = bottomSection.layoutParams as ConstraintLayout.LayoutParams
@@ -65,6 +59,7 @@ class VerifyPhoneFragment : BaseFragment() {
 
         val resendTextview = view.findViewById<TextView>(R.id.resendTextView)
         val resendText = "Didn’t receive any code? Resend Code"
+        startResendTimer()
         val spannable = SpannableString(resendText)
         spannable.setSpan(
             ForegroundColorSpan(Color.WHITE),
@@ -87,7 +82,6 @@ class VerifyPhoneFragment : BaseFragment() {
         )
         resendTextview.text = spannable
 
-
         val otpBox1: EditText = view.findViewById(R.id.otpBox1)
         val otpBox2: EditText = view.findViewById(R.id.otpBox2)
         val otpBox3: EditText = view.findViewById(R.id.otpBox3)
@@ -106,7 +100,6 @@ class VerifyPhoneFragment : BaseFragment() {
         setupBackspace(otpBox4, otpBox3)
         setupBackspace(otpBox5, otpBox4)
         setupBackspace(otpBox6, otpBox5)
-
 
         val otpErrorTextView = view.findViewById<TextView>(R.id.tvOtpError)
         val otpErrorIcon = view.findViewById<ImageView>(R.id.ivOtpErrorIcon)
@@ -132,12 +125,7 @@ class VerifyPhoneFragment : BaseFragment() {
         }
         otpFields.forEach { it.addTextChangedListener(textWatcher) }
 
-
         navController = Navigation.findNavController(view)
-
-        resendTextview.setOnClickListener {
-            Toast.makeText(requireContext(), "Resend OTP", Toast.LENGTH_SHORT).show()
-        }
 
         binding.btnVerify.setOnClickListener {
             val phone_otp = otpBox1.text.toString() +
@@ -160,17 +148,76 @@ class VerifyPhoneFragment : BaseFragment() {
         }
 
         binding.btnBack.setOnClickListener {
-            navController.popBackStack()
+            navController.navigate(R.id.action_verifyPhoneFragment_to_verifyEmailFragment)
         }
 
         binding.resendTextView.setOnClickListener {
-            val phone = arguments?.getString("phone") ?: ""
-            resendPhone(phone)
+            val phone_number = arguments?.getString("phoneNumber") ?: ""
+            resendPhone(phone_number)
+            startResendTimer()
         }
-
     }
 
-    private fun resendPhone(phone: String) {
+    private fun startResendTimer() {
+        binding.resendTextView.isEnabled = false
+        resendTimer = object : CountDownTimer(30000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsRemaining = millisUntilFinished / 1000
+                binding.resendTextView.text = "Didn’t receive any code? Resend Code ($secondsRemaining)"
+                val resendText = "Didn’t receive any code? Resend Code ($secondsRemaining)"
+                val spannable = SpannableString(resendText)
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.WHITE),
+                    0,
+                    24,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.parseColor("#7e60bf")),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                spannable.setSpan(
+                    UnderlineSpan(),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                binding.resendTextView.text = spannable
+            }
+
+            override fun onFinish() {
+                binding.resendTextView.isEnabled = true
+                binding.resendTextView.text = "Didn’t receive any code? Resend Code"
+                val resendText = "Didn’t receive any code? Resend Code"
+                val spannable = SpannableString(resendText)
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.WHITE),
+                    0,
+                    24,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.parseColor("#7e60bf")),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                spannable.setSpan(
+                    UnderlineSpan(),
+                    25,
+                    resendText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                binding.resendTextView.text = spannable
+            }
+        }.start()
+    }
+
+    private fun resendPhone(phone_number: String) {
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("Loading...")
         progressDialog.setCancelable(false)
@@ -178,14 +225,16 @@ class VerifyPhoneFragment : BaseFragment() {
 
         lifecycleScope.launch {
             try {
-                val response = RetrofitInstance.api.resendPhoneOtp(resendPhoneRequest(phone))
+                Log.e("VerifyPhoneFragment", "Phone number: $phone_number")
+                val response = RetrofitInstance.api.resendPhoneOtp(resendPhoneRequest(phone_number))
                 if (response.success) {
                     Toast.makeText(requireContext(), "OTP sent successfully", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT).show()
+                Log.e("VerifyPhoneFragment", "Error: ${e.message}")
+                Toast.makeText(requireContext(),"Failed to Resend OTP", Toast.LENGTH_SHORT).show()
             } finally {
                 progressDialog.dismiss()
             }
@@ -201,7 +250,7 @@ class VerifyPhoneFragment : BaseFragment() {
         binding.otpBox6.text?.clear()
     }
 
-    private fun phoneVerify(user_id : String, phone_otp : String){
+    private fun phoneVerify(user_id: String, phone_otp: String) {
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("Loading...")
         progressDialog.setCancelable(false)
@@ -210,17 +259,18 @@ class VerifyPhoneFragment : BaseFragment() {
         lifecycleScope.launch {
             try {
                 val response = RetrofitInstance.api.PhoneVerify(PhoneVerifyRequest(user_id, phone_otp))
-                if (response.success){
+                if (response.success) {
+                    response.tokens.let {
+                        DataStoreManager.saveTokens(requireContext(), it.access, it.refresh)
+                    }
                     Toast.makeText(requireContext(), "Otp verified, Registration Successful", Toast.LENGTH_SHORT).show()
-                    navController.navigate(R.id.homeActivity)
-                }
-                else {
+                    navController.navigate(R.id.action_verifyPhoneFragment_to_homeActivity)
+                } else {
                     Log.e("VerifyPhoneFragment", "Error: ${response.message}")
                     Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
                 }
-            }catch (e: Exception) {
-                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
-                    .show()
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT).show()
                 Log.e("VerifyPhoneFragment", "Error: ${e.message}")
             } finally {
                 progressDialog.dismiss()
@@ -231,8 +281,7 @@ class VerifyPhoneFragment : BaseFragment() {
 
     fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
         currentBox.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s.toString().length == 1) {
@@ -240,8 +289,7 @@ class VerifyPhoneFragment : BaseFragment() {
                 }
             }
 
-            override fun afterTextChanged(s: Editable?) {
-            }
+            override fun afterTextChanged(s: Editable?) {}
         })
     }
 

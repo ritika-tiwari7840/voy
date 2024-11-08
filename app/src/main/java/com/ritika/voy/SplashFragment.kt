@@ -1,5 +1,6 @@
 package com.ritika.voy
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -7,10 +8,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import com.ritika.voy.api.DataStoreManager
+import com.ritika.voy.api.RetrofitInstance
+import com.ritika.voy.api.dataclasses.GetUserResponse
 
 import com.ritika.voy.authentication.CreateAccount
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class SplashFragment : Fragment() {
 
@@ -29,10 +39,28 @@ class SplashFragment : Fragment() {
 
         navController = Navigation.findNavController(view)
 
+
+
         Handler(Looper.getMainLooper()).postDelayed({
-            navController.navigate(R.id.action_splashFragment_to_continueWithEmail)
+            lifecycleScope.launch {
+
+                val accessToken = DataStoreManager.getToken(requireContext(), "access").first()
+
+                if (accessToken != null) {
+                    val userResponse = getUserData(accessToken)
+                    if (userResponse.success) {
+                        navController.navigate(R.id.action_splashFragment_to_homeActivity)
+                    }
+                } else {
+                    navController.navigate(R.id.action_splashFragment_to_continueWithEmail)
+                }
+            }
         }, 2500)
 
 
+    }
+
+    private suspend fun getUserData(accessToken: String): GetUserResponse {
+        return RetrofitInstance.api.getUserData("Bearer $accessToken")
     }
 }

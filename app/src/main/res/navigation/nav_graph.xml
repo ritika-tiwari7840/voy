@@ -15,8 +15,15 @@
             app:destination="@id/continueWithEmail"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
+        <action
+            android:id="@+id/action_splashFragment_to_homeActivity"
+            app:destination="@id/homeActivity"
+            app:enterAnim="@anim/enter_from_right"
+            app:exitAnim="@anim/exit_to_left"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
     </fragment>
     <fragment
         android:id="@+id/continueWithEmail"
@@ -28,8 +35,8 @@
             app:destination="@id/loginFragment"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -40,29 +47,29 @@
             app:destination="@id/forgotPasswordFragment"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
         <action
             android:id="@+id/action_loginFragment_to_createAccount"
             app:destination="@id/createAccount"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
         <action
             android:id="@+id/action_loginFragment_to_continueWithEmail"
             app:destination="@id/continueWithEmail"
-            app:enterAnim="@anim/enter_from_right"
-            app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
         <action
             android:id="@+id/action_loginFragment_to_homeActivity"
             app:destination="@id/homeActivity"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
     </fragment>
     <fragment
         android:id="@+id/forgotPasswordFragment"
@@ -74,15 +81,15 @@
             app:destination="@id/otpFragment"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
         <action
             android:id="@+id/action_forgotPasswordFragment_to_loginFragment"
             app:destination="@id/loginFragment"
-            app:enterAnim="@anim/enter_from_right"
-            app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
     </fragment>
     <fragment
         android:id="@+id/otpFragment"
@@ -94,15 +101,15 @@
             app:destination="@id/resetPassword"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
         <action
             android:id="@+id/action_otpFragment_to_forgotPasswordFragment"
             app:destination="@id/forgotPasswordFragment"
-            app:enterAnim="@anim/enter_from_right"
-            app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
     </fragment>
     <fragment
         android:id="@+id/resetPassword"
@@ -112,17 +119,17 @@
         <action
             android:id="@+id/action_resetPassword_to_otpFragment"
             app:destination="@id/otpFragment"
-            app:enterAnim="@anim/enter_from_right"
-            app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
         <action
             android:id="@+id/action_resetPassword_to_loginFragment"
             app:destination="@id/loginFragment"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
     </fragment>
     <fragment
         android:id="@+id/createAccount"
@@ -133,15 +140,15 @@
             app:destination="@id/verifyEmailFragment"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
         <action
             android:id="@+id/action_createAccount_to_loginFragment"
             app:destination="@id/loginFragment"
-            app:enterAnim="@anim/enter_from_right"
-            app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
     </fragment>
     <fragment
         android:id="@+id/verifyEmailFragment"
@@ -153,15 +160,15 @@
             app:destination="@id/verifyPhoneFragment"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
         <action
             android:id="@+id/action_verifyEmailFragment_to_createAccount"
             app:destination="@id/createAccount"
-            app:enterAnim="@anim/enter_from_right"
-            app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
     </fragment>
     <fragment
         android:id="@+id/verifyPhoneFragment"
@@ -171,24 +178,24 @@
         <action
             android:id="@+id/action_verifyPhoneFragment_to_createAccount"
             app:destination="@id/createAccount"
-            app:enterAnim="@anim/enter_from_right"
-            app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
         <action
             android:id="@+id/action_verifyPhoneFragment_to_verifyEmailFragment"
             app:destination="@id/verifyEmailFragment"
-            app:enterAnim="@anim/enter_from_right"
-            app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
         <action
             android:id="@+id/action_verifyPhoneFragment_to_homeActivity"
             app:destination="@id/homeActivity"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
-            app:popEnterAnim="@anim/pop_enter_from_left"
-            app:popExitAnim="@anim/pop_exit_to_right"/>
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left"/>
     </fragment>
     <activity
         android:id="@+id/homeActivity"

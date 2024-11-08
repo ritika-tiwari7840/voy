@@ -37,6 +37,7 @@ import java.io.IOException
 import retrofit2.HttpException
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.ritika.voy.api.DataStoreManager
 
 class LoginFragment : BaseFragment() {
 
@@ -184,7 +185,7 @@ class LoginFragment : BaseFragment() {
                 val response = RetrofitInstance.api.login(LoginRequest(email, password))
                 if (response.success) {
                     response.tokens?.let {
-                        saveTokens(it.access!!, it.refresh!!)
+                        DataStoreManager.saveTokens(requireContext(), it.access!!, it.refresh!!)
                     }
                     Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
                     navController.navigate(R.id.action_loginFragment_to_homeActivity)
@@ -207,18 +208,7 @@ class LoginFragment : BaseFragment() {
             }
         }
     }
-    private suspend fun saveTokens(accessToken: String, refreshToken: String) {
-        val dataStore = PreferenceDataStoreFactory.create {
-            requireContext().preferencesDataStoreFile("tokens")
-        }
-        val accessTokenKey = stringPreferencesKey("access")
-        val refreshTokenKey = stringPreferencesKey("refresh")
 
-        dataStore.edit { preferences: MutablePreferences ->
-            preferences[accessTokenKey] = accessToken
-            preferences[refreshTokenKey] = refreshToken
-        }
-    }
 
 
     override fun onBackPressed() {
