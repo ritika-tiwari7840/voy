@@ -245,12 +245,13 @@ class VerifyEmailFragment : BaseFragment() {
             try {
                 val response = RetrofitInstance.api.EmailVerify(EmailVerifyRequest(user_id, otp))
                 if (response.success) {
-                    val phone = arguments?.getString("phone") ?: ""
+                    val phoneNumber = arguments?.getString("phoneNumber") ?: ""
                     val userBundle = Bundle().apply {
                         putString("user_id", user_id)
-                        putString("phone", phone)
+                        putString("phoneNumber", phoneNumber)
 
                     }
+                    Log.e("VerifyEmailFragment", "Phone Number : $phoneNumber")
                     Toast.makeText(requireContext(), "Email verified Successfully, Please Verify Phone Number.", Toast.LENGTH_SHORT).show()
                     navController.navigate(R.id.action_verifyEmailFragment_to_verifyPhoneFragment, userBundle)
                 } else {
