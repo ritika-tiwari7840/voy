@@ -150,7 +150,9 @@ class CreateAccount : BaseFragment() {
                                                 signUpResponse.registration_status.user_id.toString()
                                             )
                                         }
-                                        navController.navigate(R.id.action_createAccount_to_verifyEmailFragment, bundle)
+                                        navController.navigate(
+                                            R.id.action_createAccount_to_verifyEmailFragment, bundle
+                                        )
                                     } else {
                                         handleUserExist(response)
                                     }
@@ -241,6 +243,9 @@ class CreateAccount : BaseFragment() {
             ForegroundColorSpan(termsColor), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         signedUp.text = spannableString
+        binding.signedUp.setOnClickListener() {
+            navController.navigate(R.id.action_createAccount_to_loginFragment)
+        }
     }
 
     private fun setupValidation() {
@@ -277,22 +282,26 @@ class CreateAccount : BaseFragment() {
             }
 
             override fun beforeTextChanged(
-                s: CharSequence?,
-                start: Int,
-                count: Int,
-                after: Int,
+                s: CharSequence?, start: Int, count: Int, after: Int,
             ) {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Ensure +91 prefix is always present
                 if (!s.isNullOrEmpty() && !s.startsWith("+91 ")) {
                     phoneEditText.setText("+91 ${s.toString().removePrefix("+91 ")}")
                     phoneEditText.setSelection(phoneEditText.text?.length ?: 0)
                 }
+
+                // Prevent deletion of the "+91 " prefix
+                if (s.isNullOrEmpty() || s.length < 4) {
+                    phoneEditText.setText("+91 ")
+                    phoneEditText.setSelection(phoneEditText.text?.length ?: 0)
+                }
             }
         })
-
     }
+
 
     private fun setupEmailValidation(
         emailEditText: TextInputEditText,
