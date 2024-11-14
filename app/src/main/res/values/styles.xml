@@ -6,4 +6,9 @@
         <item name="android:fontFamily">@font/light</item>
     </style>
 
+    <style name="CustomBottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="itemIconTint">@color/white</item>
+    </style>
 </resources>
