@@ -1,19 +1,436 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="wrap_content"
     tools:context=".home.HomeFragment">
 
-    <TextView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Home Fragment"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
+        android:background="@color/background"
+        android:paddingBottom="39dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/home_greeting_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="88dp"
+            android:fontFamily="@font/medium"
+            android:text="hello, Tripti Sharma"
+            android:textColor="@color/white"
+            android:textSize="32sp"
+            app:layout_constraintLeft_toLeftOf="@+id/guide_left"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/home_service_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="171dp"
+            android:fontFamily="@font/medium"
+            android:text="Select Service"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            app:layout_constraintLeft_toLeftOf="@+id/guide_left"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/find_pool"
+            android:layout_width="165dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="224dp"
+            android:background="@drawable/button_background"
+            android:padding="16dp"
+            android:text="Find Pool"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="@+id/guide_left"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/offer_pool"
+            android:layout_width="165dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="224dp"
+            android:background="@drawable/button_background"
+            android:backgroundTint="@color/white"
+            android:padding="16dp"
+            android:text="Offer Pool"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintRight_toRightOf="@+id/guide_right"
+            app:layout_constraintTop_toTopOf="parent"
+
+            />
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="300dp"
+            android:background="@drawable/button_background"
+            android:backgroundTint="@color/foreground_field"
+            app:layout_constraintLeft_toLeftOf="@id/guide_left"
+            app:layout_constraintRight_toRightOf="@id/guide_right"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <Button
+                android:id="@+id/where_to"
+                android:layout_width="199dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="start|center_vertical"
+                android:background="@android:color/transparent"
+                android:drawableLeft="@drawable/search"
+                android:drawablePadding="15dp"
+                android:padding="16dp"
+                android:text="Where to?"
+                android:textAlignment="viewStart"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginVertical="10dp"
+                android:layout_marginLeft="200dp"
+                android:background="@color/white" />
+
+            <Button
+                android:id="@+id/set_timer"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/set_timer_background"
+                android:drawableLeft="@drawable/set_timer"
+                android:drawableRight="@drawable/down_arrow"
+                android:drawablePadding="5dp"
+                android:paddingHorizontal="16dp"
+                android:text="Set time"
+                android:textAllCaps="false"
+                android:textSize="14sp" />
+
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/home_shortcut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="385dp"
+            android:src="@drawable/home_shortcut"
+            app:layout_constraintLeft_toLeftOf="@+id/guide_left"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <LinearLayout
+            android:id="@+id/home_shortcut_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="376dp"
+            android:orientation="vertical"
+            app:layout_constraintLeft_toRightOf="@+id/home_shortcut"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/medium"
+                android:text="Home"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/medium"
+                android:text="Add Shortcut"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/work_shortcut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="52dp"
+            android:layout_marginTop="385dp"
+            android:src="@drawable/work_shortcut"
+            app:layout_constraintLeft_toRightOf="@+id/home_shortcut_layout"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <LinearLayout
+            android:id="@+id/work_shortcut_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="376dp"
+            android:orientation="vertical"
+            app:layout_constraintLeft_toRightOf="@+id/work_shortcut"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/medium"
+                android:text="Work"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/medium"
+                android:text="Add Shortcut"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/line1"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_marginTop="460dp"
+            android:background="@color/foreground"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/contribution_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your Contribution"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toTopOf="@id/contribution_textView"
+            app:layout_constraintLeft_toLeftOf="@+id/guide_left"
+            app:layout_constraintTop_toBottomOf="@id/line1" />
+
+        <TextView
+            android:id="@+id/contribution_textView"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:background="@drawable/gradient_background"
+            android:drawableLeft="@drawable/work_shortcut"
+            android:fontFamily="@font/medium"
+            android:gravity="start|center_vertical"
+            android:text="0 Rides , 0 kg of CO2 \n reduced"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@id/line2"
+            app:layout_constraintLeft_toRightOf="@+id/guide_left"
+            app:layout_constraintRight_toLeftOf="@id/guide_right"
+            app:layout_constraintTop_toBottomOf="@id/contribution_text" />
+
+
+        <View
+            android:id="@+id/line2"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_marginTop="714dp"
+            android:background="@color/foreground"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="739dp"
+            android:fontFamily="@font/medium"
+            android:text="Why VOY?"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            app:layout_constraintLeft_toLeftOf="@+id/guide_left"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="790dp"
+            android:background="@drawable/button_background"
+            app:cardBackgroundColor="#03DAC6"
+            app:cardCornerRadius="15dp"
+            app:layout_constraintLeft_toLeftOf="@id/guide_left"
+            app:layout_constraintRight_toRightOf="@id/guide_right"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="5dp">
+
+                <ImageView
+                    android:layout_width="43dp"
+                    android:layout_height="47dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginHorizontal="10dp"
+                    android:contentDescription="Image"
+                    android:src="@drawable/track" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/medium"
+                        android:text="Track"
+                        android:textColor="@android:color/black"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/light"
+                        android:text="Share the live location,Feel safe and \nsecure during the journey."
+                        android:textColor="@color/black"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="890dp"
+            android:background="@drawable/button_background"
+            app:cardBackgroundColor="#B1A6DF"
+            app:cardCornerRadius="15dp"
+            app:layout_constraintLeft_toLeftOf="@id/guide_left"
+            app:layout_constraintRight_toRightOf="@id/guide_right"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="5dp">
+
+                <ImageView
+                    android:layout_width="43dp"
+                    android:layout_height="47dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginHorizontal="10dp"
+                    android:contentDescription="Image"
+                    android:src="@drawable/efficient_routing" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/medium"
+                        android:text="Efficient Routing"
+                        android:textColor="@android:color/black"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/light"
+                        android:text="Enhancing safety and feel secure during \ncarpool journey in Voy."
+                        android:textColor="@color/black"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+        <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="990dp"
+            android:background="@drawable/button_background"
+            app:cardBackgroundColor="#B4E6D1"
+            app:cardCornerRadius="15dp"
+            app:layout_constraintLeft_toLeftOf="@id/guide_left"
+            app:layout_constraintRight_toRightOf="@id/guide_right"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="5dp">
+
+                <ImageView
+                    android:layout_width="43dp"
+                    android:layout_height="47dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginHorizontal="10dp"
+                    android:contentDescription="Image"
+                    android:src="@drawable/verified" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/medium"
+                        android:text="Verified"
+                        android:textColor="@android:color/black"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/light"
+                        android:text="Only verified user in Voy. We promote \nSafety."
+                        android:textColor="@android:color/black"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide_left"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.048" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide_right"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.952" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</ScrollView>
