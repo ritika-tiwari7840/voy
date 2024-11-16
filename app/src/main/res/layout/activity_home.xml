@@ -20,6 +20,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:navGraph="@navigation/home_nav_graph"
         app:defaultNavHost="true" />
+    
+    <ImageView
+        android:id="@+id/chat"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav_menu"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/chat"
+        android:padding="15dp"
+        android:background="@drawable/chat_button_background"
+        />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav_menu"

@@ -1,6 +1,7 @@
 package com.ritika.voy.home
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -20,9 +21,14 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container_view) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container_view) as NavHostFragment
         navController = navHostFragment.navController
 
         binding.bottomNavMenu.setupWithNavController(navController)
+
+        binding.chat.setOnClickListener {
+            Toast.makeText(this, "Chat Screen opens", Toast.LENGTH_SHORT).show()
+        }
     }
 }
