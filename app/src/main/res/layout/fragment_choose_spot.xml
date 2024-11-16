@@ -173,7 +173,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.0903" />
+        app:layout_constraintGuide_percent="0.0703" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/second"
