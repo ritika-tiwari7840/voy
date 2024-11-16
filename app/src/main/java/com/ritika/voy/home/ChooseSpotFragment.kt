@@ -5,17 +5,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.ritika.voy.R
+import com.ritika.voy.databinding.FragmentChooseSpotBinding
 import com.ritika.voy.databinding.FragmentHomeBinding
-import com.ritika.voy.databinding.FragmentLoginBinding
 
-class HomeFragment : Fragment() {
-    lateinit var _binding: FragmentHomeBinding
+
+class ChooseSpotFragment : Fragment() {
+    lateinit var _binding: FragmentChooseSpotBinding
     private val binding get() = _binding!!
-
     lateinit var navController: NavController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -26,18 +28,29 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = FragmentChooseSpotBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         navController = Navigation.findNavController(view)
-        binding.findPool.setOnClickListener {
-            navController.navigate(R.id.action_home_to_chooseSpotFragment)
+
+        binding.btnBack.setOnClickListener {
+            navController.navigate(R.id.action_chooseSpotFragment_to_home)
         }
-        binding.offerPool.setOnClickListener {
-            navController.navigate(R.id.action_home_to_chooseSpotFragment)
+        binding.doneButton.setOnClickListener {
+            Toast.makeText(requireContext(), "Spot set", Toast.LENGTH_SHORT).show()
         }
+        binding.setOnMap.setOnClickListener {
+            Toast.makeText(
+                requireContext(),
+                "navigate to maps to find current location",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
     }
+
 
 }
