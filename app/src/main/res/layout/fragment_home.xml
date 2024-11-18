@@ -42,12 +42,15 @@
             android:layout_width="165dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="214dp"
-            android:background="@drawable/button_background"
+            android:background="@drawable/find_pool_background"
             android:padding="16dp"
             android:text="Find Pool"
             android:textAllCaps="false"
             android:textSize="16sp"
-            app:layout_constraintLeft_toLeftOf="@+id/guide_left"
+            app:layout_constraintEnd_toStartOf="@+id/offer_pool"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
@@ -55,152 +58,168 @@
             android:layout_width="165dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="214dp"
-            android:background="@drawable/button_background"
+            android:background="@drawable/offer_pool_background"
             android:backgroundTint="@color/white"
             android:padding="16dp"
             android:text="Offer Pool"
             android:textAllCaps="false"
             android:textColor="@color/black"
             android:textSize="16sp"
-            app:layout_constraintRight_toRightOf="@+id/guide_right"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
 
-            />
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/find_pool"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <FrameLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/location_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="300dp"
-            android:background="@drawable/button_background"
-            android:backgroundTint="@color/foreground_field"
+            android:layout_marginTop="298dp"
+            android:background="@drawable/location_set_background"
+            android:padding="24dp"
             app:layout_constraintLeft_toLeftOf="@id/guide_left"
             app:layout_constraintRight_toRightOf="@id/guide_right"
             app:layout_constraintTop_toTopOf="parent">
 
-            <Button
-                android:id="@+id/where_to"
-                android:layout_width="199dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="start|center_vertical"
-                android:background="@android:color/transparent"
-                android:drawableLeft="@drawable/search"
-                android:drawablePadding="15dp"
-                android:padding="16dp"
-                android:text="Where to?"
-                android:textAlignment="viewStart"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="18sp" />
 
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_marginVertical="10dp"
-                android:layout_marginLeft="200dp"
-                android:background="@color/white" />
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_background"
+                android:backgroundTint="@color/foreground_field"
+                app:layout_constraintLeft_toLeftOf="@id/location_layout"
+                app:layout_constraintRight_toRightOf="@id/location_layout"
+                app:layout_constraintTop_toTopOf="@id/location_layout">
 
-            <Button
-                android:id="@+id/set_timer"
+                <Button
+                    android:id="@+id/where_to"
+                    android:layout_width="181dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start|center_vertical"
+                    android:background="@android:color/transparent"
+                    android:drawableLeft="@drawable/search"
+                    android:drawablePadding="15dp"
+                    android:padding="16dp"
+                    android:text="Where to?"
+                    android:textAlignment="viewStart"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginVertical="10dp"
+                    android:layout_marginLeft="155dp"
+                    android:background="@color/white" />
+
+                <Button
+                    android:id="@+id/set_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="38dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/set_timer_background"
+                    android:drawableLeft="@drawable/set_timer"
+                    android:drawableRight="@drawable/down_arrow"
+                    android:drawablePadding="5dp"
+                    android:paddingHorizontal="16dp"
+                    android:text="Set time"
+                    android:textAllCaps="false"
+                    android:textSize="14sp" />
+
+            </FrameLayout>
+
+            <ImageView
+                android:id="@+id/home_shortcut"
                 android:layout_width="wrap_content"
-                android:layout_height="38dp"
-                android:layout_gravity="end|center_vertical"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="102dp"
+                android:src="@drawable/home_shortcut"
+                app:layout_constraintLeft_toLeftOf="@+id/location_layout"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <LinearLayout
+                android:id="@+id/home_shortcut_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="93dp"
+                android:orientation="vertical"
+                app:layout_constraintLeft_toRightOf="@+id/home_shortcut"
+                app:layout_constraintTop_toTopOf="parent">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/medium"
+                    android:text="Home"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/medium"
+                    android:text="Add Shortcut"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/work_shortcut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="102dp"
                 android:layout_marginRight="10dp"
-                android:background="@drawable/set_timer_background"
-                android:drawableLeft="@drawable/set_timer"
-                android:drawableRight="@drawable/down_arrow"
-                android:drawablePadding="5dp"
-                android:paddingHorizontal="16dp"
-                android:text="Set time"
-                android:textAllCaps="false"
-                android:textSize="14sp" />
-
-        </FrameLayout>
-
-        <ImageView
-            android:id="@+id/home_shortcut"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="385dp"
-            android:src="@drawable/home_shortcut"
-            app:layout_constraintLeft_toLeftOf="@+id/guide_left"
-            app:layout_constraintTop_toTopOf="parent" />
+                android:src="@drawable/work_shortcut"
+                app:layout_constraintRight_toLeftOf="@id/work_shortcut_layout"
+                app:layout_constraintTop_toTopOf="parent" />
 
 
-        <LinearLayout
-            android:id="@+id/home_shortcut_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:layout_marginTop="376dp"
-            android:orientation="vertical"
-            app:layout_constraintLeft_toRightOf="@+id/home_shortcut"
-            app:layout_constraintTop_toTopOf="parent">
-
-
-            <TextView
+            <LinearLayout
+                android:id="@+id/work_shortcut_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/medium"
-                android:text="Home"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/medium"
-                android:text="Add Shortcut"
-                android:textColor="@color/white"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/work_shortcut"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="52dp"
-            android:layout_marginTop="385dp"
-            android:src="@drawable/work_shortcut"
-            app:layout_constraintLeft_toRightOf="@+id/home_shortcut_layout"
-            app:layout_constraintTop_toTopOf="parent" />
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="93dp"
+                android:orientation="vertical"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
 
-        <LinearLayout
-            android:id="@+id/work_shortcut_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:layout_marginTop="376dp"
-            android:orientation="vertical"
-            app:layout_constraintLeft_toRightOf="@+id/work_shortcut"
-            app:layout_constraintTop_toTopOf="parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/medium"
+                    android:text="Work"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/medium"
+                    android:text="Add Shortcut"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
 
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/medium"
-                android:text="Work"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/medium"
-                android:text="Add Shortcut"
-                android:textColor="@color/white"
-                android:textSize="14sp" />
-
-        </LinearLayout>
 
         <View
             android:id="@+id/line1"
             android:layout_width="match_parent"
             android:layout_height="5dp"
-            android:layout_marginTop="460dp"
+            android:layout_marginTop="506dp"
             android:background="@color/foreground"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -224,7 +243,7 @@
             android:drawablePadding="35dp"
             android:fontFamily="@font/medium"
             android:gravity="start|center_vertical"
-            android:paddingLeft="35dp"
+            android:padding="20dp"
             android:text="0 Rides , 0 kg of CO2 \n reduced"
             android:textColor="@color/white"
             android:textSize="18sp"
@@ -238,7 +257,7 @@
             android:id="@+id/line2"
             android:layout_width="match_parent"
             android:layout_height="5dp"
-            android:layout_marginTop="714dp"
+            android:layout_marginTop="760dp"
             android:background="@color/foreground"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -246,7 +265,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="739dp"
+            android:layout_marginTop="785dp"
             android:fontFamily="@font/medium"
             android:text="Why VOY?"
             android:textColor="@color/white"
@@ -259,7 +278,7 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="790dp"
+            android:layout_marginTop="836dp"
             android:background="@drawable/button_background"
             app:cardBackgroundColor="#CFA2F7"
             app:cardCornerRadius="15dp"
@@ -313,7 +332,7 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="890dp"
+            android:layout_marginTop="936dp"
             android:background="@drawable/button_background"
             app:cardBackgroundColor="#DCBFFF"
             app:cardCornerRadius="15dp"
@@ -368,7 +387,7 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="990dp"
+            android:layout_marginTop="1036dp"
             android:background="@drawable/button_background"
             app:cardBackgroundColor="#E5D4FF"
             app:cardCornerRadius="15dp"

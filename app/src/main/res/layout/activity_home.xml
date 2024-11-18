@@ -42,7 +42,7 @@
         app:labelVisibilityMode="labeled"
         android:padding="12dp"
         app:itemIconSize="24dp"
-        app:itemIconTint="@color/white"
+        app:itemIconTint="@color/bottom_nav_item_color"
         app:itemTextColor="@color/white"
         app:itemRippleColor="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"

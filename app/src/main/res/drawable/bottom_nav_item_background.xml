@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_checked="true">
+    <item android:state_checked="true" android:color="@color/theme_color">
         <layer-list>
             <item android:drawable="@android:color/transparent" />
             <item android:drawable="@drawable/bottom_nav_item_bar" android:gravity="bottom|center_horizontal" android:width="12dp" />
