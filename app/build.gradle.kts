@@ -1,9 +1,14 @@
 import org.jetbrains.kotlin.storage.CacheResetOnProcessCanceled.enabled
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
 }
+
+val secretPropertiesFile = rootProject.file("secret.properties")
+val secretProperties = Properties()
+secretProperties.load(secretPropertiesFile.inputStream())
 
 android {
     namespace = "com.ritika.voy"
@@ -18,6 +23,14 @@ android {
         vectorDrawables.useSupportLibrary = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "MAP_API_KEY",
+            "\"${secretProperties["API_KEY"]}\"")
+
+
+        manifestPlaceholders["API_KEY"] = secretProperties["API_KEY"] as String
     }
 
 
@@ -32,6 +45,7 @@ android {
     }
     buildFeatures {
         viewBinding =true
+        buildConfig = true
     }
 
     compileOptions {
@@ -86,4 +100,11 @@ dependencies {
     implementation ("androidx.datastore:datastore-preferences:1.0.0-alpha07")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
+
+    //map dependencies
+    implementation ("com.google.android.gms:play-services-maps:19.0.0")
+
+    //places sdk
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
+    implementation("com.google.android.libraries.places:places:3.5.0")
 }

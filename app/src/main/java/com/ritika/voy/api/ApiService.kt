@@ -9,6 +9,8 @@ import com.ritika.voy.api.dataclasses.ResetResponse
 import com.ritika.voy.api.dataclasses.EmailVerifyRequest
 import com.ritika.voy.api.dataclasses.EmailVerifyResponse
 import com.ritika.voy.api.dataclasses.GetUserResponse
+import com.ritika.voy.api.dataclasses.mapsDataClasses.RoutesRequest
+import com.ritika.voy.api.dataclasses.mapsDataClasses.RoutesResponse
 import com.ritika.voy.api.dataclasses.PhoneVerifyRequest
 import com.ritika.voy.api.dataclasses.VerifyRequest
 import com.ritika.voy.api.dataclasses.VerifyResponse
@@ -22,7 +24,9 @@ import com.ritika.voy.api.dataclasses.resendPhoneRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -55,5 +59,13 @@ interface ApiService {
 
     @GET("user/")
     suspend fun getUserData(@Header("Authorization") authHeader: String): GetUserResponse
+
+
+    @POST("directions/v2:computeRoutes")
+    suspend fun computeRoutes(
+        @Body request: RoutesRequest,
+        @Query("key") apiKey: String,
+        @Query("fields") fieldMask: String = "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline"
+    ): RoutesResponse
 
 }
