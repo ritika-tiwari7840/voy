@@ -31,7 +31,14 @@
         android:id="@+id/profile"
         android:name="com.ritika.voy.home.ProfileFragment"
         android:label="Profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profile_to_editInfo"
+            app:destination="@id/editInfo" />
+        <action
+            android:id="@+id/action_profile_to_home"
+            app:destination="@id/home" />
+    </fragment>
     <fragment
         android:id="@+id/chooseSpotFragment"
         android:name="com.ritika.voy.home.ChooseSpotFragment"
@@ -40,5 +47,14 @@
         <action
             android:id="@+id/action_chooseSpotFragment_to_home"
             app:destination="@id/home" />
+    </fragment>
+    <fragment
+        android:id="@+id/editInfo"
+        android:name="com.ritika.voy.home.EditInfo"
+        android:label="fragment_edit_info"
+        tools:layout="@layout/fragment_edit_info" >
+        <action
+            android:id="@+id/action_editInfo_to_profile"
+            app:destination="@id/profile" />
     </fragment>
 </navigation>
