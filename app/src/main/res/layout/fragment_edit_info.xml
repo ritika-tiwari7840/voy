@@ -432,4 +432,260 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.952" />
 
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/edit_name_popup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/form_background"
+        android:paddingTop="12dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/edit_name_popup_divider"
+            android:layout_width="56dp"
+            android:layout_height="2dp"
+            app:dividerColor="#5D5D5D"
+            app:layout_constraintLeft_toLeftOf="@id/edit_name_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_name_popup_guide_right"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/edit_info_popup_heading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="23dp"
+            android:fontFamily="@font/semibold"
+            android:text="Edit Name"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_name_popup_guide_left"
+            app:layout_constraintTop_toBottomOf="@id/edit_name_popup_divider" />
+
+
+        <EditText
+            android:id="@+id/first_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="31dp"
+            android:background="@drawable/popup_edit_view_background"
+            android:drawableStart="@drawable/edit_name_popup"
+            android:drawableEnd="@drawable/cross"
+            android:drawablePadding="18dp"
+            android:fontFamily="@font/light"
+            android:hint="Tripti"
+            android:padding="10dp"
+            android:textColorHint="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_name_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_name_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/edit_info_popup_heading" />
+
+        <EditText
+            android:id="@+id/last_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/popup_edit_view_background"
+            android:drawableStart="@drawable/edit_name_popup"
+            android:drawableEnd="@drawable/cross"
+            android:drawablePadding="18dp"
+            android:fontFamily="@font/light"
+            android:hint="Sharma"
+            android:padding="10dp"
+            android:textColorHint="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_name_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_name_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/first_name" />
+
+        <Button
+            android:id="@+id/edit_name_save_changes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="30dp"
+            android:background="@drawable/button_background"
+            android:fontFamily="@font/medium"
+            android:padding="16dp"
+            android:text="Save Changes"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="@id/edit_name_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_name_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/last_name" />
+
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/edit_name_popup_guide_left"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.048" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/edit_name_popup_guide_right"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.952" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/edit_gender_popup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/form_background"
+        android:paddingVertical="12dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/gender_popup_divider"
+            android:layout_width="56dp"
+            android:layout_height="2dp"
+            app:dividerColor="#5D5D5D"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/edit_gender_popup_heading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="23dp"
+            android:fontFamily="@font/semibold"
+            android:text="Gender"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintTop_toBottomOf="@id/gender_popup_divider" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/light"
+            android:text="Male"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintTop_toBottomOf="@id/edit_gender_popup_heading" />
+
+        <CheckBox
+            android:id="@+id/male"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@null"
+            android:button="@drawable/checkbox_background"
+            android:padding="8dp"
+            app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/edit_gender_popup_heading" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/gender_popup_divider_one"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            app:dividerColor="#5D5D5D"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/male" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/light"
+            android:text="Female"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintTop_toBottomOf="@id/male" />
+
+        <CheckBox
+            android:id="@+id/female"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@null"
+            android:button="@drawable/checkbox_background"
+            android:checked="true"
+            android:padding="8dp"
+            app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/male" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/gender_popup_divider_two"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            app:dividerColor="#5D5D5D"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/female" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/light"
+            android:text="Other"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintTop_toBottomOf="@id/female" />
+
+        <CheckBox
+            android:id="@+id/other"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@null"
+            android:button="@drawable/checkbox_background"
+            android:padding="8dp"
+            app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/female" />
+
+        <Button
+            android:id="@+id/edit_gender_save_changes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="10dp"
+            android:background="@drawable/button_background"
+            android:fontFamily="@font/medium"
+            android:padding="16dp"
+            android:text="Save Changes"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/other" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/edit_gender_popup_guide_left"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.048" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/edit_gender_popup_guide_right"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.952" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -35,8 +35,9 @@ class EditInfo : Fragment() {
             navController.navigate(R.id.action_editInfo_to_profile)
         }
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-    }
+}

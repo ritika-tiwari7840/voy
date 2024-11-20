@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Checked State -->
+    <item android:drawable="@drawable/checked" android:state_checked="true"></item>
+
+    <!-- Unchecked State -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@android:color/transparent" />
+            <stroke android:width="2dp" android:color="#6D6D6D" />
+            <size android:width="16dp" android:height="16dp" />
+        </shape>
+    </item>
+
+</selector>
