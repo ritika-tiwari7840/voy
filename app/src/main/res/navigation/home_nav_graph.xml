@@ -5,6 +5,7 @@
     android:id="@+id/home_nav_graph"
     app:startDestination="@id/home">
 
+    <!-- Fragments linked to bottom navigation -->
     <fragment
         android:id="@+id/home"
         android:name="com.ritika.voy.home.HomeFragment"
@@ -39,19 +40,22 @@
             android:id="@+id/action_profile_to_home"
             app:destination="@id/home" />
     </fragment>
+
+    <!-- Fragments outside bottom navigation -->
     <fragment
         android:id="@+id/chooseSpotFragment"
         android:name="com.ritika.voy.home.ChooseSpotFragment"
-        android:label="fragment_choose_spot"
+        android:label="Choose Spot"
         tools:layout="@layout/fragment_choose_spot" >
         <action
             android:id="@+id/action_chooseSpotFragment_to_home"
             app:destination="@id/home" />
     </fragment>
+
     <fragment
         android:id="@+id/editInfo"
         android:name="com.ritika.voy.home.EditInfo"
-        android:label="fragment_edit_info"
+        android:label="Edit Info"
         tools:layout="@layout/fragment_edit_info" >
         <action
             android:id="@+id/action_editInfo_to_profile"
