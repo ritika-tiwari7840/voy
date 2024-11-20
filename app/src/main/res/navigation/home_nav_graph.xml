@@ -13,7 +13,10 @@
         tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_home_to_chooseSpotFragment"
-            app:destination="@id/chooseSpotFragment" />
+            app:destination="@id/chooseSpotFragment"
+            app:popUpTo="@id/home"
+            app:popUpToInclusive="false"
+            />
     </fragment>
 
     <fragment
@@ -35,7 +38,9 @@
         tools:layout="@layout/fragment_profile" >
         <action
             android:id="@+id/action_profile_to_editInfo"
-            app:destination="@id/editInfo" />
+            app:destination="@id/editInfo"
+            app:popUpTo="@id/profile"
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_profile_to_home"
             app:destination="@id/home" />
@@ -49,7 +54,9 @@
         tools:layout="@layout/fragment_choose_spot" >
         <action
             android:id="@+id/action_chooseSpotFragment_to_home"
-            app:destination="@id/home" />
+            app:destination="@id/home"
+            app:popUpTo="@id/home"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -59,6 +66,8 @@
         tools:layout="@layout/fragment_edit_info" >
         <action
             android:id="@+id/action_editInfo_to_profile"
-            app:destination="@id/profile" />
+            app:destination="@id/profile"
+            app:popUpTo="@id/profile"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

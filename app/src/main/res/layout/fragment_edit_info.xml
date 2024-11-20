@@ -57,9 +57,9 @@
         android:id="@+id/take_image_using_camera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/camera"
-        android:contentDescription="Camera Icon"
         android:background="@drawable/camera_background"
+        android:contentDescription="Camera Icon"
+        android:src="@drawable/camera"
         app:layout_constraintBottom_toBottomOf="@id/set_profile"
         app:layout_constraintEnd_toEndOf="@id/set_profile" />
 
