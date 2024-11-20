@@ -1,22 +1,34 @@
 package com.ritika.voy.home
 
 import android.Manifest
+import android.animation.ArgbEvaluator
+import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.StateListDrawable
 import android.location.Location
 import android.os.Bundle
+import android.transition.TransitionManager
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.Toast
 import android.widget.ToggleButton
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -67,6 +79,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var isRouteAllowed = false
     private var firstMarker: Marker? = null
     private var secondMarker: Marker? = null
+    private var selectedButtonValue: String? = null
+    private var previousButton: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,7 +126,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-
         binding.confirmButton.setOnClickListener {
             when {
                 firstMarkerLatLng == null -> {
@@ -128,10 +141,139 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 firstMarkerLatLng != null && secondMarkerLatLng != null -> {
                     isRouteAllowed = true
                     getOptimalRoute()
+
+                    binding.confirmButton.visibility = View.GONE
+                    binding.satellite.visibility = View.GONE
+                    binding.descText.visibility = View.GONE
+                    binding.backButton.visibility = View.VISIBLE
+                    binding.bottomWidget.visibility = View.VISIBLE
+                    binding.whiteBar.visibility = View.VISIBLE
+                    binding.bottomWidgetText.visibility = View.VISIBLE
+                    binding.button1.visibility = View.VISIBLE
+                    binding.button2.visibility = View.VISIBLE
+                    binding.button3.visibility = View.VISIBLE
+                    binding.button4.visibility = View.VISIBLE
+                    binding.button5.visibility = View.VISIBLE
+                    binding.proceedButton.visibility = View.VISIBLE
+                    binding.routeView.root.visibility = View.VISIBLE
                 }
             }
         }
+
+        binding.backButton.setOnClickListener {
+            binding.confirmButton.visibility = View.VISIBLE
+            binding.satellite.visibility = View.VISIBLE
+            binding.descText.visibility = View. VISIBLE
+            binding.backButton.visibility = View.GONE
+            binding.bottomWidget.visibility = View.GONE
+            binding.whiteBar.visibility = View.GONE
+            binding.bottomWidgetText.visibility = View.GONE
+            binding.button1.visibility = View.GONE
+            binding.button2.visibility = View.GONE
+            binding.button3.visibility = View.GONE
+            binding.button4.visibility = View.GONE
+            binding.button5.visibility = View.GONE
+            binding.proceedButton.visibility = View.GONE
+            binding.routeView.root.visibility = View.GONE
+            googleMap.clear()
+            firstMarkerLatLng = null
+            secondMarkerLatLng = null
+            binding.descText.text = "Pickup"
+
+        }
+
+        binding.proceedButton.setOnClickListener {
+            if (selectedButtonValue != null) {
+                val gradientDrawable = GradientDrawable(
+                    GradientDrawable.Orientation.LEFT_RIGHT,
+                    intArrayOf(
+                        ContextCompat.getColor(this, android.R.color.white),
+                        ContextCompat.getColor(this, android.R.color.holo_green_light)
+                    )
+                )
+
+                binding.loader.background = gradientDrawable
+                val constraintSet = ConstraintSet()
+                constraintSet.clone(binding.root)
+
+                constraintSet.connect(
+                    binding.bottomWidget.id,
+                    ConstraintSet.TOP,
+                    binding.guideline8.id,
+                    ConstraintSet.BOTTOM
+                )
+
+                TransitionManager.beginDelayedTransition(binding.root)
+
+                constraintSet.connect(
+                    binding.routeView.root.id,
+                    ConstraintSet.TOP,
+                    binding.cancelButton.id,
+                    ConstraintSet.BOTTOM
+                )
+                constraintSet.connect(
+                    binding.routeView.root.id,
+                    ConstraintSet.START,
+                    binding.guideline2.id,
+                    ConstraintSet.START
+                )
+
+                constraintSet.applyTo(binding.root)
+
+
+                listOf(
+                    binding.bottomWidgetText,
+                    binding.button1,
+                    binding.button2,
+                    binding.button3,
+                    binding.button4,
+                    binding.button5,
+                    binding.proceedButton
+                ).forEach { it.visibility = View.GONE }
+
+
+                binding.findingRidersText.visibility = View.VISIBLE
+                binding.findingRidersDesc.visibility = View.VISIBLE
+                binding.loader.visibility = View.VISIBLE
+
+                startColorAnimation(gradientDrawable)
+
+                binding.riderImage.visibility = View.VISIBLE
+                binding.cancelButton.visibility = View.VISIBLE
+                binding.backButton.visibility = View.GONE
+                binding.routeView.swapButton.visibility = View.GONE
+
+                val newBackground = StateListDrawable().apply {
+                    addState(
+                        intArrayOf(android.R.attr.state_enabled),
+                        GradientDrawable().apply {
+                            shape = GradientDrawable.RECTANGLE
+                            setColor(Color.parseColor("#3d3d3d"))
+                            cornerRadius = 16f * resources.displayMetrics.density
+
+                        }
+                    )
+                }
+                binding.routeView.root.background= newBackground
+
+                val marginPx = 16f * resources.displayMetrics.density
+
+                val params = binding.routeView.root.layoutParams as ViewGroup.MarginLayoutParams
+                params.topMargin = marginPx.toInt()
+                binding.routeView.root.layoutParams = params
+
+                binding.routeView.root.findViewById<TextView>(R.id.start_address)?.setTextColor(Color.parseColor("#ccc7eb"))
+                binding.routeView.root.findViewById<TextView>(R.id.drop_address)?.setTextColor(Color.parseColor("#ccc7eb"))
+
+            } else {
+                Toast.makeText(applicationContext, "Please select the no. of seats", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        setupButtonListeners()
     }
+
+
 
     private fun isLocationInIndia(latLng: LatLng): Boolean {
         return latLng.latitude in INDIA_BOUNDS.southLat..INDIA_BOUNDS.northLat &&
@@ -168,10 +310,55 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             .show()
     }
 
+    private fun setupButtonListeners() {
+        val buttons = listOf(binding.button1, binding.button2, binding.button3, binding.button4, binding.button5)
+        buttons.forEachIndexed { index, button ->
+            button.setOnClickListener {
+                previousButton?.let {
+                    it.setBackgroundResource(R.drawable.seats_background)
+                }
+                selectedButtonValue = (index + 1).toString()
+                val drawable = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    cornerRadius = resources.getDimension(R.dimen.button_corner_radius)
+                    setColor(ContextCompat.getColor(this@MapActivity, R.color.theme_color))
+                }
+                button.background = drawable
+
+                previousButton = button
+            }
+        }
+    }
+
+    private fun startColorAnimation(drawable: Drawable?) {
+    if (drawable is GradientDrawable) {
+        val animator = ObjectAnimator.ofFloat(-1f, 1f).apply {
+            duration = 1500
+            repeatCount = ObjectAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+            
+            addUpdateListener { animation ->
+                val fraction = animation.animatedValue as Float
+                
+                drawable.orientation = GradientDrawable.Orientation.LEFT_RIGHT
+                
+                drawable.colors = intArrayOf(
+                    if (fraction < 0f) Color.WHITE else ContextCompat.getColor(this@MapActivity, android.R.color.holo_green_light),
+                    if (fraction < 0f) Color.WHITE else ContextCompat.getColor(this@MapActivity, android.R.color.holo_green_light)
+                )
+                
+            
+                drawable.setGradientCenter(fraction, 0.5f)
+            }
+        }
+        animator.start()
+    }
+}
+
     private fun setupSearchBox() {
         binding.searchBar.setOnFocusChangeListener { view, hasFocus ->
             if (hasFocus) {
-                // Launch autocomplete when EditText gets focus
+                
                 val fields = listOf(
                     Place.Field.ID,
                     Place.Field.NAME,
@@ -282,7 +469,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
     suspend fun getRoute(apiService: ApiService, origin: LatLng, destination: LatLng, apiKey: String): Route? {
         val request = RoutesRequest(
             origin = OriginDestination(com.ritika.voy.api.dataclasses.mapsDataClasses.Location(origin)),
@@ -340,18 +526,19 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     firstMarker?.remove()
                     firstMarkerLatLng = latLng
                     firstMarker = googleMap.addMarker(MarkerOptions().position(latLng).icon(markerIcon))
-                } else if (secondMarkerLatLng != null) {
+                } else if (firstMarkerLatLng != null && secondMarkerLatLng != null && !isRouteAllowed) {
                     secondMarker?.remove()
                     secondMarkerLatLng = latLng
                     secondMarker = googleMap.addMarker(MarkerOptions().position(latLng).icon(markerIcon))
+                } else if (firstMarkerLatLng != null && secondMarkerLatLng != null && isRouteAllowed) {
+                    // Do nothing if both markers are set and route is allowed
+                    return@setOnMapClickListener
                 }
             } else {
                 showLocationOutsideIndiaDialog()
             }
         }
     }
-
-
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
