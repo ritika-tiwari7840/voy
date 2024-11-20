@@ -139,6 +139,7 @@ class OtpFragment : BaseFragment() {
         navController = Navigation.findNavController(view)
 
         val email = arguments?.getString("email").toString()
+        binding.tvForgotSubtitle.text = "Please enter the verification code sent to \n $email"
 
         //navigation
 
@@ -158,7 +159,7 @@ class OtpFragment : BaseFragment() {
                 return@setOnClickListener
             }else{
 
-            verifyOTP(email, otp)
+                verifyOTP(email, otp)
             }
 
         }

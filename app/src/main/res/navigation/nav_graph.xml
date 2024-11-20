@@ -199,7 +199,7 @@
     </fragment>
     <activity
         android:id="@+id/homeActivity"
-        android:name="com.ritika.voy.home.HomeActivity"
+        android:name="com.ritika.voy.home.MapActivity"
         android:label="activity_home"
-        tools:layout="@layout/activity_home" />
+        tools:layout="@layout/activity_map" />
 </navigation>
