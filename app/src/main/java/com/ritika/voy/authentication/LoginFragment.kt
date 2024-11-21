@@ -175,6 +175,7 @@ class LoginFragment : BaseFragment() {
     }
 
     private fun login(email: String, password: String) {
+        Log.d("emailpassword", "Email: $email, Password: $password")
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("Loading...")
         progressDialog.setCancelable(false)

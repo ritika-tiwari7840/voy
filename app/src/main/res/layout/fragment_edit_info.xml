@@ -1,0 +1,692 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey"
+    tools:context=".home.EditInfo">
+
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Back button"
+        app:layout_constraintBottom_toTopOf="@id/guide_two"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintTop_toBottomOf="@+id/guide_one"
+        app:srcCompat="@drawable/back_button" />
+
+    <TextView
+        android:id="@+id/edit_info_heading_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:fontFamily="@font/semibold"
+        android:gravity="center"
+        android:text="Edit Info"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_back"
+        app:layout_constraintStart_toEndOf="@+id/btn_back"
+        app:layout_constraintTop_toTopOf="@+id/btn_back" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/medium"
+        android:text="Profile photo"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/guide_two"
+        app:layout_constraintBottom_toBottomOf="@id/guide_three"
+        />
+
+    <ImageView
+        android:id="@+id/set_profile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/profile_image"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/guide_three" />
+
+    <ImageView
+        android:id="@+id/take_image_using_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/camera_background"
+        android:contentDescription="Camera Icon"
+        android:src="@drawable/camera"
+        app:layout_constraintBottom_toBottomOf="@id/set_profile"
+        app:layout_constraintEnd_toEndOf="@id/set_profile" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/profile_divider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerColor="#5D5D5D"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guide_five" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/semibold"
+        android:paddingTop="12dp"
+        android:text="Profile"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@id/guide_six"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/profile_divider" />
+
+
+    <LinearLayout
+        android:id="@+id/name_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="12dp"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/guide_six">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="Image"
+            android:src="@drawable/edit_name" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/medium"
+                android:text="Name"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:fontFamily="@font/light"
+                android:text="Tripti Sharma"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:contentDescription="Image"
+            android:drawableStart="@drawable/back_button"
+            android:rotation="180" />
+
+    </LinearLayout>
+
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:dividerColor="#5D5D5D"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/name_layout" />
+
+    <LinearLayout
+        android:id="@+id/phone_number_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="12dp"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/name_layout">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="Image"
+            android:src="@drawable/edit_phone" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/medium"
+                android:text="Phone Number"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/phone_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:fontFamily="@font/light"
+                android:text="+91 1234567890"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:dividerColor="#5D5D5D"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/phone_number_layout" />
+
+    <LinearLayout
+        android:id="@+id/email_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="12dp"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/phone_number_layout">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="Image"
+            android:src="@drawable/edit_email" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/medium"
+                android:text="Email"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:fontFamily="@font/light"
+                android:text="abc@gmail.com"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:dividerColor="#5D5D5D"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/email_layout" />
+
+
+    <LinearLayout
+        android:id="@+id/gender_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="12dp"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/email_layout">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="Image"
+            android:src="@drawable/edit_gender" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/medium"
+                android:text="Gender"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/gender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:fontFamily="@font/light"
+                android:text="Female"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:contentDescription="Image"
+            android:drawableStart="@drawable/back_button"
+            android:rotation="180" />
+
+    </LinearLayout>
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:dividerColor="#5D5D5D"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/gender_layout" />
+
+
+    <LinearLayout
+        android:id="@+id/emergency_contact_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="12dp"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/gender_layout">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="Image"
+            android:src="@drawable/emergency_contact" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/medium"
+                android:text="Emergency Contact"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/emergency_contact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:fontFamily="@font/light"
+                android:text="Help is here"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:contentDescription="Image"
+            android:drawableStart="@drawable/back_button"
+            android:rotation="180" />
+
+    </LinearLayout>
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_one"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.010010" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_two"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.0881" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_three"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.194" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_four"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.303" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_five"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.377" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_six"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.452" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_left"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.048" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_right"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.952" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/edit_name_popup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/form_background"
+        android:paddingTop="12dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/edit_name_popup_divider"
+            android:layout_width="56dp"
+            android:layout_height="2dp"
+            app:dividerColor="#5D5D5D"
+            app:layout_constraintLeft_toLeftOf="@id/edit_name_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_name_popup_guide_right"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/edit_info_popup_heading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="23dp"
+            android:fontFamily="@font/semibold"
+            android:text="Edit Name"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_name_popup_guide_left"
+            app:layout_constraintTop_toBottomOf="@id/edit_name_popup_divider" />
+
+
+        <EditText
+            android:id="@+id/first_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="31dp"
+            android:background="@drawable/popup_edit_view_background"
+            android:drawableStart="@drawable/edit_name_popup"
+            android:drawableEnd="@drawable/cross"
+            android:drawablePadding="18dp"
+            android:fontFamily="@font/light"
+            android:text="Tripti"
+            android:padding="10dp"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_name_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_name_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/edit_info_popup_heading" />
+
+        <EditText
+            android:id="@+id/last_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/popup_edit_view_background"
+            android:drawableStart="@drawable/edit_name_popup"
+            android:drawableEnd="@drawable/cross"
+            android:drawablePadding="18dp"
+            android:fontFamily="@font/light"
+            android:text="Sharma"
+            android:padding="10dp"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_name_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_name_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/first_name" />
+
+        <Button
+            android:id="@+id/edit_name_save_changes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="30dp"
+            android:background="@drawable/button_background"
+            android:fontFamily="@font/medium"
+            android:padding="16dp"
+            android:text="Save Changes"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="@id/edit_name_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_name_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/last_name" />
+
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/edit_name_popup_guide_left"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.048" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/edit_name_popup_guide_right"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.952" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/edit_gender_popup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/form_background"
+        android:paddingVertical="12dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/gender_popup_divider"
+            android:layout_width="56dp"
+            android:layout_height="2dp"
+            app:dividerColor="#5D5D5D"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/edit_gender_popup_heading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="23dp"
+            android:fontFamily="@font/semibold"
+            android:text="Gender"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintTop_toBottomOf="@id/gender_popup_divider" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/light"
+            android:text="Male"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintTop_toBottomOf="@id/edit_gender_popup_heading" />
+
+        <CheckBox
+            android:id="@+id/male"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@null"
+            android:button="@drawable/checkbox_background"
+            android:padding="8dp"
+            app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/edit_gender_popup_heading" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/gender_popup_divider_one"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            app:dividerColor="#5D5D5D"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/male" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/light"
+            android:text="Female"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintTop_toBottomOf="@id/male" />
+
+        <CheckBox
+            android:id="@+id/female"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@null"
+            android:button="@drawable/checkbox_background"
+            android:checked="true"
+            android:padding="8dp"
+            app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/male" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/gender_popup_divider_two"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            app:dividerColor="#5D5D5D"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/female" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/light"
+            android:text="Other"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintTop_toBottomOf="@id/female" />
+
+        <CheckBox
+            android:id="@+id/other"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@null"
+            android:button="@drawable/checkbox_background"
+            android:padding="8dp"
+            app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/female" />
+
+        <Button
+            android:id="@+id/edit_gender_save_changes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="10dp"
+            android:background="@drawable/button_background"
+            android:fontFamily="@font/medium"
+            android:padding="16dp"
+            android:text="Save Changes"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="@id/edit_gender_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/other" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/edit_gender_popup_guide_left"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.048" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/edit_gender_popup_guide_right"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.952" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

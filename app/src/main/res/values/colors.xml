@@ -10,4 +10,5 @@
     <color name="grey">#191919</color>
     <color name="helper_text">#B0B0B0</color>
     <color name="green">#00ff00</color>
+    <color name="divider_color">#3D3D3D</color>
 </resources>
