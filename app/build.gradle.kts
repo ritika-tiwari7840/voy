@@ -107,4 +107,7 @@ dependencies {
     //places sdk
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
     implementation("com.google.android.libraries.places:places:3.5.0")
+
+    //websockets
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
 }

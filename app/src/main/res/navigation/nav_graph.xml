@@ -24,6 +24,9 @@
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
             app:popExitAnim="@anim/exit_to_left"/>
+        <action
+            android:id="@+id/action_splashFragment_to_webSocketTest"
+            app:destination="@id/webSocketTest" />
     </fragment>
     <fragment
         android:id="@+id/continueWithEmail"
@@ -202,4 +205,9 @@
         android:name="com.ritika.voy.home.MapActivity"
         android:label="activity_home"
         tools:layout="@layout/activity_map" />
+    <fragment
+        android:id="@+id/webSocketTest"
+        android:name="com.ritika.voy.authentication.WebSocketTest"
+        android:label="fragment_web_socket_test"
+        tools:layout="@layout/fragment_web_socket_test" />
 </navigation>

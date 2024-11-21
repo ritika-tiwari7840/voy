@@ -42,19 +42,20 @@ class SplashFragment : Fragment() {
 
 
         Handler(Looper.getMainLooper()).postDelayed({
-            lifecycleScope.launch {
-
-                val accessToken = DataStoreManager.getToken(requireContext(), "access").first()
-
-                if (accessToken != null) {
-                    val userResponse = getUserData(accessToken)
-                    if (userResponse.success) {
-                        navController.navigate(R.id.action_splashFragment_to_homeActivity)
-                    }
-                } else {
-                    navController.navigate(R.id.action_splashFragment_to_continueWithEmail)
-                }
-            }
+//            lifecycleScope.launch {
+//
+//                val accessToken = DataStoreManager.getToken(requireContext(), "access").first()
+//
+//                if (accessToken != null) {
+//                    val userResponse = getUserData(accessToken)
+//                    if (userResponse.success) {
+//                        navController.navigate(R.id.action_splashFragment_to_homeActivity)
+//                    }
+//                } else {
+//                    navController.navigate(R.id.action_splashFragment_to_continueWithEmail)
+//                }
+//            }
+            navController.navigate(R.id.action_splashFragment_to_webSocketTest)
         }, 2500)
 
 
