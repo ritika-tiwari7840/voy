@@ -18,12 +18,15 @@
             app:popEnterAnim="@anim/enter_from_right"
             app:popExitAnim="@anim/exit_to_left"/>
         <action
-            android:id="@+id/action_splashFragment_to_homeActivity"
-            app:destination="@id/homeActivity"
+            android:id="@+id/action_splashFragment_to_mapActivity"
+            app:destination="@id/mapActivity"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
             app:popExitAnim="@anim/exit_to_left"/>
+        <action
+            android:id="@+id/action_splashFragment_to_homeActivity"
+            app:destination="@id/homeActivity" />
     </fragment>
     <fragment
         android:id="@+id/continueWithEmail"
@@ -64,12 +67,15 @@
             app:popEnterAnim="@anim/enter_from_right"
             app:popExitAnim="@anim/exit_to_left"/>
         <action
-            android:id="@+id/action_loginFragment_to_homeActivity"
-            app:destination="@id/homeActivity"
+            android:id="@+id/action_loginFragment_to_mapActivity"
+            app:destination="@id/mapActivity"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
             app:popExitAnim="@anim/exit_to_left"/>
+        <action
+            android:id="@+id/action_loginFragment_to_homeActivity"
+            app:destination="@id/homeActivity" />
     </fragment>
     <fragment
         android:id="@+id/forgotPasswordFragment"
@@ -190,16 +196,24 @@
             app:popEnterAnim="@anim/enter_from_right"
             app:popExitAnim="@anim/exit_to_left"/>
         <action
-            android:id="@+id/action_verifyPhoneFragment_to_homeActivity"
-            app:destination="@id/homeActivity"
+            android:id="@+id/action_verifyPhoneFragment_to_mapActivity"
+            app:destination="@id/mapActivity"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
             app:popExitAnim="@anim/exit_to_left"/>
+        <action
+            android:id="@+id/action_verifyPhoneFragment_to_homeActivity"
+            app:destination="@id/homeActivity" />
     </fragment>
     <activity
-        android:id="@+id/homeActivity"
+        android:id="@+id/mapActivity"
         android:name="com.ritika.voy.home.MapActivity"
         android:label="activity_home"
         tools:layout="@layout/activity_map" />
+    <activity
+        android:id="@+id/homeActivity"
+        android:name="com.ritika.voy.home.HomeActivity"
+        android:label="activity_home"
+        tools:layout="@layout/activity_home" />
 </navigation>

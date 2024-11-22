@@ -28,27 +28,36 @@ class SplashFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_splash, container, false)
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         navController = Navigation.findNavController(view)
 
-
-
         Handler(Looper.getMainLooper()).postDelayed({
             lifecycleScope.launch {
-
                 val accessToken = DataStoreManager.getToken(requireContext(), "access").first()
-
                 if (accessToken != null) {
                     val userResponse = getUserData(accessToken)
                     if (userResponse.success) {
+                        DataStoreManager.SaveUserData(
+                            requireContext(),
+                            id = userResponse.user.id.toString()?:"",
+                            email = userResponse.user.email?:"",
+                            firstName = userResponse.user.first_name.toString()?:"",
+                            lastName = userResponse.user.last_name.toString()?:"",
+                            fullName = userResponse.user.full_name.toString()?:"",
+                            createdAt = userResponse.user.created_at?:""
+                        )
+                        DataStoreManager.getUserData(requireContext(), "email").first().let {
+                            val email = it.toString()
+                            Toast.makeText(requireContext(), "token $email", Toast.LENGTH_SHORT)
+                                .show()
+                        }
                         navController.navigate(R.id.action_splashFragment_to_homeActivity)
                     }
                 } else {
@@ -56,9 +65,8 @@ class SplashFragment : Fragment() {
                 }
             }
         }, 2500)
-
-
     }
+
 
     private suspend fun getUserData(accessToken: String): GetUserResponse {
         return RetrofitInstance.api.getUserData("Bearer $accessToken")
