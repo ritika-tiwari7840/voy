@@ -144,9 +144,9 @@
         android:id="@+id/done_button"
         android:layout_width="174dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:background="@drawable/button_background"
         android:text="Done"
-        android:layout_marginTop="20dp"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="18sp"
@@ -189,5 +189,33 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.5578112" />
 
+    <fragment
+        android:id="@+id/start_address"
+        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:dropDownHeight="wrap_content"
+        android:dropDownVerticalOffset="10dp"
+        android:padding="12dp"
+        app:layout_constraintBottom_toTopOf="@id/destination_layout"
+        app:layout_constraintEnd_toEndOf="@id/guide_right"
+        app:layout_constraintStart_toStartOf="@id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/start_layout"
+
+        />
+
+    <fragment
+        android:id="@+id/destination_address"
+        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:dropDownHeight="wrap_content"
+        android:dropDownVerticalOffset="10dp"
+        android:padding="12dp"
+        app:layout_constraintBottom_toTopOf="@id/set_on_map"
+        app:layout_constraintEnd_toEndOf="@id/guide_right"
+        app:layout_constraintStart_toStartOf="@id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/destination_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

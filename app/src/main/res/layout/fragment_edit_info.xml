@@ -40,10 +40,9 @@
         android:text="Profile photo"
         android:textColor="@color/white"
         android:textSize="24sp"
-        app:layout_constraintLeft_toLeftOf="@id/guide_left"
-        app:layout_constraintTop_toBottomOf="@id/guide_two"
         app:layout_constraintBottom_toBottomOf="@id/guide_three"
-        />
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/guide_two" />
 
     <ImageView
         android:id="@+id/set_profile"
@@ -477,8 +476,8 @@
             android:drawableEnd="@drawable/cross"
             android:drawablePadding="18dp"
             android:fontFamily="@font/light"
-            android:text="Tripti"
             android:padding="10dp"
+            android:text="Tripti"
             android:textColor="@color/white"
             android:textSize="16sp"
             app:layout_constraintLeft_toLeftOf="@id/edit_name_popup_guide_left"
@@ -495,8 +494,8 @@
             android:drawableEnd="@drawable/cross"
             android:drawablePadding="18dp"
             android:fontFamily="@font/light"
-            android:text="Sharma"
             android:padding="10dp"
+            android:text="Sharma"
             android:textColor="@color/white"
             android:textSize="16sp"
             app:layout_constraintLeft_toLeftOf="@id/edit_name_popup_guide_left"
@@ -688,5 +687,28 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
 
+        />
+
+    <TextView
+        android:id="@+id/progressText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+

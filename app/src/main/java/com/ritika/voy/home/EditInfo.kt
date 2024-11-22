@@ -1,5 +1,6 @@
 package com.ritika.voy.home
 
+import android.Manifest
 import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.app.Activity
@@ -19,6 +20,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -27,18 +30,18 @@ import androidx.navigation.fragment.findNavController
 import com.ritika.voy.R
 import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.RetrofitInstance
-import com.ritika.voy.api.dataclasses.UpdateUserRequest
 import com.ritika.voy.databinding.FragmentEditInfoBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
-import java.io.File
+import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.HttpException
+import java.io.*
+import java.net.SocketException
+import java.net.SocketTimeoutException
+import java.util.concurrent.TimeoutException
 
 class EditInfo : Fragment() {
     private var _binding: FragmentEditInfoBinding? = null
@@ -46,18 +49,20 @@ class EditInfo : Fragment() {
     private lateinit var navController: NavController
     private var selectedGender: String? = null
     private var imageUri: Uri? = null
+    private var uploadJob: Job? = null
 
     companion object {
         const val PICK_IMAGE_REQUEST = 1
         const val CAPTURE_IMAGE_REQUEST = 2
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        const val STORAGE_PERMISSION_CODE = 3
+        private const val TAG = "EditInfo"
+        private const val MAX_RETRIES = 3
+        private const val INITIAL_BACKOFF_MS = 1000L
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentEditInfoBinding.inflate(inflater, container, false)
@@ -67,204 +72,287 @@ class EditInfo : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         navController = findNavController()
+        checkAndRequestPermissions()
+        setupClickListeners()
+    }
 
-        binding.btnBack.setOnClickListener {
-            navController.navigate(R.id.action_editInfo_to_profile)
-        }
-
-        // Handle "Set Profile" button click
-        binding.setProfile.setOnClickListener {
-            pickImageFromGallery()
-        }
-
-        // Handle "Camera" button click
-        binding.takeImageUsingCamera.setOnClickListener {
-            captureImageWithCamera()
-
-        }
-
-        binding.nameLayout.setOnClickListener {
-            if (binding.editGenderPopup.visibility == View.VISIBLE) {
-                binding.editGenderPopup.visibility = View.GONE
+    private fun setupClickListeners() {
+        with(binding) {
+            btnBack.setOnClickListener {
+                navController.navigate(R.id.action_editInfo_to_profile)
             }
-            slideInPopup(binding.editNamePopup)
-        }
-        binding.genderLayout.setOnClickListener {
-            if (binding.editNamePopup.visibility == View.VISIBLE) {
-                binding.editNamePopup.visibility = View.GONE
+
+            setProfile.setOnClickListener {
+                pickImageFromGallery()
             }
-            slideInPopup(binding.editGenderPopup)
+
+            takeImageUsingCamera.setOnClickListener {
+                captureImageWithCamera()
+            }
+
+            nameLayout.setOnClickListener {
+                if (editGenderPopup.visibility == View.VISIBLE) {
+                    editGenderPopup.visibility = View.GONE
+                }
+                slideInPopup(editNamePopup)
+            }
+
+            genderLayout.setOnClickListener {
+                if (editNamePopup.visibility == View.VISIBLE) {
+                    editNamePopup.visibility = View.GONE
+                }
+                slideInPopup(editGenderPopup)
+            }
+
+            editNameSaveChanges.setOnClickListener {
+                saveNameChanges()
+            }
         }
 
-        binding.editNameSaveChanges.setOnClickListener {
-            binding.editNamePopup.visibility = View.GONE
-            val firstName: Editable = binding.firstName.text
-            val lastName: Editable = binding.lastName.text
-            Log.d("popup", "onViewCreated: $firstName $lastName")
-            binding.name.text = "$firstName $lastName"
+        setupGenderSelection()
+    }
+
+    private fun saveNameChanges() {
+        binding.apply {
+            editNamePopup.visibility = View.GONE
+            val firstName: Editable = firstName.text
+            val lastName: Editable = lastName.text
+            name.text = "$firstName $lastName"
         }
+    }
 
-        val maleCheckBox = binding.male
-        val femaleCheckBox = binding.female
-        val otherCheckBox = binding.other
+    private fun setupGenderSelection() {
+        binding.apply {
+            setExclusiveSelection(male, "Male", female, other)
+            setExclusiveSelection(female, "Female", male, other)
+            setExclusiveSelection(other, "Other", male, female)
 
-        setExclusiveSelection(maleCheckBox, "Male", femaleCheckBox, otherCheckBox)
-        setExclusiveSelection(femaleCheckBox, "Female", maleCheckBox, otherCheckBox)
-        setExclusiveSelection(otherCheckBox, "Other", maleCheckBox, femaleCheckBox)
-
-        val saveButton = binding.editGenderSaveChanges
-        saveButton.setOnClickListener {
-            if (selectedGender != null) {
-                binding.editGenderPopup.visibility = View.GONE
-                Toast.makeText(
-                    requireContext(), "Selected Gender: $selectedGender", Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                Toast.makeText(requireContext(), "No gender selected!", Toast.LENGTH_SHORT).show()
+            editGenderSaveChanges.setOnClickListener {
+                handleGenderSave()
             }
         }
     }
 
-    private fun updateUser(context: Context, filePath: String, token: String) {
-        CoroutineScope(Dispatchers.Main).launch {
-            try {
-                val response = withContext(Dispatchers.IO) {
+    private fun handleGenderSave() {
+        if (selectedGender != null) {
+            binding.editGenderPopup.visibility = View.GONE
+            showToast("Selected Gender: $selectedGender")
+        } else {
+            showToast("Please select a gender")
+        }
+    }
 
-                    val userUpdateRequest = UpdateUserRequest(
-                        profilePhoto = createMultipartBody(filePath, "profile_photo"),
-                        firstName = "Ritika",
-                        lastName = "Tiwari",
-                        gender = "Female",
-                        emergencyContactPhone = "8756256565"
-                    )
-                    Log.d(
-                        "profileApi",
-                        "profile photo: ${userUpdateRequest.profilePhoto} ,token $token"
-                    )
+    private fun checkAndRequestPermissions() {
+        val permissions = arrayOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
 
-                    RetrofitInstance.api.updateUserData(
-                        token = "Bearer $token", userUpdateRequest
-                    )
-                }
+        val permissionsToRequest = permissions.filter {
+            ContextCompat.checkSelfPermission(
+                requireContext(), it
+            ) != PackageManager.PERMISSION_GRANTED
+        }
 
-                if (response.success) {
-                    val userData = response.data
-                    Toast.makeText(
-                        context,
-                        "User updated successfully: ${userData.first_name}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+        if (permissionsToRequest.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                requireActivity(), permissionsToRequest.toTypedArray(), STORAGE_PERMISSION_CODE
+            )
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        when (requestCode) {
+            STORAGE_PERMISSION_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                    showToast("Storage permissions granted")
                 } else {
-                    Toast.makeText(
-                        context,
-                        "Error updating user: ${response.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    showToast("Storage permissions required to upload images")
                 }
-            } catch (e: Exception) {
-                Toast.makeText(context, "Exception: ${e.message}", Toast.LENGTH_LONG).show()
-
             }
         }
     }
 
-    private fun createMultipartBody(filePath: String, key: String): MultipartBody.Part {
-        val file = File("path_to_your_file")
-        val requestBody =
-            file.asRequestBody("application/octet-stream".toMediaTypeOrNull()) // Or any appropriate MIME type
-        val part = MultipartBody.Part.createFormData("file", file.name, requestBody)
-        return part
-    }
-
-
-    // Handle gallery selection
     private fun pickImageFromGallery() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(intent, PICK_IMAGE_REQUEST)
+        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also {
+            startActivityForResult(it, PICK_IMAGE_REQUEST)
+        }
     }
 
-    // Handle camera capture
     private fun captureImageWithCamera() {
-        val file = File(
+        val file = createImageFile()
+        imageUri = FileProvider.getUriForFile(
+            requireContext(), "${requireContext().packageName}.fileprovider", file
+        )
+
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+            intent.resolveActivity(requireContext().packageManager)?.let {
+                startActivityForResult(intent, CAPTURE_IMAGE_REQUEST)
+            }
+        }
+    }
+
+    private fun createImageFile(): File {
+        return File(
             requireContext().getExternalFilesDir(null),
             "profile_image_${System.currentTimeMillis()}.jpg"
         )
-        imageUri = FileProvider.getUriForFile(
-            requireContext(),
-            "${requireContext().packageName}.fileprovider",
-            file
-        )
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
-        if (intent.resolveActivity(requireContext().packageManager) != null) {
-            startActivityForResult(intent, CAPTURE_IMAGE_REQUEST)
-        }
     }
 
+    private fun copyFileToAppStorage(sourceUri: Uri): File? = runCatching {
+        val destinationFile = createImageFile()
+        requireContext().contentResolver.openInputStream(sourceUri)?.use { input ->
+            FileOutputStream(destinationFile).use { output ->
+                input.copyTo(output)
+            }
+        }
+        destinationFile
+    }.getOrNull()
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                PICK_IMAGE_REQUEST -> {
-                    val selectedImageUri = data?.data
-                    if (selectedImageUri != null) {
-                        val bitmap = MediaStore.Images.Media.getBitmap(
-                            requireContext().contentResolver,
-                            selectedImageUri
-                        )
-                        val resizedBitmap =
-                            resizeBitmap(bitmap, 200, 200)
-                        binding.setProfile.setImageBitmap(resizedBitmap)
-                        val filePath = getFilePathFromUri(selectedImageUri)
-                        Log.d("profileApi", "File path: $filePath")
-                        lifecycleScope.launch {
-                            val accessToken =
-                                DataStoreManager.getToken(requireContext(), "access").first()
-                            updateUser(requireContext(), filePath.toString(), accessToken!!)
-                        }
-                    }
-                }
+                PICK_IMAGE_REQUEST -> handleGalleryResult(data)
+                CAPTURE_IMAGE_REQUEST -> handleCameraResult()
+            }
+        } else {
+            showToast("Action canceled!")
+        }
+    }
 
-                CAPTURE_IMAGE_REQUEST -> {
-                    if (imageUri != null) {
-                        val bitmap = MediaStore.Images.Media.getBitmap(
-                            requireContext().contentResolver,
-                            imageUri
-                        )
-                        val resizedBitmap =
-                            resizeBitmap(bitmap, 200, 200)
-                        binding.setProfile.setImageBitmap(resizedBitmap)
-                        val filePath = imageUri?.path
-                        Log.d("profileApi", "file path is $filePath")
+    private fun handleGalleryResult(data: Intent?) {
+        val selectedImageUri = data?.data ?: return
+        try {
+            copyFileToAppStorage(selectedImageUri)?.let { file ->
+                updateImageAndUpload(Uri.fromFile(file), file.absolutePath)
+            } ?: showToast("Failed to process image")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error processing gallery image", e)
+            showToast("Error processing image: ${e.message}")
+        }
+    }
+
+    private fun handleCameraResult() {
+        imageUri?.let { uri ->
+            try {
+                val file = File(uri.path ?: return)
+                updateImageAndUpload(uri, file.absolutePath)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error processing camera image", e)
+                showToast("Error processing image: ${e.message}")
+            }
+        }
+    }
+
+    private fun updateImageAndUpload(uri: Uri, filePath: String) {
+        val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
+        val resizedBitmap = resizeBitmap(bitmap, 200, 200)
+        binding.setProfile.setImageBitmap(resizedBitmap)
+
+        uploadJob?.cancel() // Cancel any existing upload
+        uploadJob = lifecycleScope.launch {
+            try {
+                val accessToken = DataStoreManager.getToken(requireContext(), "access").first()
+                if (accessToken != null) {
+                    updateUserWithRetry(requireContext(), filePath, accessToken)
+                } else {
+                    showToast("Access token not found")
+                }
+            } catch (e: Exception) {
+                handleError(e)
+            }
+        }
+    }
+
+    private suspend fun updateUserWithRetry(
+        context: Context,
+        filePath: String,
+        token: String,
+        retryCount: Int = 0,
+    ) = withContext(Dispatchers.IO) {
+        try {
+            val file = File(filePath).apply {
+                if (!exists()) throw FileNotFoundException("File not found: $filePath")
+            }
+
+            val response = RetrofitInstance.api.updateUserData(
+                token = "Bearer $token",
+                profile_photo = createMultipartBody(file, "profile_photo"),
+                firstName = createRequestBody("Ritika"),
+                lastName = createRequestBody("Tiwari"),
+                gender = createRequestBody("FEMALE"),
+                emergencyContactPhone = createRequestBody("9540309305")
+            )
+
+            withContext(Dispatchers.Main) {
+                if (response.success) {
+                    showToast("Profile updated successfully")
+                    Log.d(TAG, "Update response: $response")
+                } else {
+                    showToast("Error updating profile: ${response.message}")
+                }
+            }
+        } catch (e: Exception) {
+            handleUploadError(e, context, filePath, token, retryCount)
+        }
+    }
+
+    private suspend fun handleUploadError(
+        error: Exception,
+        context: Context,
+        filePath: String,
+        token: String,
+        retryCount: Int,
+    ) {
+        when (error) {
+            is SocketException,
+            is SocketTimeoutException,
+            is TimeoutException,
+            is IOException,
+            -> {
+                if (retryCount < MAX_RETRIES) {
+                    val backoffTime = INITIAL_BACKOFF_MS * (retryCount + 1)
+                    delay(backoffTime)
+                    updateUserWithRetry(context, filePath, token, retryCount + 1)
+                } else {
+                    withContext(Dispatchers.Main) {
+                        showToast("Failed to upload after $MAX_RETRIES attempts")
                     }
                 }
             }
-        } else {
-            Toast.makeText(requireContext(), "Action canceled!", Toast.LENGTH_SHORT).show()
+
+            is HttpException -> {
+                withContext(Dispatchers.Main) {
+                    showToast("Server error: ${error.code()}")
+                }
+            }
+
+            else -> {
+                withContext(Dispatchers.Main) {
+                    showToast("Error: ${error.message}")
+                }
+            }
         }
     }
 
-    fun resizeBitmap(bitmap: Bitmap, newWidth: Int, newHeight: Int): Bitmap {
-        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+    private fun createMultipartBody(file: File, key: String): MultipartBody.Part {
+        val requestBody = file.asRequestBody("image/*".toMediaTypeOrNull())
+        return MultipartBody.Part.createFormData(key, file.name, requestBody)
     }
 
-    private fun getFilePathFromUri(uri: Uri): String? {
-        val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = requireContext().contentResolver.query(uri, projection, null, null, null)
-        cursor?.let {
-            val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            it.moveToFirst()
-            val path = it.getString(columnIndex)
-            it.close()
-            return path
-        }
-        return null
-    }
+    private fun createRequestBody(value: String) =
+        value.toRequestBody("text/plain".toMediaTypeOrNull())
 
+    private fun resizeBitmap(bitmap: Bitmap, newWidth: Int, newHeight: Int): Bitmap =
+        Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
 
-    fun setExclusiveSelection(
+    private fun setExclusiveSelection(
         selectedCheckBox: CheckBox,
         gender: String,
         vararg otherCheckBoxes: CheckBox,
@@ -279,42 +367,58 @@ class EditInfo : Fragment() {
         }
     }
 
-    fun slideInPopup(editPopupLayout: View) {
-        if (editPopupLayout.visibility != View.VISIBLE) {
-            editPopupLayout.visibility = View.VISIBLE
-            val animator = ObjectAnimator.ofFloat(editPopupLayout, "translationY", 1000f, 0f)
-            animator.duration = 300
-            animator.start()
+    private fun slideInPopup(popupView: View) {
+        if (popupView.visibility != View.VISIBLE) {
+            popupView.visibility = View.VISIBLE
+            ObjectAnimator.ofFloat(popupView, "translationY", 1000f, 0f).apply {
+                duration = 300
+                start()
+            }
         }
         binding.root.setOnTouchListener { _, event ->
-            outsideClickEvent(editPopupLayout, event)
+            handleOutsideClick(popupView, event)
         }
     }
 
-    fun outsideClickEvent(editPopupLayout: View, event: MotionEvent): Boolean {
-        if (event.action == MotionEvent.ACTION_DOWN && editPopupLayout.visibility == View.VISIBLE) {
+    private fun handleOutsideClick(popupView: View, event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_DOWN && popupView.visibility == View.VISIBLE) {
             val outRect = Rect()
-            editPopupLayout.getGlobalVisibleRect(outRect)
+            popupView.getGlobalVisibleRect(outRect)
             if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
-                val animator = ObjectAnimator.ofFloat(editPopupLayout, "translationY", 0f, 1000f)
-                animator.duration = 300
-                animator.start()
-                animator.addListener(object : Animator.AnimatorListener {
-                    override fun onAnimationStart(animation: Animator) {}
-                    override fun onAnimationEnd(animation: Animator) {
-                        editPopupLayout.visibility = View.GONE
-                    }
-
-                    override fun onAnimationCancel(animation: Animator) {}
-                    override fun onAnimationRepeat(animation: Animator) {}
-                })
+                animateAndHidePopup(popupView)
             }
         }
         return false
     }
 
+    private fun animateAndHidePopup(popupView: View) {
+        ObjectAnimator.ofFloat(popupView, "translationY", 0f, 1000f).apply {
+            duration = 300
+            addListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(animation: Animator) {}
+                override fun onAnimationEnd(animation: Animator) {
+                    popupView.visibility = View.GONE
+                }
+
+                override fun onAnimationCancel(animation: Animator) {}
+                override fun onAnimationRepeat(animation: Animator) {}
+            })
+            start()
+        }
+    }
+
+    private fun handleError(error: Exception) {
+        Log.e(TAG, "Error in EditInfo", error)
+        showToast("Error: ${error.message}")
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
+        uploadJob?.cancel() // Cancel any ongoing upload when the view is destroyed
         _binding = null
     }
 }

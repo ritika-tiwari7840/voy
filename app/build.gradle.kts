@@ -107,4 +107,6 @@ dependencies {
     //places sdk
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
     implementation("com.google.android.libraries.places:places:3.5.0")
+//    implementation ("com.google.android.gms:play-services-places:18.0.1")
+
 }
