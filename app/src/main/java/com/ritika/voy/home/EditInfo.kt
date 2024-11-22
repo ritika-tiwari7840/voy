@@ -3,6 +3,7 @@ package com.ritika.voy.home
 import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -20,10 +21,23 @@ import android.widget.CheckBox
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.ritika.voy.R
+import com.ritika.voy.api.DataStoreManager
+import com.ritika.voy.api.RetrofitInstance
+import com.ritika.voy.api.dataclasses.UpdateUserRequest
 import com.ritika.voy.databinding.FragmentEditInfoBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 
 class EditInfo : Fragment() {
@@ -65,8 +79,8 @@ class EditInfo : Fragment() {
 
         // Handle "Camera" button click
         binding.takeImageUsingCamera.setOnClickListener {
-            checkAndRequestPermissions()
             captureImageWithCamera()
+
         }
 
         binding.nameLayout.setOnClickListener {
@@ -111,18 +125,55 @@ class EditInfo : Fragment() {
         }
     }
 
-    private fun checkAndRequestPermissions() {
-        val permissions = arrayOf(
-            android.Manifest.permission.CAMERA,
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
-        val requestCode = 123
-        val deniedPermissions = permissions.filter {
-            requireContext().checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
+    private fun updateUser(context: Context, filePath: String, token: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+
+                    val userUpdateRequest = UpdateUserRequest(
+                        profilePhoto = createMultipartBody(filePath, "profile_photo"),
+                        firstName = "Ritika",
+                        lastName = "Tiwari",
+                        gender = "Female",
+                        emergencyContactPhone = "8756256565"
+                    )
+                    Log.d(
+                        "profileApi",
+                        "profile photo: ${userUpdateRequest.profilePhoto} ,token $token"
+                    )
+
+                    RetrofitInstance.api.updateUserData(
+                        token = "Bearer $token", userUpdateRequest
+                    )
+                }
+
+                if (response.success) {
+                    val userData = response.data
+                    Toast.makeText(
+                        context,
+                        "User updated successfully: ${userData.first_name}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Error updating user: ${response.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(context, "Exception: ${e.message}", Toast.LENGTH_LONG).show()
+
+            }
         }
-        if (deniedPermissions.isNotEmpty()) {
-            requestPermissions(deniedPermissions.toTypedArray(), requestCode)
-        }
+    }
+
+    private fun createMultipartBody(filePath: String, key: String): MultipartBody.Part {
+        val file = File("path_to_your_file")
+        val requestBody =
+            file.asRequestBody("application/octet-stream".toMediaTypeOrNull()) // Or any appropriate MIME type
+        val part = MultipartBody.Part.createFormData("file", file.name, requestBody)
+        return part
     }
 
 
@@ -166,8 +217,13 @@ class EditInfo : Fragment() {
                         val resizedBitmap =
                             resizeBitmap(bitmap, 200, 200)
                         binding.setProfile.setImageBitmap(resizedBitmap)
-                        val filePath = selectedImageUri?.path
-                        Log.d("profileApi", "file path is  $filePath")
+                        val filePath = getFilePathFromUri(selectedImageUri)
+                        Log.d("profileApi", "File path: $filePath")
+                        lifecycleScope.launch {
+                            val accessToken =
+                                DataStoreManager.getToken(requireContext(), "access").first()
+                            updateUser(requireContext(), filePath.toString(), accessToken!!)
+                        }
                     }
                 }
 
@@ -192,6 +248,19 @@ class EditInfo : Fragment() {
 
     fun resizeBitmap(bitmap: Bitmap, newWidth: Int, newHeight: Int): Bitmap {
         return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+    }
+
+    private fun getFilePathFromUri(uri: Uri): String? {
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor = requireContext().contentResolver.query(uri, projection, null, null, null)
+        cursor?.let {
+            val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            it.moveToFirst()
+            val path = it.getString(columnIndex)
+            it.close()
+            return path
+        }
+        return null
     }
 
 
