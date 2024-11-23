@@ -3,6 +3,7 @@ package com.ritika.voy.home
 import android.Manifest
 import android.animation.ObjectAnimator
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
@@ -61,8 +62,14 @@ import com.ritika.voy.api.dataclasses.mapsDataClasses.RouteModifiers
 import com.ritika.voy.api.dataclasses.mapsDataClasses.RoutesRequest
 import com.ritika.voy.databinding.ActivityMapBinding
 import com.ritika.voy.geocoding_helper.GeocodingHelper
+import com.ritika.voy.geocoding_helper.GeocodingResult
 import com.ritika.voy.mapRoute.drawRouteOnMap
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -341,30 +348,146 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 ).show()
             }
         }
-
+        setupButtonListeners()
     }
 
 
-    private suspend fun geoCodeAddress(address: String): LatLng {
+    private suspend fun geoCodeAddress(address: String): LatLng? {
         try {
             val result = geocodingHelper.geocodeAddress(address)
             return if (result.success) {
                 Log.d(
                     "Geocoding", """
-                Latitude: ${result.latitude}
-                Longitude: ${result.longitude}
-                Formatted Address: ${result.formattedAddress}
-            """.trimIndent()
+                    Latitude: ${result.latitude}
+                    Longitude: ${result.longitude}
+                    Formatted Address: ${result.formattedAddress}
+                """.trimIndent()
                 )
                 LatLng(result.latitude, result.longitude)
             } else {
                 Log.e("Geocoding", "Failed to geocode address: ${result.errorMessage}")
-                LatLng(0.0, 0.0) // Default value for failure
+                handleUnknownLocation(address)
             }
         } catch (e: Exception) {
             Log.e("Geocoding", "Exception during geocoding: ${e.message}")
-            return LatLng(0.0, 0.0)
+            return handleUnknownLocation(address)
         }
+    }
+
+    private suspend fun handleUnknownLocation(address: String): LatLng? {
+        // First try to get the last known location as a reference point
+        var referenceLocation: LatLng? = null
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            try {
+                val location = getLastLocationSuspend()
+                if (location != null) {
+                    referenceLocation = LatLng(location.latitude, location.longitude)
+                }
+            } catch (e: Exception) {
+                Log.e("Location", "Error getting last location: ${e.message}")
+            }
+        }
+
+        // If we have a reference location, try to find nearby addresses
+        referenceLocation?.let { location ->
+            try {
+                val nearbyResults = geocodingHelper.findNearbyAddresses(
+                    latitude = location.latitude,
+                    longitude = location.longitude,
+                    radiusKm = 2.0, // Search within 1km
+                    maxResults = 5
+                )
+
+                // Find the most relevant nearby address based on similarity to the original address
+                val mostRelevantAddress = findMostRelevantAddress(address, nearbyResults)
+
+                mostRelevantAddress?.let {
+                    return LatLng(it.latitude, it.longitude)
+                }
+            } catch (e: Exception) {
+                Log.e("NearbySearch", "Error finding nearby addresses: ${e.message}")
+            }
+        }
+
+        // If we still haven't found a location, show an error dialog on the main thread
+        withContext(Dispatchers.Main) {
+            showLocationNotFoundDialog(address)
+        }
+
+        return null
+    }
+
+    // Add this new suspend function to handle getting last location
+    private suspend fun getLastLocationSuspend(): Location? = suspendCoroutine { continuation ->
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            continuation.resume(null)
+            return@suspendCoroutine
+        }
+
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location ->
+                continuation.resume(location)
+            }
+            .addOnFailureListener { exception ->
+                continuation.resumeWithException(exception)
+            }
+            .addOnCanceledListener {
+                continuation.resume(null)
+            }
+    }
+
+
+    private fun findMostRelevantAddress(
+        originalAddress: String,
+        nearbyResults: List<GeocodingResult>,
+    ): GeocodingResult? {
+        if (nearbyResults.isEmpty()) return null
+
+        // Simple string similarity comparison
+        return nearbyResults.maxByOrNull { result ->
+            calculateAddressSimilarity(
+                originalAddress.lowercase(),
+                result.formattedAddress?.lowercase() ?: ""
+            )
+        }
+    }
+
+    private fun calculateAddressSimilarity(original: String, candidate: String): Int {
+        // Split addresses into words and count matching words
+        val originalWords = original.split(" ").toSet()
+        val candidateWords = candidate.split(" ").toSet()
+        return originalWords.intersect(candidateWords).size
+    }
+
+    private fun showLocationNotFoundDialog(address: String) {
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Location Not Found")
+            .setMessage(
+                "We couldn't find \"$address\". Would you like to:\n\n" +
+                        "1. Pick a location on the map\n" +
+                        "2. Try a different address"
+            )
+            .setPositiveButton("Pick on Map") { dialog, _ ->
+                dialog.dismiss()
+                // Enable map click handling
+                binding.descText.text = if (firstMarkerLatLng == null) "Pickup" else "Drop"
+            }
+            .setNegativeButton("Try Again") { dialog, _ ->
+                dialog.dismiss()
+                // Open the search box
+                binding.searchBar.requestFocus()
+            }
+            .create()
+
+        dialog.show()
     }
 
     private suspend fun reverseGeoCode(latitude: Double, longitude: Double): String? {

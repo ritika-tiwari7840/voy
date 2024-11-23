@@ -19,7 +19,9 @@
             android:layout_marginTop="20dp"
             android:layout_width="16dp"
             android:layout_height="16dp"
-            android:background="@drawable/green_circle" />
+            android:background="@drawable/green_circle"
+            android:backgroundTint="@color/theme_color"
+            />
 
         <View
             android:layout_width="2dp"
@@ -30,7 +32,9 @@
             android:layout_marginBottom="19dp"
             android:layout_width="16dp"
             android:layout_height="16dp"
-            android:background="@drawable/red_circle" />
+            android:background="@drawable/red_circle"
+            android:backgroundTint="@color/theme_color"
+            />
     </LinearLayout>
 
     <LinearLayout
