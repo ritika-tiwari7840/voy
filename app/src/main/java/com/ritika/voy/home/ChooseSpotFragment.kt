@@ -2,130 +2,149 @@ package com.ritika.voy.home
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
-import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+import com.google.android.libraries.places.api.model.AutocompletePrediction
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.ritika.voy.BuildConfig
 import com.ritika.voy.R
 import com.ritika.voy.databinding.FragmentChooseSpotBinding
 
 class ChooseSpotFragment : Fragment() {
-    private lateinit var _binding: FragmentChooseSpotBinding
-    private val binding get() = _binding
+
+    private lateinit var binding: FragmentChooseSpotBinding
     private lateinit var navController: NavController
-    private var startLocation: Place? = null
-    private var destinationLocation: Place? = null
+    private val placesClient by lazy { Places.createClient(requireContext()) }
+    private val startAdapter by lazy {
+        SuggestionsAdapter { suggestion ->
+            onSuggestionClicked(
+                suggestion,
+                isStart = true
+            )
+        }
+    }
+    private val destinationAdapter by lazy {
+        SuggestionsAdapter { suggestion ->
+            onSuggestionClicked(
+                suggestion,
+                isStart = false
+            )
+        }
+    }
 
     override fun onCreateView(
+
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
-        _binding = FragmentChooseSpotBinding.inflate(inflater, container, false)
+    ): View {
+        binding = FragmentChooseSpotBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        navController = Navigation.findNavController(view)
-
-        // Initialize Places SDK
+        navController = findNavController()
+        // Initialize Places API
         if (!Places.isInitialized()) {
             Places.initialize(requireContext(), BuildConfig.MAP_API_KEY)
         }
 
-        // Set up autocomplete for start and destination
-        setupAutocomplete()
+        setupRecyclerViews()
+        setupListeners()
 
         binding.btnBack.setOnClickListener {
             navController.navigate(R.id.action_chooseSpotFragment_to_home)
         }
+    }
 
-        binding.doneButton.setOnClickListener {
-            if (startLocation != null && destinationLocation != null) {
-                Toast.makeText(
-                    requireContext(),
-                    "Start: ${startLocation!!.name}, Destination: ${destinationLocation!!.name}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    "Please select both start and destination locations",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+    private fun setupRecyclerViews() {
+        binding.startRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = startAdapter
         }
 
-        binding.setOnMap.setOnClickListener {
-            Toast.makeText(
-                requireContext(),
-                "Navigate to maps to find current location",
-                Toast.LENGTH_SHORT
-            ).show()
+        binding.destinationRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = destinationAdapter
         }
     }
 
-    private fun setupAutocomplete() {
-        // Autocomplete for Start Location
-        val startAutocomplete =
-            childFragmentManager.findFragmentById(R.id.start_address) as AutocompleteSupportFragment
-        startAutocomplete.setPlaceFields(
-            listOf(
-                Place.Field.ID,
-                Place.Field.NAME,
-                Place.Field.LAT_LNG
-            )
-        )
-        startAutocomplete.setHint("Pickup Location")
-        startAutocomplete.setOnPlaceSelectedListener(object : PlaceSelectionListener {
-            override fun onPlaceSelected(place: Place) {
-                startLocation = place
-                binding.start.setText(place.name)
-                Log.i("ChooseSpot", "Start location selected: ${place.name}, ${place.latLng}")
+    private fun setupListeners() {
+        binding.start.addTextChangedListener { text ->
+            fetchPlaceSuggestions(text.toString()) { predictions ->
+                startAdapter.submitList(predictions)
+                binding.startRecyclerView.visibility =
+                    if (checkCursorAndShowToast(binding.start)) View.GONE else View.VISIBLE
+                if (predictions.isEmpty()) View.GONE else View.VISIBLE
             }
+        }
 
-            override fun onError(status: com.google.android.gms.common.api.Status) {
-                Toast.makeText(
-                    requireContext(),
-                    "Error: ${status.statusMessage}",
-                    Toast.LENGTH_SHORT
-                ).show()
+        binding.destination.addTextChangedListener { text ->
+            fetchPlaceSuggestions(text.toString()) { predictions ->
+                destinationAdapter.submitList(predictions)
+                binding.destinationRecyclerView.visibility =
+                    if (checkCursorAndShowToast(binding.destination)) View.GONE else View.VISIBLE
+                if (predictions.isEmpty()) View.GONE else View.VISIBLE
             }
-        })
+        }
+    }
 
-        // Autocomplete for Destination
-        val destinationAutocomplete =
-            childFragmentManager.findFragmentById(R.id.destination_address) as AutocompleteSupportFragment
-        destinationAutocomplete.setPlaceFields(
-            listOf(
-                Place.Field.ID,
-                Place.Field.NAME,
-                Place.Field.LAT_LNG
-            )
-        )
-        destinationAutocomplete.setHint("Drop Location")
-        destinationAutocomplete.setOnPlaceSelectedListener(object : PlaceSelectionListener {
-            override fun onPlaceSelected(place: Place) {
-                destinationLocation = place
-                binding.destination.setText(place.name)
-                Log.i("ChooseSpot", "Destination location selected: ${place.name}, ${place.latLng}")
-            }
+    private fun fetchPlaceSuggestions(
+        query: String,
+        callback: (List<AutocompletePrediction>) -> Unit,
+    ) {
+        if (query.isBlank()) {
+            callback(emptyList())
+            return
+        }
 
-            override fun onError(status: com.google.android.gms.common.api.Status) {
-                Toast.makeText(
-                    requireContext(),
-                    "Error: ${status.statusMessage}",
-                    Toast.LENGTH_SHORT
-                ).show()
+        val request = FindAutocompletePredictionsRequest.builder()
+            .setQuery(query)
+            .setCountry("IN") // Adjust or remove for global predictions
+            .build()
+
+        placesClient.findAutocompletePredictions(request)
+            .addOnSuccessListener { response ->
+                callback(response.autocompletePredictions)
+                Log.d(
+                    "ChooseSpotFragment",
+                    "Fetched ${response.autocompletePredictions.size} predictions"
+                )
             }
-        })
+            .addOnFailureListener { exception ->
+                Log.e("ChooseSpotFragment", "Error fetching place predictions", exception)
+                callback(emptyList())
+            }
+    }
+
+    private fun onSuggestionClicked(suggestion: AutocompletePrediction, isStart: Boolean) {
+        binding.startRecyclerView.visibility = View.GONE
+        binding.destinationRecyclerView.visibility = View.GONE
+        if (isStart) {
+            binding.start.setText(suggestion.getPrimaryText(null).toString())
+        } else {
+            binding.destination.setText(suggestion.getPrimaryText(null).toString())
+        }
+    }
+
+
+    fun checkCursorAndShowToast(editText: EditText): Boolean {
+        val cursorStart = editText.selectionStart
+        val text = editText.text.toString()
+
+        if (cursorStart == 0 && text.isNotEmpty()) {
+            binding.startRecyclerView.visibility = View.GONE
+            return true
+        }
+        return false
     }
 }

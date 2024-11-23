@@ -131,13 +131,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 firstMarkerLatLng == null -> {
                     showAddFirstLocationDialog()
                 }
+
                 firstMarkerLatLng != null && secondMarkerLatLng == null && !isSecondMarkerAllowed -> {
                     isSecondMarkerAllowed = true
                     binding.descText.text = "Drop"
                 }
+
                 firstMarkerLatLng != null && secondMarkerLatLng == null && isSecondMarkerAllowed -> {
                     showAddSecondLocationDialog()
                 }
+
                 firstMarkerLatLng != null && secondMarkerLatLng != null -> {
                     isRouteAllowed = true
                     getOptimalRoute()
@@ -163,7 +166,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.backButton.setOnClickListener {
             binding.confirmButton.visibility = View.VISIBLE
             binding.satellite.visibility = View.VISIBLE
-            binding.descText.visibility = View. VISIBLE
+            binding.descText.visibility = View.VISIBLE
             binding.backButton.visibility = View.GONE
             binding.bottomWidget.visibility = View.GONE
             binding.whiteBar.visibility = View.GONE
@@ -254,7 +257,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
                     )
                 }
-                binding.routeView.root.background= newBackground
+                binding.routeView.root.background = newBackground
 
                 val marginPx = 16f * resources.displayMetrics.density
 
@@ -262,17 +265,22 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 params.topMargin = marginPx.toInt()
                 binding.routeView.root.layoutParams = params
 
-                binding.routeView.root.findViewById<TextView>(R.id.start_address)?.setTextColor(Color.parseColor("#ccc7eb"))
-                binding.routeView.root.findViewById<TextView>(R.id.drop_address)?.setTextColor(Color.parseColor("#ccc7eb"))
+                binding.routeView.root.findViewById<TextView>(R.id.start_address)
+                    ?.setTextColor(Color.parseColor("#ccc7eb"))
+                binding.routeView.root.findViewById<TextView>(R.id.drop_address)
+                    ?.setTextColor(Color.parseColor("#ccc7eb"))
 
             } else {
-                Toast.makeText(applicationContext, "Please select the no. of seats", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    applicationContext,
+                    "Please select the no. of seats",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
         setupButtonListeners()
     }
-
 
 
     private fun isLocationInIndia(latLng: LatLng): Boolean {
@@ -311,7 +319,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun setupButtonListeners() {
-        val buttons = listOf(binding.button1, binding.button2, binding.button3, binding.button4, binding.button5)
+        val buttons = listOf(
+            binding.button1,
+            binding.button2,
+            binding.button3,
+            binding.button4,
+            binding.button5
+        )
         buttons.forEachIndexed { index, button ->
             button.setOnClickListener {
                 previousButton?.let {
@@ -331,34 +345,40 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun startColorAnimation(drawable: Drawable?) {
-    if (drawable is GradientDrawable) {
-        val animator = ObjectAnimator.ofFloat(-1f, 1f).apply {
-            duration = 1500
-            repeatCount = ObjectAnimator.INFINITE
-            interpolator = AccelerateDecelerateInterpolator()
-            
-            addUpdateListener { animation ->
-                val fraction = animation.animatedValue as Float
-                
-                drawable.orientation = GradientDrawable.Orientation.LEFT_RIGHT
-                
-                drawable.colors = intArrayOf(
-                    if (fraction < 0f) Color.WHITE else ContextCompat.getColor(this@MapActivity, android.R.color.holo_green_light),
-                    if (fraction < 0f) Color.WHITE else ContextCompat.getColor(this@MapActivity, android.R.color.holo_green_light)
-                )
-                
-            
-                drawable.setGradientCenter(fraction, 0.5f)
+        if (drawable is GradientDrawable) {
+            val animator = ObjectAnimator.ofFloat(-1f, 1f).apply {
+                duration = 1500
+                repeatCount = ObjectAnimator.INFINITE
+                interpolator = AccelerateDecelerateInterpolator()
+
+                addUpdateListener { animation ->
+                    val fraction = animation.animatedValue as Float
+
+                    drawable.orientation = GradientDrawable.Orientation.LEFT_RIGHT
+
+                    drawable.colors = intArrayOf(
+                        if (fraction < 0f) Color.WHITE else ContextCompat.getColor(
+                            this@MapActivity,
+                            android.R.color.holo_green_light
+                        ),
+                        if (fraction < 0f) Color.WHITE else ContextCompat.getColor(
+                            this@MapActivity,
+                            android.R.color.holo_green_light
+                        )
+                    )
+
+
+                    drawable.setGradientCenter(fraction, 0.5f)
+                }
             }
+            animator.start()
         }
-        animator.start()
     }
-}
 
     private fun setupSearchBox() {
         binding.searchBar.setOnFocusChangeListener { view, hasFocus ->
             if (hasFocus) {
-                
+
                 val fields = listOf(
                     Place.Field.ID,
                     Place.Field.NAME,
@@ -399,6 +419,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         imm.hideSoftInputFromWindow(binding.searchBar.windowToken, 0)
                     }
                 }
+
                 AutocompleteActivity.RESULT_ERROR -> {
                     // Handle the error
                     data?.let {
@@ -408,6 +429,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     binding.searchBar.clearFocus()
                     binding.searchBar.setText("")
                 }
+
                 Activity.RESULT_CANCELED -> {
                     // Reset focus and clear any partial text
                     binding.searchBar.clearFocus()
@@ -424,19 +446,36 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun getBitmapDescriptorFromResource(resourceId: Int): BitmapDescriptor {
         val bitmap = BitmapFactory.decodeResource(resources, resourceId)
-        val scaledBitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.width * 0.12).toInt(), (bitmap.height * 0.12).toInt(), false)
+        val scaledBitmap = Bitmap.createScaledBitmap(
+            bitmap,
+            (bitmap.width * 0.12).toInt(),
+            (bitmap.height * 0.12).toInt(),
+            false
+        )
         return BitmapDescriptorFactory.fromBitmap(scaledBitmap)
     }
 
     private fun checkLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
         } else {
             getLastKnownLocation()
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
@@ -448,7 +487,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun getLastKnownLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 location?.let {
                     val userLatLng = LatLng(it.latitude, it.longitude)
@@ -461,7 +504,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun getOptimalRoute() {
         if (firstMarkerLatLng != null && secondMarkerLatLng != null && isRouteAllowed) {
             lifecycleScope.launch {
-                val route = getRoute(mapApi, firstMarkerLatLng!!, secondMarkerLatLng!!, BuildConfig.MAP_API_KEY)
+                val route = getRoute(
+                    mapApi,
+                    firstMarkerLatLng!!,
+                    secondMarkerLatLng!!,
+                    BuildConfig.MAP_API_KEY
+                )
                 route?.let {
                     drawRouteOnMap(it, googleMap)
                 }
@@ -469,11 +517,28 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    suspend fun getRoute(apiService: ApiService, origin: LatLng, destination: LatLng, apiKey: String): Route? {
+    suspend fun getRoute(
+        apiService: ApiService,
+        origin: LatLng,
+        destination: LatLng,
+        apiKey: String,
+    ): Route? {
         val request = RoutesRequest(
-            origin = OriginDestination(com.ritika.voy.api.dataclasses.mapsDataClasses.Location(origin)),
-            destination = OriginDestination(com.ritika.voy.api.dataclasses.mapsDataClasses.Location(destination)),
-            routeModifiers = RouteModifiers(avoidTolls = false, avoidHighways = false, avoidFerries = false)
+            origin = OriginDestination(
+                com.ritika.voy.api.dataclasses.mapsDataClasses.Location(
+                    origin
+                )
+            ),
+            destination = OriginDestination(
+                com.ritika.voy.api.dataclasses.mapsDataClasses.Location(
+                    destination
+                )
+            ),
+            routeModifiers = RouteModifiers(
+                avoidTolls = false,
+                avoidHighways = false,
+                avoidFerries = false
+            )
         )
         val response = apiService.computeRoutes(request, apiKey)
         return response.routes.firstOrNull()
@@ -483,17 +548,28 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         googleMap = map
         googleMap.uiSettings.isMyLocationButtonEnabled = true
 
-        val locationButton = (findViewById<View>(Integer.parseInt("1")).parent as View).findViewById<View>(Integer.parseInt("2"))
+        val locationButton =
+            (findViewById<View>(Integer.parseInt("1")).parent as View).findViewById<View>(
+                Integer.parseInt("2")
+            )
         val rlp = locationButton.layoutParams as (RelativeLayout.LayoutParams)
 
         rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
         rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
         rlp.setMargins(0, 0, 30, 30)
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             googleMap.isMyLocationEnabled = true
         } else {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
         }
 
         try {
@@ -517,19 +593,23 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             if (isLocationInIndia(latLng)) {
                 if (firstMarkerLatLng == null) {
                     firstMarkerLatLng = latLng
-                    firstMarker = googleMap.addMarker(MarkerOptions().position(latLng).icon(markerIcon))
+                    firstMarker =
+                        googleMap.addMarker(MarkerOptions().position(latLng).icon(markerIcon))
                 } else if (secondMarkerLatLng == null && isSecondMarkerAllowed) {
                     secondMarkerLatLng = latLng
-                    secondMarker = googleMap.addMarker(MarkerOptions().position(latLng).icon(markerIcon))
+                    secondMarker =
+                        googleMap.addMarker(MarkerOptions().position(latLng).icon(markerIcon))
                     isSecondMarkerAllowed = false
                 } else if (firstMarkerLatLng != null && secondMarkerLatLng == null) {
                     firstMarker?.remove()
                     firstMarkerLatLng = latLng
-                    firstMarker = googleMap.addMarker(MarkerOptions().position(latLng).icon(markerIcon))
+                    firstMarker =
+                        googleMap.addMarker(MarkerOptions().position(latLng).icon(markerIcon))
                 } else if (firstMarkerLatLng != null && secondMarkerLatLng != null && !isRouteAllowed) {
                     secondMarker?.remove()
                     secondMarkerLatLng = latLng
-                    secondMarker = googleMap.addMarker(MarkerOptions().position(latLng).icon(markerIcon))
+                    secondMarker =
+                        googleMap.addMarker(MarkerOptions().position(latLng).icon(markerIcon))
                 } else if (firstMarkerLatLng != null && secondMarkerLatLng != null && isRouteAllowed) {
                     // Do nothing if both markers are set and route is allowed
                     return@setOnMapClickListener
