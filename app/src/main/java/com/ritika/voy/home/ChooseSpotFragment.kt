@@ -74,10 +74,13 @@ class ChooseSpotFragment : Fragment() {
                     .show()
             } else {
                 val bundle = Bundle()
-                bundle.putString("startLocation",binding.start.text.toString())
-                bundle.putString("destinationLocation",binding.destination.text.toString())
+                bundle.putString("startLocation", binding.start.text.toString())
+                bundle.putString("destinationLocation", binding.destination.text.toString())
                 navController.navigate(R.id.action_chooseSpotFragment_to_mapActivity, bundle)
             }
+        }
+        binding.setOnMap.setOnClickListener {
+            navController.navigate(R.id.action_chooseSpotFragment_to_mapActivity)
         }
     }
 

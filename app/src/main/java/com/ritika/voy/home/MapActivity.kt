@@ -83,8 +83,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var destinationLatLng: LatLng? = null
     private var startLocation: String? = null
     private var destinationLocation: String? = null
-    private var isResettingStartLocation = false
-    private var isResettingDestination = false
     private var hasSetInitialLocations = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,25 +117,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             } catch (e: Exception) {
                 Log.e("geocode-address", "Error geocoding: ${e.message}")
-            }
-        }
-
-
-
-        lifecycleScope.launch {
-            try {
-                if (startLatLng != null && destinationLatLng != null) {
-                    val startAddress =
-                        reverseGeoCode(startLatLng!!.latitude, startLatLng!!.longitude)
-                    val destinationAddress =
-                        reverseGeoCode(destinationLatLng!!.latitude, destinationLatLng!!.longitude)
-                    Log.d(
-                        "reverseGeoCodeAddress",
-                        "reverseGeoCodeAddress: from $startAddress to $destinationAddress"
-                    )
-                }
-            } catch (e: Exception) {
-                Log.e("reverseGeoCodeAddress", "Error during reverse geocoding: ${e.message}")
             }
         }
 
@@ -207,6 +186,42 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     binding.button5.visibility = View.VISIBLE
                     binding.proceedButton.visibility = View.VISIBLE
                     binding.routeView.root.visibility = View.VISIBLE
+
+                    Log.d(
+                        "reverseGeoCoding",
+                        "geocoding while setOnMap $firstMarkerLatLng $secondMarkerLatLng"
+                    )
+
+                    lifecycleScope.launch {
+                        try {
+                            if (firstMarkerLatLng != null && secondMarkerLatLng != null) {
+                                val startAddress =
+                                    reverseGeoCode(
+                                        firstMarkerLatLng!!.latitude,
+                                        firstMarkerLatLng!!.longitude
+                                    )
+                                val destinationAddress =
+                                    reverseGeoCode(
+                                        secondMarkerLatLng!!.latitude,
+                                        secondMarkerLatLng!!.longitude
+                                    )
+                                Log.d(
+                                    "reverseGeoCodeAddress",
+                                    "reverseGeoCodeAddress: from $startAddress to $destinationAddress"
+                                )
+                                binding.routeView.root.findViewById<TextView>(R.id.start_address)
+                                    ?.text = startAddress
+                                binding.routeView.root.findViewById<TextView>(R.id.drop_address)
+                                    ?.text = destinationAddress
+                            }
+                        } catch (e: Exception) {
+                            Log.e(
+                                "reverseGeoCodeAddress",
+                                "Error during reverse geocoding: ${e.message}"
+                            )
+                        }
+                    }
+
                 }
             }
         }
@@ -234,6 +249,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         binding.proceedButton.setOnClickListener {
+
             if (selectedButtonValue != null) {
                 val gradientDrawable = GradientDrawable(
                     GradientDrawable.Orientation.LEFT_RIGHT,
@@ -312,7 +328,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 val params = binding.routeView.root.layoutParams as ViewGroup.MarginLayoutParams
                 params.topMargin = marginPx.toInt()
                 binding.routeView.root.layoutParams = params
-
                 binding.routeView.root.findViewById<TextView>(R.id.start_address)
                     ?.setTextColor(Color.parseColor("#ccc7eb"))
                 binding.routeView.root.findViewById<TextView>(R.id.drop_address)
@@ -763,47 +778,87 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                     15f
                                 )
                             )
-                            showConfirmationDialog(
-                                "Confirm Drop Location",
-                                "Do you want to confirm this drop location?",
-                                onConfirm = {
+                            binding.confirmButton.setOnClickListener {
 
-                                    if (firstMarkerLatLng != null && secondMarkerLatLng != null) {
-                                        isRouteAllowed = true
-                                        getOptimalRoute()
-                                        binding.confirmButton.visibility = View.GONE
-                                        binding.satellite.visibility = View.GONE
-                                        binding.descText.visibility = View.GONE
-                                        binding.backButton.visibility = View.VISIBLE
-                                        binding.bottomWidget.visibility = View.VISIBLE
-                                        binding.whiteBar.visibility = View.VISIBLE
-                                        binding.bottomWidgetText.visibility = View.VISIBLE
-                                        binding.button1.visibility = View.VISIBLE
-                                        binding.button2.visibility = View.VISIBLE
-                                        binding.button3.visibility = View.VISIBLE
-                                        binding.button4.visibility = View.VISIBLE
-                                        binding.button5.visibility = View.VISIBLE
-                                        binding.proceedButton.visibility = View.VISIBLE
-                                        binding.routeView.root.visibility = View.VISIBLE
+                                showConfirmationDialog(
+                                    "Confirm Drop Location",
+                                    "Do you want to confirm this drop location?",
+                                    onConfirm = {
+
+                                        if (firstMarkerLatLng != null && secondMarkerLatLng != null) {
+                                            isRouteAllowed = true
+                                            getOptimalRoute()
+                                            binding.confirmButton.visibility = View.GONE
+                                            binding.satellite.visibility = View.GONE
+                                            binding.descText.visibility = View.GONE
+                                            binding.backButton.visibility = View.VISIBLE
+                                            binding.bottomWidget.visibility = View.VISIBLE
+                                            binding.whiteBar.visibility = View.VISIBLE
+                                            binding.bottomWidgetText.visibility = View.VISIBLE
+                                            binding.button1.visibility = View.VISIBLE
+                                            binding.button2.visibility = View.VISIBLE
+                                            binding.button3.visibility = View.VISIBLE
+                                            binding.button4.visibility = View.VISIBLE
+                                            binding.button5.visibility = View.VISIBLE
+                                            binding.proceedButton.visibility = View.VISIBLE
+                                            binding.routeView.root.visibility = View.VISIBLE
+                                            Log.d(
+                                                "hii",
+                                                "onCreate: $firstMarkerLatLng $secondMarkerLatLng"
+                                            )
+
+                                            lifecycleScope.launch {
+                                                try {
+                                                    if (firstMarkerLatLng != null && secondMarkerLatLng != null) {
+                                                        val startAddress =
+                                                            reverseGeoCode(
+                                                                firstMarkerLatLng!!.latitude,
+                                                                firstMarkerLatLng!!.longitude
+                                                            )
+                                                        val destinationAddress =
+                                                            reverseGeoCode(
+                                                                secondMarkerLatLng!!.latitude,
+                                                                secondMarkerLatLng!!.longitude
+                                                            )
+                                                        Log.d(
+                                                            "reverseGeoCodeAddress",
+                                                            "reverseGeoCodeAddress: from $startAddress to $destinationAddress"
+                                                        )
+                                                        binding.routeView.root.findViewById<TextView>(
+                                                            R.id.start_address
+                                                        )
+                                                            ?.text = startAddress
+                                                        binding.routeView.root.findViewById<TextView>(
+                                                            R.id.drop_address
+                                                        )
+                                                            ?.text = destinationAddress
+                                                    }
+                                                } catch (e: Exception) {
+                                                    Log.e(
+                                                        "reverseGeoCodeAddress",
+                                                        "Error during reverse geocoding: ${e.message}"
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    },
+                                    onDeny = {
+                                        // Clear the marker and allow user to select new location
+                                        secondMarker?.remove()
+                                        secondMarkerLatLng = null
+                                        destinationLatLng = null
                                     }
-                                },
-                                onDeny = {
-                                    showResetLocationDialog(false, destinationLatLng!!)
-                                    // Clear the marker and allow user to select new location
-                                    secondMarker?.remove()
-                                    secondMarkerLatLng = null
-                                    destinationLatLng = null
-                                }
-                            )
+                                )
+                            }
                         }
                     },
-                    onDeny = {
 
-                        showResetLocationDialog(true, startLatLng!!)
+                    onDeny = {
                         // Clear the marker and allow user to select new location
                         firstMarker?.remove()
                         firstMarkerLatLng = null
                         startLatLng = null
+
                     }
                 )
             }
@@ -831,42 +886,5 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             .show()
     }
 
-    private fun showResetLocationDialog(isStartLocation: Boolean, newLatLng: LatLng) {
-        val locationType = if (isStartLocation) "pickup" else "drop-off"
-        showConfirmationDialog(
-            "Reset Location",
-            "Do you want to reset the $locationType location?",
-            onConfirm = {
-                if (isStartLocation) {
-                    firstMarker?.remove()
-                    firstMarkerLatLng = newLatLng
-                    firstMarker =
-                        googleMap.addMarker(MarkerOptions().position(newLatLng).icon(markerIcon))
-                    if (secondMarkerLatLng != null) {
-                        isRouteAllowed = true
-                        getOptimalRoute()
-                    }
-                } else {
-                    secondMarker?.remove()
-                    secondMarkerLatLng = newLatLng
-                    secondMarker =
-                        googleMap.addMarker(MarkerOptions().position(newLatLng).icon(markerIcon))
-                    if (firstMarkerLatLng != null) {
-                        isRouteAllowed = true
-                        getOptimalRoute()
-
-                    }
-                }
-            },
-            onDeny = {
-                // Keep existing location
-                if (isStartLocation) {
-                    isResettingStartLocation = false
-                } else {
-                    isResettingDestination = false
-                }
-            }
-        )
-    }
 
 }
