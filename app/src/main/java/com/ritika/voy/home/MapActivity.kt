@@ -1,7 +1,6 @@
 package com.ritika.voy.home
 
 import android.Manifest
-import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.Intent
@@ -25,7 +24,6 @@ import android.widget.Button
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
-import android.widget.ToggleButton
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintSet
@@ -57,13 +55,12 @@ import com.ritika.voy.R
 import com.ritika.voy.api.ApiService
 import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.RetrofitInstance.mapApi
-import com.ritika.voy.api.Utility
 import com.ritika.voy.api.dataclasses.mapsDataClasses.OriginDestination
 import com.ritika.voy.api.dataclasses.mapsDataClasses.Route
 import com.ritika.voy.api.dataclasses.mapsDataClasses.RouteModifiers
 import com.ritika.voy.api.dataclasses.mapsDataClasses.RoutesRequest
 import com.ritika.voy.databinding.ActivityMapBinding
-import com.ritika.voy.mapRoute.decodePolyline
+import com.ritika.voy.geocoding_helper.GeocodingHelper
 import com.ritika.voy.mapRoute.drawRouteOnMap
 import kotlinx.coroutines.launch
 
@@ -81,6 +78,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var secondMarker: Marker? = null
     private var selectedButtonValue: String? = null
     private var previousButton: Button? = null
+    private lateinit var geocodingHelper: GeocodingHelper
+    private var startLatLng: LatLng? = null
+    private var destinationLatLng: LatLng? = null
+    private var startLocation: String? = null
+    private var destinationLocation: String? = null
+    private var isResettingStartLocation = false
+    private var isResettingDestination = false
+    private var hasSetInitialLocations = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,6 +98,49 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        // Initialize geocodingHelper
+        geocodingHelper = GeocodingHelper(this)
+
+        val bundle = intent.extras
+        startLocation = bundle?.getString("startLocation")
+        destinationLocation = bundle?.getString("destinationLocation")
+        Log.d("Bundle", " Bundle:  from  $startLocation to $destinationLocation")
+
+        lifecycleScope.launch {
+            try {
+                startLatLng = geoCodeAddress(startLocation ?: "")
+                destinationLatLng = geoCodeAddress(destinationLocation ?: "")
+                Log.d("geocode-address", "geocodeAddress: from $startLatLng to $destinationLatLng")
+
+                // Set initial markers if both locations are available
+                if (startLatLng != null && destinationLatLng != null && !hasSetInitialLocations) {
+                    setInitialLocations()
+                }
+            } catch (e: Exception) {
+                Log.e("geocode-address", "Error geocoding: ${e.message}")
+            }
+        }
+
+
+
+        lifecycleScope.launch {
+            try {
+                if (startLatLng != null && destinationLatLng != null) {
+                    val startAddress =
+                        reverseGeoCode(startLatLng!!.latitude, startLatLng!!.longitude)
+                    val destinationAddress =
+                        reverseGeoCode(destinationLatLng!!.latitude, destinationLatLng!!.longitude)
+                    Log.d(
+                        "reverseGeoCodeAddress",
+                        "reverseGeoCodeAddress: from $startAddress to $destinationAddress"
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("reverseGeoCodeAddress", "Error during reverse geocoding: ${e.message}")
+            }
+        }
+
 
         if (!Places.isInitialized()) {
             Places.initialize(applicationContext, BuildConfig.MAP_API_KEY)
@@ -279,7 +327,60 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-        setupButtonListeners()
+    }
+
+
+    private suspend fun geoCodeAddress(address: String): LatLng {
+        try {
+            val result = geocodingHelper.geocodeAddress(address)
+            return if (result.success) {
+                Log.d(
+                    "Geocoding", """
+                Latitude: ${result.latitude}
+                Longitude: ${result.longitude}
+                Formatted Address: ${result.formattedAddress}
+            """.trimIndent()
+                )
+                LatLng(result.latitude, result.longitude)
+            } else {
+                Log.e("Geocoding", "Failed to geocode address: ${result.errorMessage}")
+                LatLng(0.0, 0.0) // Default value for failure
+            }
+        } catch (e: Exception) {
+            Log.e("Geocoding", "Exception during geocoding: ${e.message}")
+            return LatLng(0.0, 0.0)
+        }
+    }
+
+    private suspend fun reverseGeoCode(latitude: Double, longitude: Double): String? {
+        return try {
+            val result = geocodingHelper.reverseGeocode(latitude, longitude)
+            if (result.success) {
+                Log.d("Reverse Geocoding", "Address: ${result.formattedAddress}")
+                result.formattedAddress
+            } else {
+                Log.e("Reverse Geocoding", "Failed to reverse geocode: ${result.errorMessage}")
+                "Unknown address" // Return a fallback value
+            }
+        } catch (e: Exception) {
+            Log.e("Reverse Geocoding", "Exception during reverse geocoding: ${e.message}")
+            "Error retrieving address" // Return an error message
+        }
+    }
+
+
+    private fun nearbyAddresses(latitude: Double, longitude: Double) {
+        lifecycleScope.launch {
+            val results = geocodingHelper.findNearbyAddresses(
+                latitude = latitude,
+                longitude = longitude,
+                radiusKm = 0.5,
+                maxResults = 5
+            )
+            results.forEach { result ->
+                Log.d("Nearby", "Found: ${result.formattedAddress}")
+            }
+        }
     }
 
 
@@ -632,4 +733,140 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val eastLng = 97.4  // Eastern-most point
         }
     }
+
+
+    private fun setInitialLocations() {
+        if (!hasSetInitialLocations && startLatLng != null) {
+            firstMarkerLatLng = startLatLng
+            firstMarker =
+                googleMap.addMarker(MarkerOptions().position(startLatLng!!).icon(markerIcon))
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startLatLng!!, 15f))
+
+            // Show confirmation dialog for proceeding to destination
+            binding.confirmButton.setOnClickListener {
+                showConfirmationDialog(
+                    "Confirm Pickup Location",
+                    "Do you want to confirm this pickup location?",
+                    onConfirm = {
+                        isSecondMarkerAllowed = true
+                        binding.descText.text = "Drop"
+
+                        // Set destination marker after pickup confirmation
+                        if (destinationLatLng != null) {
+                            secondMarkerLatLng = destinationLatLng
+                            secondMarker = googleMap.addMarker(
+                                MarkerOptions().position(destinationLatLng!!).icon(markerIcon)
+                            )
+                            googleMap.moveCamera(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    destinationLatLng!!,
+                                    15f
+                                )
+                            )
+                            showConfirmationDialog(
+                                "Confirm Drop Location",
+                                "Do you want to confirm this drop location?",
+                                onConfirm = {
+
+                                    if (firstMarkerLatLng != null && secondMarkerLatLng != null) {
+                                        isRouteAllowed = true
+                                        getOptimalRoute()
+                                        binding.confirmButton.visibility = View.GONE
+                                        binding.satellite.visibility = View.GONE
+                                        binding.descText.visibility = View.GONE
+                                        binding.backButton.visibility = View.VISIBLE
+                                        binding.bottomWidget.visibility = View.VISIBLE
+                                        binding.whiteBar.visibility = View.VISIBLE
+                                        binding.bottomWidgetText.visibility = View.VISIBLE
+                                        binding.button1.visibility = View.VISIBLE
+                                        binding.button2.visibility = View.VISIBLE
+                                        binding.button3.visibility = View.VISIBLE
+                                        binding.button4.visibility = View.VISIBLE
+                                        binding.button5.visibility = View.VISIBLE
+                                        binding.proceedButton.visibility = View.VISIBLE
+                                        binding.routeView.root.visibility = View.VISIBLE
+                                    }
+                                },
+                                onDeny = {
+                                    showResetLocationDialog(false, destinationLatLng!!)
+                                    // Clear the marker and allow user to select new location
+                                    secondMarker?.remove()
+                                    secondMarkerLatLng = null
+                                    destinationLatLng = null
+                                }
+                            )
+                        }
+                    },
+                    onDeny = {
+
+                        showResetLocationDialog(true, startLatLng!!)
+                        // Clear the marker and allow user to select new location
+                        firstMarker?.remove()
+                        firstMarkerLatLng = null
+                        startLatLng = null
+                    }
+                )
+            }
+            hasSetInitialLocations = true
+        }
+    }
+
+    private fun showConfirmationDialog(
+        title: String,
+        message: String,
+        onConfirm: () -> Unit,
+        onDeny: () -> Unit,
+    ) {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("Yes") { dialog, _ ->
+                dialog.dismiss()
+                onConfirm()
+            }
+            .setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+                onDeny()
+            }
+            .show()
+    }
+
+    private fun showResetLocationDialog(isStartLocation: Boolean, newLatLng: LatLng) {
+        val locationType = if (isStartLocation) "pickup" else "drop-off"
+        showConfirmationDialog(
+            "Reset Location",
+            "Do you want to reset the $locationType location?",
+            onConfirm = {
+                if (isStartLocation) {
+                    firstMarker?.remove()
+                    firstMarkerLatLng = newLatLng
+                    firstMarker =
+                        googleMap.addMarker(MarkerOptions().position(newLatLng).icon(markerIcon))
+                    if (secondMarkerLatLng != null) {
+                        isRouteAllowed = true
+                        getOptimalRoute()
+                    }
+                } else {
+                    secondMarker?.remove()
+                    secondMarkerLatLng = newLatLng
+                    secondMarker =
+                        googleMap.addMarker(MarkerOptions().position(newLatLng).icon(markerIcon))
+                    if (firstMarkerLatLng != null) {
+                        isRouteAllowed = true
+                        getOptimalRoute()
+
+                    }
+                }
+            },
+            onDeny = {
+                // Keep existing location
+                if (isStartLocation) {
+                    isResettingStartLocation = false
+                } else {
+                    isResettingDestination = false
+                }
+            }
+        )
+    }
+
 }

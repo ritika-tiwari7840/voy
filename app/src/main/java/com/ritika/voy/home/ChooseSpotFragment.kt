@@ -64,6 +64,21 @@ class ChooseSpotFragment : Fragment() {
         binding.btnBack.setOnClickListener {
             navController.navigate(R.id.action_chooseSpotFragment_to_home)
         }
+
+        binding.doneButton.setOnClickListener {
+
+            if (binding.start.text.toString().isBlank() || binding.destination.text.toString()
+                    .isBlank()
+            ) {
+                Toast.makeText(requireContext(), "Please enter both the fields", Toast.LENGTH_SHORT)
+                    .show()
+            } else {
+                val bundle = Bundle()
+                bundle.putString("startLocation",binding.start.text.toString())
+                bundle.putString("destinationLocation",binding.destination.text.toString())
+                navController.navigate(R.id.action_chooseSpotFragment_to_mapActivity, bundle)
+            }
+        }
     }
 
     private fun setupRecyclerViews() {
@@ -76,6 +91,7 @@ class ChooseSpotFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = destinationAdapter
         }
+
     }
 
     private fun setupListeners() {

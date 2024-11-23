@@ -57,6 +57,9 @@
             app:destination="@id/home"
             app:popUpTo="@id/home"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_chooseSpotFragment_to_mapActivity"
+            app:destination="@id/mapActivity" />
     </fragment>
 
     <fragment
@@ -70,4 +73,9 @@
             app:popUpTo="@id/profile"
             app:popUpToInclusive="true" />
     </fragment>
+    <activity
+        android:id="@+id/mapActivity"
+        android:name="com.ritika.voy.home.MapActivity"
+        android:label="activity_map"
+        tools:layout="@layout/activity_map" />
 </navigation>
