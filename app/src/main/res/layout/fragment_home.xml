@@ -250,7 +250,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="836dp"
             android:background="@drawable/button_background"
-            app:cardBackgroundColor="#CFA2F7"
+            app:cardBackgroundColor="#E5D4FF"
             app:cardCornerRadius="15dp"
             app:layout_constraintLeft_toLeftOf="@id/guide_left"
             app:layout_constraintRight_toRightOf="@id/guide_right"
@@ -289,7 +289,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/light"
+                        android:fontFamily="@font/medium"
                         android:text="Share the live location,Feel safe and \nsecure during the journey."
                         android:textColor="@color/black"
                         android:textSize="12sp" />
@@ -304,7 +304,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="936dp"
             android:background="@drawable/button_background"
-            app:cardBackgroundColor="#DCBFFF"
+            app:cardBackgroundColor="#E5D4FF"
             app:cardCornerRadius="15dp"
             app:layout_constraintLeft_toLeftOf="@id/guide_left"
             app:layout_constraintRight_toRightOf="@id/guide_right"
@@ -343,7 +343,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/light"
+                        android:fontFamily="@font/medium"
                         android:text="Enhancing safety and feel secure during \ncarpool journey in Voy."
                         android:textColor="@color/black"
                         android:textSize="12sp" />
@@ -398,7 +398,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/light"
+                        android:fontFamily="@font/medium"
                         android:text="Only verified user in Voy. We promote \nSafety."
                         android:textColor="@android:color/black"
                         android:textSize="12sp" />
