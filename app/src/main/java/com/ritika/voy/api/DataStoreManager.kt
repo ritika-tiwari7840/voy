@@ -19,6 +19,12 @@ object DataStoreManager {
         lastName: String,
         fullName: String,
         createdAt: String,
+        phoneNo: String,
+        gender: String,
+        emergencyContact: String,
+        profilePhoto: String,
+        ratingAsDriver: String,
+        ratingAsPassenger: String,
     ) {
         val idKey = stringPreferencesKey("id")
         val emailKey = stringPreferencesKey("email")
@@ -26,6 +32,12 @@ object DataStoreManager {
         val lastNameKey = stringPreferencesKey("lastName")
         val fullNameKey = stringPreferencesKey("fullName")
         val createdAtKey = stringPreferencesKey("createdAt")
+        val phoneKey = stringPreferencesKey("phoneNo")
+        val genderKey = stringPreferencesKey("gender")
+        val emergencyContactKey = stringPreferencesKey("emergencyContact")
+        val profileKey = stringPreferencesKey("profilePhoto")
+        val ratingAsDriverKey = stringPreferencesKey("ratingAsDriver")
+        val ratingAsPassengerKey = stringPreferencesKey("ratingAsPassenger")
         context.dataStore1.edit { preferences ->
             preferences[idKey] = id
             preferences[emailKey] = email
@@ -33,6 +45,12 @@ object DataStoreManager {
             preferences[lastNameKey] = lastName
             preferences[fullNameKey] = fullName
             preferences[createdAtKey] = createdAt
+            preferences[phoneKey] = phoneNo
+            preferences[genderKey] = gender
+            preferences[emergencyContactKey] = emergencyContact
+            preferences[profileKey] = profilePhoto
+            preferences[ratingAsDriverKey] = ratingAsDriver
+            preferences[ratingAsPassengerKey] = ratingAsPassenger
         }
     }
 

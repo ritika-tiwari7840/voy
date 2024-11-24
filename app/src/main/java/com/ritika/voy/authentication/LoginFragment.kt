@@ -188,6 +188,24 @@ class LoginFragment : BaseFragment() {
                     response.tokens?.let {
                         DataStoreManager.saveTokens(requireContext(), it.access!!, it.refresh!!)
                     }
+                    response.user?.let {
+                        DataStoreManager.SaveUserData(
+                            requireContext(),
+                            it.id!!.toString(),
+                            it.email!!,
+                            it.first_name!!,
+                            it.last_name!!,
+                            it.full_name!!,
+                            it.created_at!!,
+                            it.phone_number!!,
+                            it.gender!!.toString(),
+                            it.emergency_contact_phone!!.toString(),
+                            it.profile_photo!!.toString(),
+                            "5.0",
+                                    "5.0",
+                            )
+                    }
+
                     Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
                     navController.navigate(R.id.action_loginFragment_to_homeActivity)
                 } else {

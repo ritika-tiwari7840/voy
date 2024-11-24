@@ -25,6 +25,8 @@ import com.ritika.voy.api.dataclasses.resendPhoneRequest
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -77,9 +79,21 @@ interface ApiService {
     suspend fun updateUserData(
         @Header("Authorization") token: String,
         @Part profile_photo: MultipartBody.Part,
-        @Part("first_name") firstName: RequestBody,
-        @Part("last_name") lastName: RequestBody,
-        @Part("gender") gender: RequestBody,
-        @Part("emergency_contact_phone") emergencyContactPhone: RequestBody,
+    ): UserResponseData
+
+    @FormUrlEncoded
+    @PUT("user/")
+    suspend fun updateGender(
+        @Header("Authorization") token: String,
+        @Field("gender") gender: String?
+    ): UserResponseData
+
+
+    @FormUrlEncoded
+    @PUT("user/")
+    suspend fun updateUserName(
+        @Header("Authorization") token: String,
+        @Field("first_name") firstName: String?,
+        @Field("last_name") lastName: String?
     ): UserResponseData
 }

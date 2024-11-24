@@ -123,7 +123,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:fontFamily="@font/light"
-                android:text="Tripti Sharma"
+                android:text="User Name"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -295,7 +295,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:fontFamily="@font/light"
-                android:text="Female"
+                android:text="Not Specified"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -618,7 +618,7 @@
             android:layout_marginTop="16dp"
             android:background="@null"
             android:button="@drawable/checkbox_background"
-            android:checked="true"
+            android:checked="false"
             android:padding="8dp"
             app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
             app:layout_constraintTop_toBottomOf="@id/male" />
@@ -687,28 +687,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
 
-        />
-
-    <TextView
-        android:id="@+id/progressText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

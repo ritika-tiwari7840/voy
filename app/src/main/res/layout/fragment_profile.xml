@@ -45,6 +45,7 @@
         app:layout_constraintTop_toBottomOf="@id/heading_text_bottom_guide">
 
         <TextView
+            android:id="@+id/user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawableTop="@drawable/profile_image"
@@ -84,6 +85,7 @@
         app:layout_constraintTop_toBottomOf="@id/heading_text_bottom_guide">
 
         <TextView
+            android:id="@+id/rating_as_host"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
@@ -94,6 +96,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/total_ratings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="15dp"
@@ -104,6 +107,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/rating_as_guest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="15dp"

@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="58dp"
             android:fontFamily="@font/medium"
-            android:text="hello, Tripti Sharma"
+            android:text="hello, User"
             android:textColor="@color/white"
             android:textSize="32sp"
             app:layout_constraintLeft_toLeftOf="@+id/guide_left"
