@@ -28,7 +28,8 @@ android {
         buildConfigField(
             "String",
             "MAP_API_KEY",
-            "\"${secretProperties["API_KEY"]}\"")
+            "\"${secretProperties["API_KEY"]}\""
+        )
 
 
         manifestPlaceholders["API_KEY"] = secretProperties["API_KEY"] as String
@@ -45,7 +46,7 @@ android {
         }
     }
     buildFeatures {
-        viewBinding =true
+        viewBinding = true
         buildConfig = true
     }
 
@@ -81,29 +82,27 @@ dependencies {
 
     //retrofit and datastore
 
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation ("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
 
     // Testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation (libs.material.v190)
-
-
+    implementation(libs.material.v190)
 
 
     //Retrofit Dependencies
-    implementation ("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation ("androidx.datastore:datastore-preferences:1.0.0-alpha07")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("androidx.datastore:datastore-preferences:1.0.0-alpha07")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
 
     //map dependencies
-    implementation ("com.google.android.gms:play-services-maps:19.0.0")
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
 
     //places sdk
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
@@ -111,8 +110,16 @@ dependencies {
 //    implementation ("com.google.android.gms:play-services-places:18.0.1")
 
 
-    implementation ("com.github.bumptech.glide:glide:4.12.0")
-    kapt ("com.github.bumptech.glide:compiler:4.12.0")
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+    kapt("com.github.bumptech.glide:compiler:4.12.0")
 
 
+//    implementation("com.google.android.libraries.maps:maps:3.5.0")
+    implementation("com.google.maps.android:android-maps-utils:2.2.5")
+
+    implementation("com.google.android.gms:play-services-maps:18.0.0")
+//    implementation ("com.github.googlemaps:google-maps-services-java:0.23.0")
+
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
 }

@@ -37,6 +37,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.ritika.voy.R.id.map_fragment
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -349,8 +350,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
         setupButtonListeners()
-    }
 
+        binding.cancelButton.setOnClickListener {
+            Toast.makeText(
+                applicationContext,
+                "navigation to Map Fragment",
+                Toast.LENGTH_SHORT
+            ).show()
+            val mapFragment = MapFragment()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.main, mapFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+    }
 
     private suspend fun geoCodeAddress(address: String): LatLng? {
         try {

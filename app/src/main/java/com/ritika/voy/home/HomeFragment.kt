@@ -51,25 +51,25 @@ class HomeFragment : Fragment() {
             }
         }
 
-//        binding.findPool.setOnClickListener {
-//            binding.findPool.backgroundTintList =
-//                ContextCompat.getColorStateList(requireContext(), R.color.theme_color)
-//            binding.findPool.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-//            binding.offerPool.backgroundTintList =
-//                ContextCompat.getColorStateList(requireContext(), R.color.white)
-//            binding.offerPool.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-//
-//        }
-//
-//        binding.offerPool.setOnClickListener {
-//            binding.offerPool.backgroundTintList =
-//                ContextCompat.getColorStateList(requireContext(), R.color.theme_color)
-//            binding.offerPool.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-//            binding.findPool.backgroundTintList =
-//                ContextCompat.getColorStateList(requireContext(), R.color.white)
-//            binding.findPool.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-//
-//        }
+        binding.findPool.setOnClickListener {
+            binding.findPool.backgroundTintList =
+                ContextCompat.getColorStateList(requireContext(), R.color.theme_color)
+            binding.findPool.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            binding.offerPool.backgroundTintList =
+                ContextCompat.getColorStateList(requireContext(), R.color.white)
+            binding.offerPool.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+
+        }
+
+        binding.offerPool.setOnClickListener {
+            binding.offerPool.backgroundTintList =
+                ContextCompat.getColorStateList(requireContext(), R.color.theme_color)
+            binding.offerPool.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            binding.findPool.backgroundTintList =
+                ContextCompat.getColorStateList(requireContext(), R.color.white)
+            binding.findPool.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+
+        }
 
         binding.whereTo.setOnClickListener {
             navController.navigate(R.id.action_home_to_chooseSpotFragment)
