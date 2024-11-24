@@ -51,7 +51,13 @@ class SplashFragment : Fragment() {
                             firstName = userResponse.user.first_name.toString()?:"",
                             lastName = userResponse.user.last_name.toString()?:"",
                             fullName = userResponse.user.full_name.toString()?:"",
-                            createdAt = userResponse.user.created_at?:""
+                            createdAt = userResponse.user.created_at?:"",
+                            phoneNo = userResponse.user.phone_number.toString()?:"",
+                            gender = userResponse.user.gender.toString()?:"",
+                            emergencyContact = userResponse.user.emergency_contact_phone.toString()?:"",
+                            profilePhoto = userResponse.user.profile_photo.toString()?:"",
+                            ratingAsDriver = "5.0",
+                            ratingAsPassenger = "5.0",
                         )
                         DataStoreManager.getUserData(requireContext(), "email").first().let {
                             val email = it.toString()
@@ -66,7 +72,6 @@ class SplashFragment : Fragment() {
             }
         }, 2500)
     }
-
 
     private suspend fun getUserData(accessToken: String): GetUserResponse {
         return RetrofitInstance.api.getUserData("Bearer $accessToken")

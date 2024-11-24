@@ -123,7 +123,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:fontFamily="@font/light"
-                android:text="Tripti Sharma"
+                android:text="User Name"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -295,7 +295,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:fontFamily="@font/light"
-                android:text="Female"
+                android:text="Not Specified"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -618,7 +618,7 @@
             android:layout_marginTop="16dp"
             android:background="@null"
             android:button="@drawable/checkbox_background"
-            android:checked="true"
+            android:checked="false"
             android:padding="8dp"
             app:layout_constraintRight_toRightOf="@id/edit_gender_popup_guide_right"
             app:layout_constraintTop_toBottomOf="@id/male" />
@@ -687,28 +687,95 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/edit_emergency_popup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/form_background"
+        android:paddingTop="12dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
 
-        />
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/edit_emergency_popup_divider"
+            android:layout_width="56dp"
+            android:layout_height="2dp"
+            app:dividerColor="#5D5D5D"
+            app:layout_constraintLeft_toLeftOf="@id/edit_emergency_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_emergency_popup_guide_right"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/progressText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/edit_info_emrgency_popup_heading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="23dp"
+            android:fontFamily="@font/semibold"
+            android:text="Emergency Contact"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_emergency_popup_guide_left"
+            app:layout_constraintTop_toBottomOf="@id/edit_emergency_popup_divider" />
+
+
+        <EditText
+            android:id="@+id/emergency"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="31dp"
+            android:background="@drawable/popup_edit_view_background"
+            android:drawableStart="@drawable/emergency_contact"
+            android:drawableEnd="@drawable/cross"
+            android:drawablePadding="18dp"
+            android:fontFamily="@font/light"
+            android:padding="10dp"
+            android:hint="Help is here"
+            android:maxLength="10"
+            android:textColorHint="@color/white"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="@id/edit_emergency_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_emergency_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/edit_info_emrgency_popup_heading" />
+
+        <Button
+            android:id="@+id/edit_emergency_save_changes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="30dp"
+            android:background="@drawable/button_background"
+            android:fontFamily="@font/medium"
+            android:padding="16dp"
+            android:text="Save Changes"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="@id/edit_emergency_popup_guide_left"
+            app:layout_constraintRight_toRightOf="@id/edit_emergency_popup_guide_right"
+            app:layout_constraintTop_toBottomOf="@id/emergency" />
+
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/edit_emergency_popup_guide_left"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.048" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/edit_emergency_popup_guide_right"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.952" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

@@ -4,6 +4,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    kotlin("kapt")
 }
 
 val secretPropertiesFile = rootProject.file("secret.properties")
@@ -56,7 +57,7 @@ android {
         jvmTarget = "1.8"
     }
 
-    
+
 }
 
 dependencies {
@@ -108,5 +109,10 @@ dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
     implementation("com.google.android.libraries.places:places:3.5.0")
 //    implementation ("com.google.android.gms:play-services-places:18.0.1")
+
+
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+    kapt ("com.github.bumptech.glide:compiler:4.12.0")
+
 
 }

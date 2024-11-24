@@ -16,7 +16,7 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        enableEdgeToEdge()
+//      enableEdgeToEdge()
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -51,4 +51,6 @@ class HomeActivity : AppCompatActivity() {
             Toast.makeText(this, "Chat Screen opens", Toast.LENGTH_SHORT).show()
         }
     }
+
+
 }
