@@ -96,4 +96,11 @@ interface ApiService {
         @Field("first_name") firstName: String?,
         @Field("last_name") lastName: String?
     ): UserResponseData
+
+    @FormUrlEncoded
+    @PUT("user/")
+    suspend fun updateEmergencyContactNo(
+        @Header("Authorization") token: String,
+        @Field("emergency_contact_phone") emergencyContactNo: String?
+    ): UserResponseData
 }

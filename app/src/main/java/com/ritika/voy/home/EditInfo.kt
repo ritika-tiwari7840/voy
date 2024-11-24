@@ -38,6 +38,7 @@ import com.ritika.voy.R
 import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.GetUserResponse
+import com.ritika.voy.api.dataclasses.UserResponseData
 import com.ritika.voy.databinding.FragmentEditInfoBinding
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
@@ -87,106 +88,10 @@ class EditInfo : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         navController = findNavController()
+        writeUserDataOnView(binding)
         checkAndRequestPermissions()
         setupClickListeners()
-        writeUserDataOnView(binding)
     }
-
-    private suspend fun updateUserWithRetry(
-        context: Context,
-        filePath: String = "",
-        retryCount: Int = 0,
-    ) = withContext(Dispatchers.IO) {
-        var token: String? = null
-        try {
-            val file = File(filePath).apply {
-                if (!exists()) throw FileNotFoundException("File not found: $filePath")
-            }
-            token = DataStoreManager.getToken(requireContext(), "access").first()
-            if (token != null) {
-                val response = RetrofitInstance.api.updateUserData(
-                    token = "Bearer $token",
-                    profile_photo = createMultipartBody(file, "profile_photo"),
-                )
-
-                withContext(Dispatchers.Main) {
-                    if (response.success) {
-                        showToast("Profile updated successfully")
-                        Log.d(TAG, "Update response: $response")
-                    } else {
-                        showToast("Error updating profile: ${response.message}")
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Log.d(TAG, "updateUserWithRetry: $e ,$filePath")
-            handleUploadError(e, context, filePath, retryCount)
-        }
-    }
-
-    private suspend fun updateGender(context: Context, gender: String?) =
-        withContext(Dispatchers.IO) {
-            try {
-                val token = DataStoreManager.getToken(context, "access").first()
-                if (!token.isNullOrEmpty()) {
-                    val response = RetrofitInstance.api.updateGender(
-                        token = "Bearer $token",
-                        gender = gender
-                    )
-                    withContext(Dispatchers.Main) {
-                        if (response.success) {
-                            showToast("Gender updated successfully")
-                            Log.d(TAG, "Update response: $response")
-                        } else {
-                            Log.e(TAG, "Error updating gender: ${response.message} ")
-                            showToast("Error updating gender: ${response.message}")
-                        }
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        showToast("Token is missing")
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error updating gender $gender", e)
-                withContext(Dispatchers.Main) {
-                    showToast("An error occurred: ${e.message}")
-                }
-            }
-        }
-
-
-    private suspend fun updateUserName(context: Context, firstName: String?, lastName: String?) =
-        withContext(Dispatchers.IO) {
-            try {
-                val token = DataStoreManager.getToken(context, "access").first()
-                if (!token.isNullOrEmpty()) {
-                    val response = RetrofitInstance.api.updateUserName(
-                        token = "Bearer $token",
-                        firstName = firstName,
-                        lastName = lastName
-                    )
-                    withContext(Dispatchers.Main) {
-                        if (response.success) {
-                            showToast("UserName updated successfully")
-                            Log.d(TAG, "Update response: $response")
-                        } else {
-                            Log.e(TAG, "Error updating gender: ${response.message} ")
-                            showToast("Error updating gender: ${response.message}")
-                        }
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        showToast("Token is missing")
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error updating gender $firstName $lastName", e)
-                withContext(Dispatchers.Main) {
-                    showToast("An error occurred: ${e.message}")
-                }
-            }
-        }
 
     private fun setupClickListeners() {
         with(binding) {
@@ -203,98 +108,44 @@ class EditInfo : Fragment() {
             }
 
             nameLayout.setOnClickListener {
-                if (editGenderPopup.visibility == View.VISIBLE) {
+                if (editGenderPopup.visibility == View.VISIBLE || editEmergencyPopup.visibility == View.VISIBLE) {
                     editGenderPopup.visibility = View.GONE
+                    editEmergencyPopup.visibility = View.GONE
                 }
                 slideInPopup(editNamePopup)
             }
 
             genderLayout.setOnClickListener {
-                if (editNamePopup.visibility == View.VISIBLE) {
+                if (editNamePopup.visibility == View.VISIBLE || editEmergencyPopup.visibility == View.VISIBLE) {
                     editNamePopup.visibility = View.GONE
+                    editEmergencyPopup.visibility = View.GONE
                 }
                 slideInPopup(editGenderPopup)
+            }
+            emergencyContactLayout.setOnClickListener {
+                if (editNamePopup.visibility == View.VISIBLE || editGenderPopup.visibility == View.VISIBLE) {
+                    editNamePopup.visibility = View.GONE
+                    editGenderPopup.visibility = View.GONE
+                }
+                slideInPopup(editEmergencyPopup)
             }
 
             editNameSaveChanges.setOnClickListener {
                 saveNameChanges()
             }
+
+            editEmergencySaveChanges.setOnClickListener {
+                saveEmergencyContact()
+            }
         }
         setupGenderSelection()
     }
-
-    private fun saveNameChanges() {
-        binding.apply {
-            editNamePopup.visibility = View.GONE
-            val firstName: Editable = firstName.text
-            val lastName: Editable = lastName.text
-            name.text = "$firstName $lastName"
-            val progressDialog = ProgressDialog(requireContext())
-            progressDialog.setMessage("Loading...")
-            progressDialog.setCancelable(false)
-            progressDialog.show()
-            lifecycleScope.launch {
-                try {
-                    updateUserName(requireContext(), firstName.toString(), lastName.toString())
-                } catch (e: Exception) {
-                    handleError(e)
-                } finally {
-                    delay(1000)
-                    progressDialog.dismiss()
-                }
-            }
-        }
-    }
-
-    private fun setupGenderSelection() {
-        binding.apply {
-            setExclusiveSelection(male, "MALE", female, other)
-            setExclusiveSelection(female, "FEMALE", male, other)
-            setExclusiveSelection(other, "OTHER", male, female)
-
-            editGenderSaveChanges.setOnClickListener {
-                if (handleGenderSave()) {
-                    val progressDialog = ProgressDialog(requireContext())
-                    progressDialog.setMessage("Loading...")
-                    progressDialog.setCancelable(false)
-                    progressDialog.show()
-//                    uploadJob?.cancel() // Cancel any existing upload
-                    uploadJob = lifecycleScope.launch {
-                        try {
-                            updateGender(
-                                requireContext(),
-                                selectedGender!!
-                            )
-                        } catch (e: Exception) {
-                            handleError(e)
-                        } finally {
-                            delay(1000)
-                            progressDialog.dismiss()
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun handleGenderSave(): Boolean {
-        if (selectedGender != null) {
-            binding.editGenderPopup.visibility = View.GONE
-            showToast("Selected Gender: $selectedGender")
-            return true
-        } else {
-            showToast("Please select a gender")
-            return false
-        }
-    }
-
 
     private fun writeUserDataOnView(
         binding: FragmentEditInfoBinding,
 
         ) {
         lifecycleScope.launch {
-
 
             DataStoreManager.getUserData(requireContext(), "email").first().let {
                 val email = it.toString()
@@ -304,11 +155,14 @@ class EditInfo : Fragment() {
                 val fullName = it.toString()
                 if (fullName.isNotEmpty()) {
                     binding.name.text = fullName
+                    binding.firstName.setText(fullName.split(" ")[0])
+                    binding.lastName.setText(fullName.split(" ")[1])
                 } else {
                     binding.name.text = "User Name"
+                    binding.firstName.setText("Update First Name")
+                    binding.lastName.setText("Update Last Name")
                 }
             }
-
             DataStoreManager.getUserData(requireContext(), "phoneNo").first().let {
                 val phoneNo = it.toString()
                 binding.phoneNumber.text = phoneNo
@@ -318,12 +172,30 @@ class EditInfo : Fragment() {
                 val gender = it.toString()
                 if (gender.isNotEmpty()) {
                     binding.gender.text = gender
+                    selectedGender = gender
+                    if (selectedGender != null) {
+                        if (selectedGender == "FEMALE") {
+                            binding.female.isChecked = true
+                        } else if (selectedGender == "MALE") {
+                            binding.male.isChecked = true
+                        } else if (selectedGender == "OTHER") {
+                            binding.other.isChecked = true
+                        }
+                    }
                 } else {
                     binding.gender.text = "Not Specified"
                 }
             }
 
-            DataStoreManager.getUserData(requireContext(), "emergencyContactPhone").first().let {
+            DataStoreManager.getUserData(requireContext(), "emergencyContact").first().let {
+                    val emergencyContactPhone = it.toString()
+                    if (emergencyContactPhone.isNotEmpty() && emergencyContactPhone != "null") {
+                        binding.emergencyContact.text = emergencyContactPhone
+                    } else {
+                        binding.emergencyContact.text = "Help is here"
+                    }
+                }
+            DataStoreManager.getUserData(requireContext(), "emergencyContact").first().let {
                 val emergencyContactPhone = it.toString()
                 if (emergencyContactPhone.isNotEmpty() && emergencyContactPhone != "null") {
                     binding.emergencyContact.text = emergencyContactPhone
@@ -331,7 +203,6 @@ class EditInfo : Fragment() {
                     binding.emergencyContact.text = "Help is here"
                 }
             }
-
         }
     }
 
@@ -387,15 +258,12 @@ class EditInfo : Fragment() {
     private fun captureImageWithCamera() {
         // Check if camera permission is granted
         if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.CAMERA
+                requireContext(), Manifest.permission.CAMERA
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             // Request camera permission if not granted
             ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(Manifest.permission.CAMERA),
-                STORAGE_PERMISSION_CODE
+                requireActivity(), arrayOf(Manifest.permission.CAMERA), STORAGE_PERMISSION_CODE
             )
         } else {
             // If permission is already granted, proceed to capture image
@@ -502,85 +370,15 @@ class EditInfo : Fragment() {
         imageWidth: Int = 300,
         imageHeight: Int = 300,
     ) {
-        Glide.with(context)
-            .load(java.io.File(filePath))
-            .apply(
-                RequestOptions()
-                    .override(imageWidth, imageHeight)
-                    .transform(RoundedCorners(cornerRadius))
-                    .transform(CircleCrop())
+        Glide.with(context).load(java.io.File(filePath)).apply(
+                RequestOptions().override(imageWidth, imageHeight)
+                    .transform(RoundedCorners(cornerRadius)).transform(CircleCrop())
 
-            )
-            .into(imageView)
-
+            ).into(imageView)
+        Log.d(TAG, "loadImageWithGlide: $filePath")
         imageView.setBackgroundColor(ContextCompat.getColor(context, backgroundColor))
     }
 
-    private suspend fun handleUploadError(
-        error: Exception,
-        context: Context,
-        filePath: String,
-        retryCount: Int,
-    ) {
-        when (error) {
-            is SocketException,
-            is SocketTimeoutException,
-            is TimeoutException,
-            is IOException,
-            -> {
-                if (retryCount < MAX_RETRIES) {
-                    val backoffTime = INITIAL_BACKOFF_MS * (retryCount + 1)
-                    delay(backoffTime)
-                    updateUserWithRetry(
-                        context,
-                        filePath,
-                    )
-                } else {
-                    withContext(Dispatchers.Main) {
-                        showToast("Failed to upload after $MAX_RETRIES attempts")
-                    }
-                }
-            }
-
-            is HttpException -> {
-                withContext(Dispatchers.Main) {
-                    showToast("Server error: ${error.code()}")
-                }
-            }
-
-            else -> {
-                withContext(Dispatchers.Main) {
-                    showToast("Error: ${error.message}")
-                }
-            }
-        }
-    }
-
-    private fun createMultipartBody(file: File, key: String): MultipartBody.Part {
-        val requestBody = file.asRequestBody("image/*".toMediaTypeOrNull())
-        return MultipartBody.Part.createFormData(key, file.name, requestBody)
-    }
-
-    private fun createRequestBody(value: String) =
-        value.toRequestBody("text/plain".toMediaTypeOrNull())
-
-    private fun resizeBitmap(bitmap: Bitmap, newWidth: Int, newHeight: Int): Bitmap =
-        Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
-
-    private fun setExclusiveSelection(
-        selectedCheckBox: CheckBox,
-        gender: String,
-        vararg otherCheckBoxes: CheckBox,
-    ) {
-        selectedCheckBox.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                otherCheckBoxes.forEach { it.isChecked = false }
-                selectedGender = gender
-            } else if (!otherCheckBoxes.any { it.isChecked }) {
-                selectedGender = null
-            }
-        }
-    }
 
     private fun slideInPopup(popupView: View) {
         if (popupView.visibility != View.VISIBLE) {
@@ -622,6 +420,292 @@ class EditInfo : Fragment() {
         }
     }
 
+
+    private fun saveNameChanges() {
+        binding.apply {
+            editNamePopup.visibility = View.GONE
+            val firstName: Editable = firstName.text
+            val lastName: Editable = lastName.text
+            name.text = "$firstName $lastName"
+            val progressDialog = ProgressDialog(requireContext())
+            progressDialog.setMessage("Loading...")
+            progressDialog.setCancelable(false)
+            progressDialog.show()
+            lifecycleScope.launch {
+                try {
+                    updateUserName(requireContext(), firstName.toString(), lastName.toString())
+                } catch (e: Exception) {
+                    handleError(e)
+                } finally {
+                    delay(1000)
+                    progressDialog.dismiss()
+                }
+            }
+        }
+    }
+
+    private fun setupGenderSelection() {
+        binding.apply {
+            setExclusiveSelection(male, "MALE", female, other)
+            setExclusiveSelection(female, "FEMALE", male, other)
+            setExclusiveSelection(other, "OTHER", male, female)
+
+            editGenderSaveChanges.setOnClickListener {
+                if (handleGenderSave()) {
+                    val progressDialog = ProgressDialog(requireContext())
+                    progressDialog.setMessage("Loading...")
+                    progressDialog.setCancelable(false)
+                    progressDialog.show()
+//                    uploadJob?.cancel() // Cancel any existing upload
+                    uploadJob = lifecycleScope.launch {
+                        try {
+                            updateGender(
+                                requireContext(), selectedGender!!
+                            )
+                        } catch (e: Exception) {
+                            handleError(e)
+                        } finally {
+                            delay(1000)
+                            progressDialog.dismiss()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun handleGenderSave(): Boolean {
+        if (selectedGender != null) {
+            binding.editGenderPopup.visibility = View.GONE
+            showToast("Selected Gender: $selectedGender")
+            return true
+        } else {
+            showToast("Please select a gender")
+            return false
+        }
+    }
+
+    private fun setExclusiveSelection(
+        selectedCheckBox: CheckBox,
+        gender: String,
+        vararg otherCheckBoxes: CheckBox,
+    ) {
+        selectedCheckBox.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                otherCheckBoxes.forEach { it.isChecked = false }
+                selectedGender = gender
+            } else if (!otherCheckBoxes.any { it.isChecked }) {
+                selectedGender = null
+            }
+        }
+    }
+
+
+    private fun saveEmergencyContact() {
+        binding.apply {
+            editEmergencyPopup.visibility = View.GONE
+            val emergencyContactNo: Editable = emergency.text
+            emergencyContact.text = emergencyContactNo
+            val progressDialog = ProgressDialog(requireContext())
+            progressDialog.setMessage("Loading...")
+            progressDialog.setCancelable(false)
+            progressDialog.show()
+            lifecycleScope.launch {
+                try {
+                    updateEmergencyContactNo(requireContext(), emergencyContactNo.toString())
+                } catch (e: Exception) {
+                    handleError(e)
+                } finally {
+                    delay(1000)
+                    progressDialog.dismiss()
+                }
+            }
+        }
+    }
+
+
+    private suspend fun updateUserWithRetry(
+        context: Context,
+        filePath: String = "",
+        retryCount: Int = 0,
+    ) = withContext(Dispatchers.IO) {
+        var token: String? = null
+        try {
+            val file = File(filePath).apply {
+                if (!exists()) throw FileNotFoundException("File not found: $filePath")
+            }
+            token = DataStoreManager.getToken(requireContext(), "access").first()
+            if (token != null) {
+                val response = RetrofitInstance.api.updateUserData(
+                    token = "Bearer $token",
+                    profile_photo = createMultipartBody(file, "profile_photo"),
+                )
+
+                withContext(Dispatchers.Main) {
+                    if (response.success) {
+                        showToast("Profile updated successfully")
+                        saveUserDataInDataStore(context, response)
+                        Log.d(TAG, "Update response: $response \n file path is $filePath")
+                    } else {
+                        showToast("Error updating profile: ${response.message}")
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.d(TAG, "updateUserWithRetry: $e ,$filePath")
+            handleUploadError(e, context, filePath, retryCount)
+        }
+    }
+
+
+    private suspend fun handleUploadError(
+        error: Exception,
+        context: Context,
+        filePath: String,
+        retryCount: Int,
+    ) {
+        when (error) {
+            is SocketException,
+            is SocketTimeoutException,
+            is TimeoutException,
+            is IOException,
+            -> {
+                if (retryCount < MAX_RETRIES) {
+                    val backoffTime = INITIAL_BACKOFF_MS * (retryCount + 1)
+                    delay(backoffTime)
+                    updateUserWithRetry(
+                        context,
+                        filePath,
+                    )
+                } else {
+                    withContext(Dispatchers.Main) {
+                        showToast("Failed to upload after $MAX_RETRIES attempts")
+                    }
+                }
+            }
+
+            is HttpException -> {
+                withContext(Dispatchers.Main) {
+                    showToast("Server error: ${error.code()}")
+                }
+            }
+
+            else -> {
+                withContext(Dispatchers.Main) {
+                    showToast("Error: ${error.message}")
+                }
+            }
+        }
+    }
+
+    private suspend fun updateGender(context: Context, gender: String?) =
+        withContext(Dispatchers.IO) {
+            try {
+                val token = DataStoreManager.getToken(context, "access").first()
+                if (!token.isNullOrEmpty()) {
+                    val response = RetrofitInstance.api.updateGender(
+                        token = "Bearer $token", gender = gender
+                    )
+                    withContext(Dispatchers.Main) {
+                        if (response.success) {
+                            showToast("Gender updated successfully")
+                            saveUserDataInDataStore(context, response)
+                            Log.d(TAG, "Update response: $response")
+                        } else {
+                            Log.e(TAG, "Error updating gender: ${response.message} ")
+                            showToast("Error updating gender: ${response.message}")
+                        }
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        showToast("Token is missing")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error updating gender $gender", e)
+                withContext(Dispatchers.Main) {
+                    showToast("An error occurred: ${e.message}")
+                }
+            }
+        }
+
+
+    private suspend fun updateUserName(context: Context, firstName: String?, lastName: String?) =
+        withContext(Dispatchers.IO) {
+            try {
+                val token = DataStoreManager.getToken(context, "access").first()
+                if (!token.isNullOrEmpty()) {
+                    val response = RetrofitInstance.api.updateUserName(
+                        token = "Bearer $token", firstName = firstName, lastName = lastName
+                    )
+                    withContext(Dispatchers.Main) {
+                        if (response.success) {
+                            showToast("UserName updated successfully")
+                            saveUserDataInDataStore(context, response)
+                            Log.d(TAG, "Update response: $response")
+                        } else {
+                            Log.e(TAG, "Error updating gender: ${response.message} ")
+                            showToast("Error updating gender: ${response.message}")
+                        }
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        showToast("Token is missing")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error updating gender $firstName $lastName", e)
+                withContext(Dispatchers.Main) {
+                    showToast("An error occurred: ${e.message}")
+                }
+            }
+        }
+
+
+    private suspend fun updateEmergencyContactNo(context: Context, emergencyContactNo: String?) =
+        withContext(Dispatchers.IO) {
+            try {
+                val token = DataStoreManager.getToken(context, "access").first()
+                if (!token.isNullOrEmpty()) {
+                    val response = RetrofitInstance.api.updateEmergencyContactNo(
+                        token = "Bearer $token", emergencyContactNo = emergencyContactNo
+                    )
+                    withContext(Dispatchers.Main) {
+                        if (response.success) {
+                            showToast("Emergency Contact updated successfully")
+                            saveUserDataInDataStore(context, response)
+                            Log.d(TAG, "Update response: $response, $emergencyContactNo")
+                        } else {
+                            Log.e(TAG, "Error Adding Emergency Contact: ${response.message} ")
+                            showToast("Error Adding Emergency Contact: ${response.message}")
+                        }
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        showToast("Token is missing")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error Adding Emergency Contact $emergencyContactNo", e)
+                withContext(Dispatchers.Main) {
+                    showToast("An error occurred: ${e.message}")
+                }
+            }
+        }
+
+
+    private fun createMultipartBody(file: File, key: String): MultipartBody.Part {
+        val requestBody = file.asRequestBody("image/*".toMediaTypeOrNull())
+        return MultipartBody.Part.createFormData(key, file.name, requestBody)
+    }
+
+    private fun createRequestBody(value: String) =
+        value.toRequestBody("text/plain".toMediaTypeOrNull())
+
+    private fun resizeBitmap(bitmap: Bitmap, newWidth: Int, newHeight: Int): Bitmap =
+        Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+
+
     private fun handleError(error: Exception) {
         Log.e(TAG, "Error in EditInfo", error)
         showToast("Error: ${error.message}")
@@ -629,6 +713,37 @@ class EditInfo : Fragment() {
 
     private fun showToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
+
+    private fun saveUserDataInDataStore(
+        context: Context,
+        response: UserResponseData,
+    ) {
+        lifecycleScope.launch {
+            DataStoreManager.SaveUserData(
+                context,
+                response.user.id.toString(),
+                response.user.email,
+                response.user.first_name.toString(),
+                response.user.last_name.toString(),
+                response.user.full_name.toString(),
+                response.user.created_at.toString(),
+                response.user.phone_number.toString(),
+                response.user.gender.toString(),
+                response.user.emergency_contact_phone,
+                filePath,
+                response.user.rating_as_driver.toString(),
+                response.user.rating_as_passenger.toString()
+            )
+            writeUserDataOnView(binding)
+        }
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        writeUserDataOnView(binding)
     }
 
     override fun onDestroyView() {

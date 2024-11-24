@@ -48,7 +48,7 @@ object DataStoreManager {
             preferences[phoneKey] = phoneNo
             preferences[genderKey] = gender
             preferences[emergencyContactKey] = emergencyContact
-            preferences[profileKey] = profilePhoto
+            preferences[profileKey] = profilePhoto.toString()
             preferences[ratingAsDriverKey] = ratingAsDriver
             preferences[ratingAsPassengerKey] = ratingAsPassenger
         }

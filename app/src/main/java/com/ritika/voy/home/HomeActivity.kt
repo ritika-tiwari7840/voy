@@ -51,4 +51,6 @@ class HomeActivity : AppCompatActivity() {
             Toast.makeText(this, "Chat Screen opens", Toast.LENGTH_SHORT).show()
         }
     }
+
+
 }
