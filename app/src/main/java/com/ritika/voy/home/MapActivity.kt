@@ -111,8 +111,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val bundle = intent.extras
         startLocation = bundle?.getString("startLocation")
         destinationLocation = bundle?.getString("destinationLocation")
-        role = bundle?.getString("role", role) ?: "passenger"
-        Toast.makeText(this, "your role is $role", Toast.LENGTH_SHORT).show()
+        role = bundle?.getString("role") ?: "passenger"
+        Toast.makeText(this, "Your role is $role", Toast.LENGTH_SHORT).show()
         Log.d("Bundle", " Bundle:  from  $startLocation to $destinationLocation")
 
         lifecycleScope.launch {
@@ -130,6 +130,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
+
         if (!Places.isInitialized()) {
             Places.initialize(applicationContext, BuildConfig.MAP_API_KEY)
         }
@@ -138,15 +139,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         markerIcon = getBitmapDescriptorFromResource(R.drawable.location)
 
-//        binding.logoutButton.setOnClickListener {
-//            lifecycleScope.launch {
-//                DataStoreManager.clearTokens(applicationContext)
-//            }
-//            val intent = Intent(this, MainActivity::class.java)
-//            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//            startActivity(intent)
-//            finish()
-//        }
+        binding.logoutButton.setOnClickListener {
+            lifecycleScope.launch {
+                DataStoreManager.clearTokens(applicationContext)
+            }
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        }
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -250,7 +251,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             firstMarkerLatLng = null
             secondMarkerLatLng = null
             binding.descText.text = "Pickup"
+
         }
+
         binding.proceedButton.setOnClickListener {
 
             if (selectedButtonValue != null) {
@@ -260,6 +263,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         ContextCompat.getColor(this, android.R.color.holo_green_light)
                     )
                 )
+
                 binding.loader.background = gradientDrawable
                 val constraintSet = ConstraintSet()
                 constraintSet.clone(binding.root)
@@ -594,6 +598,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
             }
         }
+
         // Optional: Keep the click listener for redundancy
         binding.searchBar.setOnClickListener {
             if (!binding.searchBar.hasFocus()) {
