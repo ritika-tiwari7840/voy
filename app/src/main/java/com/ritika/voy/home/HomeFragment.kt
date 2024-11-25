@@ -8,7 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.ui.semantics.Role
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -22,7 +24,7 @@ import kotlinx.coroutines.launch
 class HomeFragment : Fragment() {
     lateinit var _binding: FragmentHomeBinding
     private val binding get() = _binding!!
-
+    private lateinit var role: String
     lateinit var navController: NavController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +41,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         navController = Navigation.findNavController(view)
+        role="passenger"
 
         lifecycleScope.launch {
             DataStoreManager.getUserData(requireContext(), "fullName").first().let {
@@ -58,7 +61,8 @@ class HomeFragment : Fragment() {
             binding.offerPool.backgroundTintList =
                 ContextCompat.getColorStateList(requireContext(), R.color.white)
             binding.offerPool.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-
+            role="passenger"
+            Toast.makeText(requireContext(), "You are passenger now", Toast.LENGTH_SHORT).show()
         }
 
         binding.offerPool.setOnClickListener {
@@ -68,11 +72,15 @@ class HomeFragment : Fragment() {
             binding.findPool.backgroundTintList =
                 ContextCompat.getColorStateList(requireContext(), R.color.white)
             binding.findPool.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-
+            role="driver"
+            Toast.makeText(requireContext(), "You are Driver now", Toast.LENGTH_SHORT).show()
         }
 
         binding.whereTo.setOnClickListener {
-            navController.navigate(R.id.action_home_to_chooseSpotFragment)
+                val bundle = Bundle()
+                bundle.putString("role", role)
+            Toast.makeText(requireContext(), "You are $role", Toast.LENGTH_SHORT).show()
+            navController.navigate(R.id.action_home_to_chooseSpotFragment, bundle)
         }
     }
 

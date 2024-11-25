@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="335dp"
+        android:layout_height="505dp"
+        android:background="@drawable/verification_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="33dp"
+            android:fontFamily="@font/semibold"
+            android:text="Get a Verified Profile"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="299dp"
+            android:layout_height="243dp"
+            android:layout_marginLeft="23dp"
+            android:layout_marginTop="64dp"
+            android:backgroundTint="@color/divider_color"
+            android:src="@drawable/verify_profile"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="307dp"
+            android:fontFamily="@font/regular"
+            android:lineHeight="17sp"
+            android:lineSpacingExtra="-7sp"
+            android:text="User, you’re only missing few steps\n from having a Verified profile."
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="357dp"
+            android:fontFamily="@font/regular"
+            android:lineHeight="17sp"
+            android:lineSpacingExtra="-7sp"
+            android:text="Confirm your ID document to boost\n trust as a Driver or as Passenger."
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <Button
+            android:id="@+id/get_verification"
+            android:layout_width="299dp"
+            android:layout_height="56dp"
+            android:layout_marginLeft="23dp"
+            android:layout_marginTop="415dp"
+            android:background="@drawable/button_background"
+            android:fontFamily="@font/medium"
+            android:padding="10dp"
+            android:text="Get Verified"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textAllCaps="false"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

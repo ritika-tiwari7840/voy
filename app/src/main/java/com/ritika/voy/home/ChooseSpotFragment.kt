@@ -23,6 +23,7 @@ class ChooseSpotFragment : Fragment() {
 
     private lateinit var binding: FragmentChooseSpotBinding
     private lateinit var navController: NavController
+    private lateinit var role:String
     private val placesClient by lazy { Places.createClient(requireContext()) }
     private val startAdapter by lazy {
         SuggestionsAdapter { suggestion ->
@@ -53,6 +54,7 @@ class ChooseSpotFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         navController = findNavController()
+        role = arguments?.getString("role") ?: "passenger"
         // Initialize Places API
         if (!Places.isInitialized()) {
             Places.initialize(requireContext(), BuildConfig.MAP_API_KEY)
@@ -76,11 +78,14 @@ class ChooseSpotFragment : Fragment() {
                 val bundle = Bundle()
                 bundle.putString("startLocation", binding.start.text.toString())
                 bundle.putString("destinationLocation", binding.destination.text.toString())
+                bundle.putString("role",role)
                 navController.navigate(R.id.action_chooseSpotFragment_to_mapActivity, bundle)
             }
         }
         binding.setOnMap.setOnClickListener {
-            navController.navigate(R.id.action_chooseSpotFragment_to_mapActivity)
+            val bundle = Bundle()
+            bundle.putString("role",role)
+            navController.navigate(R.id.action_chooseSpotFragment_to_mapActivity,bundle)
         }
     }
 
