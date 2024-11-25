@@ -203,24 +203,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     lifecycleScope.launch {
                         try {
                             if (firstMarkerLatLng != null && secondMarkerLatLng != null) {
-                                val startAddress =
-                                    reverseGeoCode(
-                                        firstMarkerLatLng!!.latitude,
-                                        firstMarkerLatLng!!.longitude
-                                    )
-                                val destinationAddress =
-                                    reverseGeoCode(
-                                        secondMarkerLatLng!!.latitude,
-                                        secondMarkerLatLng!!.longitude
-                                    )
+                                val startAddress = reverseGeoCode(
+                                    firstMarkerLatLng!!.latitude, firstMarkerLatLng!!.longitude
+                                )
+                                val destinationAddress = reverseGeoCode(
+                                    secondMarkerLatLng!!.latitude, secondMarkerLatLng!!.longitude
+                                )
                                 Log.d(
                                     "reverseGeoCodeAddress",
                                     "reverseGeoCodeAddress: from $startAddress to $destinationAddress"
                                 )
-                                binding.routeView.root.findViewById<TextView>(R.id.start_address)
-                                    ?.text = startAddress
-                                binding.routeView.root.findViewById<TextView>(R.id.drop_address)
-                                    ?.text = destinationAddress
+                                binding.routeView.root.findViewById<TextView>(R.id.start_address)?.text =
+                                    startAddress
+                                binding.routeView.root.findViewById<TextView>(R.id.drop_address)?.text =
+                                    destinationAddress
                             }
                         } catch (e: Exception) {
                             Log.e(
@@ -260,8 +256,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
             if (selectedButtonValue != null) {
                 val gradientDrawable = GradientDrawable(
-                    GradientDrawable.Orientation.LEFT_RIGHT,
-                    intArrayOf(
+                    GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(
                         ContextCompat.getColor(this, android.R.color.white),
                         ContextCompat.getColor(this, android.R.color.holo_green_light)
                     )
@@ -319,15 +314,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 binding.routeView.swapButton.visibility = View.GONE
 
                 val newBackground = StateListDrawable().apply {
-                    addState(
-                        intArrayOf(android.R.attr.state_enabled),
-                        GradientDrawable().apply {
-                            shape = GradientDrawable.RECTANGLE
-                            setColor(Color.parseColor("#3d3d3d"))
-                            cornerRadius = 16f * resources.displayMetrics.density
+                    addState(intArrayOf(android.R.attr.state_enabled), GradientDrawable().apply {
+                        shape = GradientDrawable.RECTANGLE
+                        setColor(Color.parseColor("#3d3d3d"))
+                        cornerRadius = 16f * resources.displayMetrics.density
 
-                        }
-                    )
+                    })
                 }
                 binding.routeView.root.background = newBackground
 
@@ -343,26 +335,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
             } else {
                 Toast.makeText(
-                    applicationContext,
-                    "Please select the no. of seats",
-                    Toast.LENGTH_SHORT
+                    applicationContext, "Please select the no. of seats", Toast.LENGTH_SHORT
                 ).show()
             }
         }
         setupButtonListeners()
 
-        binding.cancelButton.setOnClickListener {
-            Toast.makeText(
-                applicationContext,
-                "navigation to Map Fragment",
-                Toast.LENGTH_SHORT
-            ).show()
-            val mapFragment = MapFragment()
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.main, mapFragment)
-                .addToBackStack(null)
-                .commit()
-        }
+//        binding.cancelButton.setOnClickListener {
+//            Toast.makeText(
+//                applicationContext, "navigation to Map Fragment", Toast.LENGTH_SHORT
+//            ).show()
+//            val mapFragment = MapFragment()
+//            supportFragmentManager.beginTransaction().replace(R.id.main, mapFragment)
+//                .addToBackStack(null).commit()
+//        }
     }
 
     private suspend fun geoCodeAddress(address: String): LatLng? {
@@ -391,8 +377,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // First try to get the last known location as a reference point
         var referenceLocation: LatLng? = null
         if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                this, Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             try {
@@ -437,24 +422,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     // Add this new suspend function to handle getting last location
     private suspend fun getLastLocationSuspend(): Location? = suspendCoroutine { continuation ->
         if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                this, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             continuation.resume(null)
             return@suspendCoroutine
         }
 
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { location ->
-                continuation.resume(location)
-            }
-            .addOnFailureListener { exception ->
-                continuation.resumeWithException(exception)
-            }
-            .addOnCanceledListener {
-                continuation.resume(null)
-            }
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            continuation.resume(location)
+        }.addOnFailureListener { exception ->
+            continuation.resumeWithException(exception)
+        }.addOnCanceledListener {
+            continuation.resume(null)
+        }
     }
 
 
@@ -467,8 +448,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // Simple string similarity comparison
         return nearbyResults.maxByOrNull { result ->
             calculateAddressSimilarity(
-                originalAddress.lowercase(),
-                result.formattedAddress?.lowercase() ?: ""
+                originalAddress.lowercase(), result.formattedAddress?.lowercase() ?: ""
             )
         }
     }
@@ -481,24 +461,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun showLocationNotFoundDialog(address: String) {
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Location Not Found")
-            .setMessage(
-                "We couldn't find \"$address\". Would you like to:\n\n" +
-                        "1. Pick a location on the map\n" +
-                        "2. Try a different address"
-            )
-            .setPositiveButton("Pick on Map") { dialog, _ ->
-                dialog.dismiss()
-                // Enable map click handling
-                binding.descText.text = if (firstMarkerLatLng == null) "Pickup" else "Drop"
-            }
-            .setNegativeButton("Try Again") { dialog, _ ->
-                dialog.dismiss()
-                // Open the search box
-                binding.searchBar.requestFocus()
-            }
-            .create()
+        val dialog = AlertDialog.Builder(this).setTitle("Location Not Found").setMessage(
+            "We couldn't find \"$address\". Would you like to:\n\n" + "1. Pick a location on the map\n" + "2. Try a different address"
+        ).setPositiveButton("Pick on Map") { dialog, _ ->
+            dialog.dismiss()
+            // Enable map click handling
+            binding.descText.text = if (firstMarkerLatLng == null) "Pickup" else "Drop"
+        }.setNegativeButton("Try Again") { dialog, _ ->
+            dialog.dismiss()
+            // Open the search box
+            binding.searchBar.requestFocus()
+        }.create()
 
         dialog.show()
     }
@@ -523,10 +496,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun nearbyAddresses(latitude: Double, longitude: Double) {
         lifecycleScope.launch {
             val results = geocodingHelper.findNearbyAddresses(
-                latitude = latitude,
-                longitude = longitude,
-                radiusKm = 0.5,
-                maxResults = 5
+                latitude = latitude, longitude = longitude, radiusKm = 0.5, maxResults = 5
             )
             results.forEach { result ->
                 Log.d("Nearby", "Found: ${result.formattedAddress}")
@@ -536,47 +506,36 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
     private fun isLocationInIndia(latLng: LatLng): Boolean {
-        return latLng.latitude in INDIA_BOUNDS.southLat..INDIA_BOUNDS.northLat &&
-                latLng.longitude in INDIA_BOUNDS.westLng..INDIA_BOUNDS.eastLng
+        return latLng.latitude in INDIA_BOUNDS.southLat..INDIA_BOUNDS.northLat && latLng.longitude in INDIA_BOUNDS.westLng..INDIA_BOUNDS.eastLng
     }
 
     private fun showLocationOutsideIndiaDialog() {
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Location Not Supported")
+        androidx.appcompat.app.AlertDialog.Builder(this).setTitle("Location Not Supported")
             .setMessage("Selected location is outside India. Please select a location within India.")
             .setPositiveButton("OK") { dialog, _ ->
                 dialog.dismiss()
-            }
-            .show()
+            }.show()
     }
 
     private fun showAddFirstLocationDialog() {
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("First Location Missing")
+        androidx.appcompat.app.AlertDialog.Builder(this).setTitle("First Location Missing")
             .setMessage("Please add the first location on the map.")
             .setPositiveButton("OK") { dialog, _ ->
                 dialog.dismiss()
-            }
-            .show()
+            }.show()
     }
 
     private fun showAddSecondLocationDialog() {
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Second Location Missing")
+        androidx.appcompat.app.AlertDialog.Builder(this).setTitle("Second Location Missing")
             .setMessage("Please add the second location on the map.")
             .setPositiveButton("OK") { dialog, _ ->
                 dialog.dismiss()
-            }
-            .show()
+            }.show()
     }
 
     private fun setupButtonListeners() {
         val buttons = listOf(
-            binding.button1,
-            binding.button2,
-            binding.button3,
-            binding.button4,
-            binding.button5
+            binding.button1, binding.button2, binding.button3, binding.button4, binding.button5
         )
         buttons.forEachIndexed { index, button ->
             button.setOnClickListener {
@@ -610,12 +569,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     drawable.colors = intArrayOf(
                         if (fraction < 0f) Color.WHITE else ContextCompat.getColor(
-                            this@MapActivity,
-                            android.R.color.holo_green_light
-                        ),
-                        if (fraction < 0f) Color.WHITE else ContextCompat.getColor(
-                            this@MapActivity,
-                            android.R.color.holo_green_light
+                            this@MapActivity, android.R.color.holo_green_light
+                        ), if (fraction < 0f) Color.WHITE else ContextCompat.getColor(
+                            this@MapActivity, android.R.color.holo_green_light
                         )
                     )
 
@@ -632,14 +588,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             if (hasFocus) {
 
                 val fields = listOf(
-                    Place.Field.ID,
-                    Place.Field.NAME,
-                    Place.Field.LAT_LNG,
-                    Place.Field.ADDRESS
+                    Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS
                 )
 
-                val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
-                    .build(this)
+                val intent =
+                    Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields).build(this)
                 startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
             }
         }
@@ -699,18 +652,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun getBitmapDescriptorFromResource(resourceId: Int): BitmapDescriptor {
         val bitmap = BitmapFactory.decodeResource(resources, resourceId)
         val scaledBitmap = Bitmap.createScaledBitmap(
-            bitmap,
-            (bitmap.width * 0.12).toInt(),
-            (bitmap.height * 0.12).toInt(),
-            false
+            bitmap, (bitmap.width * 0.12).toInt(), (bitmap.height * 0.12).toInt(), false
         )
         return BitmapDescriptorFactory.fromBitmap(scaledBitmap)
     }
 
     private fun checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                this, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
@@ -740,8 +689,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun getLastKnownLocation() {
         if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                this, Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
@@ -757,10 +705,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         if (firstMarkerLatLng != null && secondMarkerLatLng != null && isRouteAllowed) {
             lifecycleScope.launch {
                 val route = getRoute(
-                    mapApi,
-                    firstMarkerLatLng!!,
-                    secondMarkerLatLng!!,
-                    BuildConfig.MAP_API_KEY
+                    mapApi, firstMarkerLatLng!!, secondMarkerLatLng!!, BuildConfig.MAP_API_KEY
                 )
                 route?.let {
                     drawRouteOnMap(it, googleMap)
@@ -780,16 +725,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 com.ritika.voy.api.dataclasses.mapsDataClasses.Location(
                     origin
                 )
-            ),
-            destination = OriginDestination(
+            ), destination = OriginDestination(
                 com.ritika.voy.api.dataclasses.mapsDataClasses.Location(
                     destination
                 )
-            ),
-            routeModifiers = RouteModifiers(
-                avoidTolls = false,
-                avoidHighways = false,
-                avoidFerries = false
+            ), routeModifiers = RouteModifiers(
+                avoidTolls = false, avoidHighways = false, avoidFerries = false
             )
         )
         val response = apiService.computeRoutes(request, apiKey)
@@ -811,8 +752,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         rlp.setMargins(0, 0, 30, 30)
 
         if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                this, Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             googleMap.isMyLocationEnabled = true
@@ -895,8 +835,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
             // Show confirmation dialog for proceeding to destination
             binding.confirmButton.setOnClickListener {
-                showConfirmationDialog(
-                    "Confirm Pickup Location",
+                showConfirmationDialog("Confirm Pickup Location",
                     "Do you want to confirm this pickup location?",
                     onConfirm = {
                         isSecondMarkerAllowed = true
@@ -910,14 +849,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                             )
                             googleMap.moveCamera(
                                 CameraUpdateFactory.newLatLngZoom(
-                                    destinationLatLng!!,
-                                    15f
+                                    destinationLatLng!!, 15f
                                 )
                             )
                             binding.confirmButton.setOnClickListener {
 
-                                showConfirmationDialog(
-                                    "Confirm Drop Location",
+                                showConfirmationDialog("Confirm Drop Location",
                                     "Do you want to confirm this drop location?",
                                     onConfirm = {
 
@@ -946,28 +883,24 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                             lifecycleScope.launch {
                                                 try {
                                                     if (firstMarkerLatLng != null && secondMarkerLatLng != null) {
-                                                        val startAddress =
-                                                            reverseGeoCode(
-                                                                firstMarkerLatLng!!.latitude,
-                                                                firstMarkerLatLng!!.longitude
-                                                            )
-                                                        val destinationAddress =
-                                                            reverseGeoCode(
-                                                                secondMarkerLatLng!!.latitude,
-                                                                secondMarkerLatLng!!.longitude
-                                                            )
+                                                        val startAddress = reverseGeoCode(
+                                                            firstMarkerLatLng!!.latitude,
+                                                            firstMarkerLatLng!!.longitude
+                                                        )
+                                                        val destinationAddress = reverseGeoCode(
+                                                            secondMarkerLatLng!!.latitude,
+                                                            secondMarkerLatLng!!.longitude
+                                                        )
                                                         Log.d(
                                                             "reverseGeoCodeAddress",
                                                             "reverseGeoCodeAddress: from $startAddress to $destinationAddress"
                                                         )
                                                         binding.routeView.root.findViewById<TextView>(
                                                             R.id.start_address
-                                                        )
-                                                            ?.text = startAddress
+                                                        )?.text = startAddress
                                                         binding.routeView.root.findViewById<TextView>(
                                                             R.id.drop_address
-                                                        )
-                                                            ?.text = destinationAddress
+                                                        )?.text = destinationAddress
                                                     }
                                                 } catch (e: Exception) {
                                                     Log.e(
@@ -983,8 +916,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                         secondMarker?.remove()
                                         secondMarkerLatLng = null
                                         destinationLatLng = null
-                                    }
-                                )
+                                    })
                             }
                         }
                     },
@@ -995,8 +927,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         firstMarkerLatLng = null
                         startLatLng = null
 
-                    }
-                )
+                    })
             }
             hasSetInitialLocations = true
         }
@@ -1008,18 +939,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         onConfirm: () -> Unit,
         onDeny: () -> Unit,
     ) {
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle(title)
-            .setMessage(message)
+        androidx.appcompat.app.AlertDialog.Builder(this).setTitle(title).setMessage(message)
             .setPositiveButton("Yes") { dialog, _ ->
                 dialog.dismiss()
                 onConfirm()
-            }
-            .setNegativeButton("No") { dialog, _ ->
+            }.setNegativeButton("No") { dialog, _ ->
                 dialog.dismiss()
                 onDeny()
-            }
-            .show()
+            }.show()
     }
 
 

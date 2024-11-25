@@ -1,7 +1,9 @@
 package com.ritika.voy.home
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -33,7 +35,7 @@ import org.json.JSONObject
 import java.io.IOException
 import java.net.URLEncoder
 
-class MapFragment: Fragment(), OnMapReadyCallback {
+class MapFragment : Fragment(), OnMapReadyCallback {
 
     private var _googleMap: GoogleMap? = null
     private val googleMap get() = _googleMap!!
@@ -43,6 +45,7 @@ class MapFragment: Fragment(), OnMapReadyCallback {
     private lateinit var startAddressInput: EditText
     private lateinit var endAddressInput: EditText
     private lateinit var navigateButton: Button
+    private var currentDestination: LatLng? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,8 +64,8 @@ class MapFragment: Fragment(), OnMapReadyCallback {
         navigateButton = view.findViewById(R.id.navigateButton)
 
         // Set default addresses for testing
-        startAddressInput.setText("123 Main St, New York, NY")
-        endAddressInput.setText("Times Square, New York, NY")
+        startAddressInput.setText("Delhi-Meerut Expressway, P.O. Adhyatmik Nagar, Ghaziabad - 201015")
+        endAddressInput.setText("Ghaziabad Hapur Road, Near Petrol Pump D, Block Shastri Nagar, Ghaziabad Uttar Pradesh")
 
         navigateButton.setOnClickListener {
             val startAddress = startAddressInput.text.toString()
@@ -194,20 +197,6 @@ class MapFragment: Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun fetchRouteAndDraw(origin: LatLng, destination: LatLng) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                val polyline = fetchDirections(origin, destination)
-                polyline?.let {
-                    drawRoute(it)
-                }
-            } catch (e: Exception) {
-                Log.e("MapFragment", "Error fetching directions: ${e.message}")
-                showError("Failed to fetch route")
-            }
-        }
-    }
-
     private suspend fun fetchDirections(origin: LatLng, destination: LatLng): String? {
         return withContext(Dispatchers.IO) {
             try {
@@ -253,9 +242,64 @@ class MapFragment: Fragment(), OnMapReadyCallback {
                     .width(10f)
             )
             showSuccess("Route drawn successfully!")
+
+            // Start navigation automatically when route is drawn
+            currentDestination?.let { destination ->
+                startNavigation(destination)
+            }
         } catch (e: Exception) {
             Log.e("MapFragment", "Error drawing route: ${e.message}")
             showError("Failed to draw route")
+        }
+    }
+
+    private fun startNavigation(destination: LatLng) {
+        try {
+            // Create a URI for Google Maps navigation
+            val gmmIntentUri = Uri.parse(
+                "google.navigation:q=${destination.latitude},${destination.longitude}"
+            )
+
+            // Create the Intent with the correct package name
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = gmmIntentUri
+                setPackage("com.google.android.apps.maps")
+            }
+
+            // Verify that the intent will resolve to an activity
+            if (intent.resolveActivity(requireActivity().packageManager) != null) {
+                startActivity(intent)
+            } else {
+                // Fallback to browser if Google Maps isn't installed
+                val browserIntent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(
+                        "https://www.google.com/maps/dir/?api=1" +
+                                "&destination=${destination.latitude},${destination.longitude}" +
+                                "&travelmode=driving"
+                    )
+                )
+                startActivity(browserIntent)
+            }
+        } catch (e: Exception) {
+            Log.e("MapFragment", "Error starting navigation: ${e.message}")
+            showError("Failed to start navigation. Please make sure Google Maps is installed.")
+        }
+    }
+
+    // Update fetchRouteAndDraw to store the destination
+    private fun fetchRouteAndDraw(origin: LatLng, destination: LatLng) {
+        currentDestination = destination  // Store the destination
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val polyline = fetchDirections(origin, destination)
+                polyline?.let {
+                    drawRoute(it)
+                }
+            } catch (e: Exception) {
+                Log.e("MapFragment", "Error fetching directions: ${e.message}")
+                showError("Failed to fetch route")
+            }
         }
     }
 

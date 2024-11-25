@@ -18,23 +18,23 @@
         android:id="@+id/endAddressInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter destination address"
         android:layout_marginBottom="8dp"
-        android:padding="12dp"
-        android:background="@android:drawable/edit_text"/>
+        android:background="@android:drawable/edit_text"
+        android:hint="Enter destination address"
+        android:padding="12dp" />
 
     <Button
         android:id="@+id/navigateButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Navigate"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp"
+        android:text="Navigate" />
 
     <fragment
         android:id="@+id/map_fragment"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
 </LinearLayout>
