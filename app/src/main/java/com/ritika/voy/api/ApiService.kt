@@ -37,34 +37,34 @@ import retrofit2.http.Query
 
 interface ApiService {
 
-    @POST("login/")
+    @POST("auth/login/")
     suspend fun login(@Body loginRequest: LoginRequest): LoginResponse
 
-    @POST("forgot-password/")
+    @POST("auth/forgot-password/")
     suspend fun forgotPassword(@Body forgotRequest: ForgotRequest): ForgotResponse
 
-    @POST("verify-otp/")
+    @POST("auth/verify-otp/")
     suspend fun verifyOtp(@Body verifyRequest: VerifyRequest): VerifyResponse
 
-    @POST("reset-password/")
+    @POST("auth/reset-password/")
     suspend fun resetPassword(@Body resetRequest: ResetRequest): ResetResponse
 
-    @POST("verify-email/")
+    @POST("auth/verify-email/")
     suspend fun EmailVerify(@Body request: EmailVerifyRequest): EmailVerifyResponse
 
-    @POST("verify-phone/")
+    @POST("auth/verify-phone/")
     suspend fun PhoneVerify(@Body request: PhoneVerifyRequest): phoneVerifyResponseX
 
-    @POST("resend-otp/")
+    @POST("auth/resend-otp/")
     suspend fun resendOtp(@Body request: resendOTPRequest): resendForgotOTP
 
-    @POST("resend-emailotp/")
+    @POST("auth/resend-emailotp/")
     suspend fun resendEmailOtp(@Body request: resendEmailRequest): resendEmailOTP
 
-    @POST("resend-phoneotp/")
+    @POST("auth/resend-phoneotp/")
     suspend fun resendPhoneOtp(@Body request: resendPhoneRequest): resendPhoneOTP
 
-    @GET("user/")
+    @GET("auth/user/")
     suspend fun getUserData(@Header("Authorization") authHeader: String): GetUserResponse
 
     @POST("directions/v2:computeRoutes")
@@ -75,14 +75,14 @@ interface ApiService {
     ): RoutesResponse
 
     @Multipart
-    @PUT("user/")
+    @PUT("auth/user/")
     suspend fun updateUserData(
         @Header("Authorization") token: String,
         @Part profile_photo: MultipartBody.Part,
     ): UserResponseData
 
     @FormUrlEncoded
-    @PUT("user/")
+    @PUT("auth/user/")
     suspend fun updateGender(
         @Header("Authorization") token: String,
         @Field("gender") gender: String?
@@ -90,7 +90,7 @@ interface ApiService {
 
 
     @FormUrlEncoded
-    @PUT("user/")
+    @PUT("auth/user/")
     suspend fun updateUserName(
         @Header("Authorization") token: String,
         @Field("first_name") firstName: String?,
@@ -98,7 +98,7 @@ interface ApiService {
     ): UserResponseData
 
     @FormUrlEncoded
-    @PUT("user/")
+    @PUT("auth/user/")
     suspend fun updateEmergencyContactNo(
         @Header("Authorization") token: String,
         @Field("emergency_contact_phone") emergencyContactNo: String?
