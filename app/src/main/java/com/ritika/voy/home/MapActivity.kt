@@ -56,7 +56,11 @@ import com.ritika.voy.MainActivity
 import com.ritika.voy.R
 import com.ritika.voy.api.ApiService
 import com.ritika.voy.api.DataStoreManager
+import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.RetrofitInstance.mapApi
+import com.ritika.voy.api.dataclasses.AvailableRides
+import com.ritika.voy.api.dataclasses.AvailableRidesSearchRequest
+import com.ritika.voy.api.dataclasses.LocationPoint
 import com.ritika.voy.api.dataclasses.mapsDataClasses.OriginDestination
 import com.ritika.voy.api.dataclasses.mapsDataClasses.Route
 import com.ritika.voy.api.dataclasses.mapsDataClasses.RouteModifiers
@@ -66,11 +70,13 @@ import com.ritika.voy.geocoding_helper.GeocodingHelper
 import com.ritika.voy.geocoding_helper.GeocodingResult
 import com.ritika.voy.mapRoute.drawRouteOnMap
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import kotlin.math.log
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -93,6 +99,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var destinationLocation: String? = null
     private var hasSetInitialLocations = false
     private lateinit var role: String
+    private lateinit var authToken: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -227,7 +234,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                             )
                         }
                     }
-
                 }
             }
         }
@@ -257,84 +263,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.proceedButton.setOnClickListener {
 
             if (selectedButtonValue != null) {
-                val gradientDrawable = GradientDrawable(
-                    GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(
-                        ContextCompat.getColor(this, android.R.color.white),
-                        ContextCompat.getColor(this, android.R.color.holo_green_light)
-                    )
-                )
-
-                binding.loader.background = gradientDrawable
-                val constraintSet = ConstraintSet()
-                constraintSet.clone(binding.root)
-
-                constraintSet.connect(
-                    binding.bottomWidget.id,
-                    ConstraintSet.TOP,
-                    binding.guideline8.id,
-                    ConstraintSet.BOTTOM
-                )
-
-                TransitionManager.beginDelayedTransition(binding.root)
-
-                constraintSet.connect(
-                    binding.routeView.root.id,
-                    ConstraintSet.TOP,
-                    binding.cancelButton.id,
-                    ConstraintSet.BOTTOM
-                )
-                constraintSet.connect(
-                    binding.routeView.root.id,
-                    ConstraintSet.START,
-                    binding.guideline2.id,
-                    ConstraintSet.START
-                )
-
-                constraintSet.applyTo(binding.root)
-
-
-                listOf(
-                    binding.bottomWidgetText,
-                    binding.button1,
-                    binding.button2,
-                    binding.button3,
-                    binding.button4,
-                    binding.button5,
-                    binding.proceedButton
-                ).forEach { it.visibility = View.GONE }
-
-
-                binding.findingRidersText.visibility = View.VISIBLE
-                binding.findingRidersDesc.visibility = View.VISIBLE
-                binding.loader.visibility = View.VISIBLE
-
-                startColorAnimation(gradientDrawable)
-
-                binding.riderImage.visibility = View.VISIBLE
-                binding.cancelButton.visibility = View.VISIBLE
-                binding.backButton.visibility = View.GONE
-                binding.routeView.swapButton.visibility = View.GONE
-
-                val newBackground = StateListDrawable().apply {
-                    addState(intArrayOf(android.R.attr.state_enabled), GradientDrawable().apply {
-                        shape = GradientDrawable.RECTANGLE
-                        setColor(Color.parseColor("#3d3d3d"))
-                        cornerRadius = 16f * resources.displayMetrics.density
-
-                    })
+                lifecycleScope.launch {
+                    DataStoreManager.getToken(this@MapActivity, "access").first()!!.let {
+                        authToken = it
+                        if (authToken != "") {
+                            proceedButtonClicked(authToken)
+                        }
+                    }
                 }
-                binding.routeView.root.background = newBackground
-
-                val marginPx = 16f * resources.displayMetrics.density
-
-                val params = binding.routeView.root.layoutParams as ViewGroup.MarginLayoutParams
-                params.topMargin = marginPx.toInt()
-                binding.routeView.root.layoutParams = params
-                binding.routeView.root.findViewById<TextView>(R.id.start_address)
-                    ?.setTextColor(Color.parseColor("#ccc7eb"))
-                binding.routeView.root.findViewById<TextView>(R.id.drop_address)
-                    ?.setTextColor(Color.parseColor("#ccc7eb"))
-
             } else {
                 Toast.makeText(
                     applicationContext, "Please select the no. of seats", Toast.LENGTH_SHORT
@@ -351,6 +287,204 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 //            supportFragmentManager.beginTransaction().replace(R.id.main, mapFragment)
 //                .addToBackStack(null).commit()
 //        }
+    }
+
+    private fun findingRidesScreen() {
+//        setupLoaderBackground()
+        adjustConstraints()
+        toggleViewVisibility()
+        setRouteViewBackground()
+        adjustRouteViewMargins()
+        updateRouteViewTextColors()
+    }
+
+
+    private fun setupLoaderBackground() {
+        val gradientDrawable = GradientDrawable(
+            GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(
+                ContextCompat.getColor(this, android.R.color.white),
+                ContextCompat.getColor(this, android.R.color.holo_green_light)
+            )
+        )
+        binding.loader.background = gradientDrawable
+        startColorAnimation(gradientDrawable)
+    }
+
+    private fun adjustConstraints() {
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(binding.root)
+
+        constraintSet.connect(
+            binding.bottomWidget.id,
+            ConstraintSet.TOP,
+            binding.guideline8.id,
+            ConstraintSet.BOTTOM
+        )
+
+        TransitionManager.beginDelayedTransition(binding.root)
+
+        constraintSet.connect(
+            binding.routeView.root.id,
+            ConstraintSet.TOP,
+            binding.cancelButton.id,
+            ConstraintSet.BOTTOM
+        )
+        constraintSet.connect(
+            binding.routeView.root.id,
+            ConstraintSet.START,
+            binding.guideline2.id,
+            ConstraintSet.START
+        )
+        constraintSet.applyTo(binding.root)
+    }
+
+    private fun toggleViewVisibility() {
+        listOf(
+            binding.bottomWidgetText,
+            binding.button1,
+            binding.button2,
+            binding.button3,
+            binding.button4,
+            binding.button5,
+            binding.proceedButton
+        ).forEach { it.visibility = View.GONE }
+
+        binding.findingRidersText.visibility = View.VISIBLE
+        binding.findingRidersDesc.visibility = View.VISIBLE
+        binding.loader.visibility = View.VISIBLE
+        binding.riderImage.visibility = View.VISIBLE
+        binding.cancelButton.visibility = View.VISIBLE
+        binding.backButton.visibility = View.GONE
+        binding.routeView.swapButton.visibility = View.GONE
+    }
+
+    private fun setRouteViewBackground() {
+        val newBackground = StateListDrawable().apply {
+            addState(intArrayOf(android.R.attr.state_enabled), GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                setColor(Color.parseColor("#3d3d3d"))
+                cornerRadius = 16f * resources.displayMetrics.density
+            })
+        }
+        binding.routeView.root.background = newBackground
+    }
+
+    private fun adjustRouteViewMargins() {
+        val marginPx = 16f * resources.displayMetrics.density
+        val params = binding.routeView.root.layoutParams as ViewGroup.MarginLayoutParams
+        params.topMargin = marginPx.toInt()
+        binding.routeView.root.layoutParams = params
+    }
+
+    private fun updateRouteViewTextColors() {
+        binding.routeView.root.findViewById<TextView>(R.id.start_address)
+            ?.setTextColor(Color.parseColor("#ccc7eb"))
+        binding.routeView.root.findViewById<TextView>(R.id.drop_address)
+            ?.setTextColor(Color.parseColor("#ccc7eb"))
+    }
+
+    private fun startLoaderAnimation() {
+        val gradientDrawable = GradientDrawable(
+            GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(
+                ContextCompat.getColor(this, android.R.color.white),
+                ContextCompat.getColor(this, android.R.color.holo_green_light)
+            )
+        )
+        binding.loader.background = gradientDrawable
+
+        val animator = ObjectAnimator.ofFloat(0f, 1f).apply {
+            duration = 1500
+            repeatCount = ObjectAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+
+            addUpdateListener { animation ->
+                val fraction = animation.animatedValue as Float
+                gradientDrawable.setGradientCenter(fraction, 0.5f)
+            }
+        }
+        animator.start()
+    }
+
+    private fun proceedButtonClicked(authToken: String) {
+        setupLoaderBackground() // Start loader background
+        findingRidesScreen() // Adjust UI for fetching state
+
+        // Fetch API
+        lifecycleScope.launch {
+            startLoaderAnimation() // Start loader animation
+            val response = fetchApiResponse(authToken) // Pass the auth token
+            if (response != null) {
+                onApiSuccess(response)
+            } else {
+                onApiFailure()
+            }
+        }
+    }
+
+    private suspend fun fetchApiResponse(authToken: String): AvailableRides? {
+        val requestBody = AvailableRidesSearchRequest(
+            pickup_point = LocationPoint(
+                type = "Point",
+                coordinates = listOf(-73.985428, 40.758900) // Replace with dynamic values if needed
+            ),
+            destination_point = LocationPoint(
+                type = "Point",
+                coordinates = listOf(-73.778900, 40.645244) // Replace with dynamic values if needed
+            ),
+            seats_needed = 2, // Replace with dynamic value if needed
+            radius = 5000.0 // Replace with dynamic value if needed
+        )
+
+        return withContext(Dispatchers.IO) {
+            try {
+                val response =
+                    RetrofitInstance.api.getAvailableRides("Bearer $authToken", requestBody)
+                if (response != null && response.success) {
+                    response // Return the response if successful
+                } else {
+                    null // Return null if the response is unsuccessful
+                }
+            } catch (e: Exception) {
+                Log.d("API", "fetchApiResponse: $e")
+                e.printStackTrace()
+                null // Return null in case of an error
+            }
+        }
+    }
+
+
+    private fun onApiSuccess(availableRides: AvailableRides) {
+        // Handle the successful API response
+        availableRides.data?.let { rides ->
+            // Process and display the list of rides
+            for (ride in rides) {
+                println("Ride from ${ride.data.start_location} to ${ride.data.end_location}")
+                Log.d("API", "onApiSuccess:  ${availableRides.data} ")
+            }
+        }
+        // Update the loader to 100% completion
+        val gradientDrawable = binding.loader.background as GradientDrawable
+        gradientDrawable.colors = intArrayOf(
+            ContextCompat.getColor(this, android.R.color.holo_green_light),
+            ContextCompat.getColor(this, android.R.color.holo_green_light)
+        )
+        binding.loader.background = gradientDrawable
+        sendResponseStatus(true)
+    }
+
+    private fun onApiFailure() {
+        // Reset the loader animation and notify failure if needed
+        binding.loader.setBackgroundColor(ContextCompat.getColor(this, android.R.color.white))
+        sendResponseStatus(false)
+    }
+
+    private fun sendResponseStatus(status: Boolean) {
+        // Send the response status (e.g., navigate to the next screen or show a toast)
+        if (status) {
+            Toast.makeText(this, "API call successful", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "API call failed", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private suspend fun geoCodeAddress(address: String): LatLng? {

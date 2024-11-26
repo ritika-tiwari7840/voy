@@ -1,5 +1,7 @@
 package com.ritika.voy.api
 
+import com.ritika.voy.api.dataclasses.AvailableRides
+import com.ritika.voy.api.dataclasses.AvailableRidesSearchRequest
 import com.ritika.voy.api.dataclasses.ForgotRequest
 import com.ritika.voy.api.dataclasses.ForgotResponse
 import com.ritika.voy.api.dataclasses.LoginRequest
@@ -103,4 +105,11 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Field("emergency_contact_phone") emergencyContactNo: String?
     ): UserResponseData
+
+    @POST("rides/passenger/search/")
+    suspend fun getAvailableRides(
+        @Header("Authorization") authHeader: String,
+        @Body requestBody: AvailableRidesSearchRequest
+    ): AvailableRides
+
 }
