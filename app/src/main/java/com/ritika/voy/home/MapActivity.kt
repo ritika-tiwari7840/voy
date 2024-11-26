@@ -115,6 +115,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // Initialize geocodingHelper
         geocodingHelper = GeocodingHelper(this)
 
+        // Get data from Bundle
         val bundle = intent.extras
         startLocation = bundle?.getString("startLocation")
         destinationLocation = bundle?.getString("destinationLocation")
@@ -122,6 +123,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         Toast.makeText(this, "Your role is $role", Toast.LENGTH_SHORT).show()
         Log.d("Bundle", " Bundle:  from  $startLocation to $destinationLocation")
 
+        //calling geocoding to convert address in string to LatLng
         lifecycleScope.launch {
             try {
                 startLatLng = geoCodeAddress(startLocation ?: "")
@@ -137,7 +139,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-
         if (!Places.isInitialized()) {
             Places.initialize(applicationContext, BuildConfig.MAP_API_KEY)
         }
@@ -145,16 +146,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         setupSearchBox()
 
         markerIcon = getBitmapDescriptorFromResource(R.drawable.location)
-
-        binding.logoutButton.setOnClickListener {
-            lifecycleScope.launch {
-                DataStoreManager.clearTokens(applicationContext)
-            }
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
-        }
+//
+//        binding.logoutButton.setOnClickListener {
+//            lifecycleScope.launch {
+//                DataStoreManager.clearTokens(applicationContext)
+//            }
+//            val intent = Intent(this, MainActivity::class.java)
+//            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//            startActivity(intent)
+//            finish()
+//        }
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -239,6 +240,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         binding.backButton.setOnClickListener {
+            // Reset all state variables
             binding.confirmButton.visibility = View.VISIBLE
             binding.satellite.visibility = View.VISIBLE
             binding.descText.visibility = View.VISIBLE
@@ -253,16 +255,23 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             binding.button5.visibility = View.GONE
             binding.proceedButton.visibility = View.GONE
             binding.routeView.root.visibility = View.GONE
+
+            // Clear the map
             googleMap.clear()
+
+            // Reset all markers and state flags
             firstMarkerLatLng = null
             secondMarkerLatLng = null
+            isSecondMarkerAllowed = false
+            isRouteAllowed = false
+
+            // Reset the description text to initial state
             binding.descText.text = "Pickup"
-
         }
-
         binding.proceedButton.setOnClickListener {
 
             if (selectedButtonValue != null) {
+                Toast.makeText(this, "$selectedButtonValue", Toast.LENGTH_SHORT).show()
                 lifecycleScope.launch {
                     DataStoreManager.getToken(this@MapActivity, "access").first()!!.let {
                         authToken = it
@@ -425,14 +434,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val requestBody = AvailableRidesSearchRequest(
             pickup_point = LocationPoint(
                 type = "Point",
-                coordinates = listOf(-73.985428, 40.758900) // Replace with dynamic values if needed
+                coordinates = listOf(startLatLng!!.latitude, startLatLng!!.longitude)
             ),
             destination_point = LocationPoint(
                 type = "Point",
-                coordinates = listOf(-73.778900, 40.645244) // Replace with dynamic values if needed
+                coordinates = listOf(destinationLatLng!!.latitude, destinationLatLng!!.longitude)
             ),
-            seats_needed = 2, // Replace with dynamic value if needed
-            radius = 5000.0 // Replace with dynamic value if needed
+            seats_needed = selectedButtonValue!!.toInt(),
+            radius = 5000.0
         )
 
         return withContext(Dispatchers.IO) {
@@ -1084,6 +1093,5 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 onDeny()
             }.show()
     }
-
 
 }
