@@ -65,9 +65,12 @@ class SplashFragment : Fragment() {
                                 .show()
                         }
                         navController.navigate(R.id.action_splashFragment_to_homeActivity)
+                        requireActivity().finish()
+
                     }
                 } else {
                     navController.navigate(R.id.action_splashFragment_to_continueWithEmail)
+                    requireActivity().finish()
                 }
             }
         }, 2500)
