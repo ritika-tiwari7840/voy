@@ -13,4 +13,5 @@
     <color name="divider_color">#3D3D3D</color>
     <color name="eco_text">#81C784</color>
     <color name="gev_id_proof_text">#B0B0B0</color>
+    <color name="verification_layout_text">#B0B0B0</color>
 </resources>

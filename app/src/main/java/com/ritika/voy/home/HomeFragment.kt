@@ -60,6 +60,7 @@ class HomeFragment : Fragment() {
             }
             DataStoreManager.getUserData(requireContext(), "isDriverVerified").first().let {
                 isDiverVerified = it.toBoolean()
+                Toast.makeText(requireContext(), "$isDiverVerified", Toast.LENGTH_SHORT).show()
             }
             DataStoreManager.getUserData(requireContext(), "firstName").first().let {
                 firstName = it.toString()
@@ -77,7 +78,6 @@ class HomeFragment : Fragment() {
             role = "passenger"
             Toast.makeText(requireContext(), "You are passenger now", Toast.LENGTH_SHORT).show()
         }
-
         binding.offerPool.setOnClickListener {
             if (isDiverVerified == true) {
                 role = "driver"

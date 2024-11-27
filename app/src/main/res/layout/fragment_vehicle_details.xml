@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context=".home.VehicleDetailsFragment">
+
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Back button"
+        app:layout_constraintBottom_toTopOf="@id/guide_two"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintTop_toBottomOf="@+id/guide_one"
+        app:srcCompat="@drawable/back_button" />
+
+
+    <TextView
+        android:id="@+id/vehicle_details_heading_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:fontFamily="@font/medium"
+        android:gravity="center"
+        android:text="Vehicle Details"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_back"
+        app:layout_constraintStart_toEndOf="@+id/btn_back"
+        app:layout_constraintTop_toTopOf="@+id/btn_back" />
+
+    <TextView
+        android:id="@+id/model_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/medium"
+        android:text="Model"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/guide_three" />
+
+
+    <EditText
+        android:id="@+id/model"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/edit_text_background"
+        android:fontFamily="@font/medium"
+        android:hint="Select Vehicle Model"
+        android:inputType="text"
+        android:padding="10dp"
+        android:textColorHint="@color/verification_layout_text"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/model_text"
+
+        />
+
+    <TextView
+        android:id="@+id/vehicle_number_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/medium"
+        android:text="Vehicle Number"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/model" />
+
+
+    <EditText
+        android:id="@+id/vehicle_number"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/edit_text_background"
+        android:fontFamily="@font/medium"
+        android:hint="Add Vehicle Number"
+        android:inputType="text"
+        android:padding="10dp"
+        android:textColorHint="#B0B0B0"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/vehicle_number_text" />
+
+
+    <TextView
+        android:id="@+id/offeringSeats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/medium"
+        android:text="Offering Seats"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/vehicle_number" />
+
+    <Button
+        android:id="@+id/seat_one"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/verify_driver_layout_background"
+        android:fontFamily="@font/regular"
+        android:text="1"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/seat_two"
+        app:layout_constraintStart_toStartOf="@id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/offeringSeats" />
+
+    <Button
+        android:id="@+id/seat_two"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/verify_driver_layout_background"
+        android:fontFamily="@font/regular"
+        android:text="2"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/seat_three"
+        app:layout_constraintStart_toEndOf="@id/seat_one"
+        app:layout_constraintTop_toBottomOf="@id/offeringSeats" />
+
+    <Button
+        android:id="@+id/seat_three"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/verify_driver_layout_background"
+        android:fontFamily="@font/regular"
+        android:text="3"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/seat_four"
+        app:layout_constraintStart_toEndOf="@id/seat_two"
+        app:layout_constraintTop_toBottomOf="@id/offeringSeats" />
+
+    <Button
+        android:id="@+id/seat_four"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/verify_driver_layout_background"
+        android:fontFamily="@font/regular"
+        android:text="4"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/seat_five"
+        app:layout_constraintStart_toEndOf="@id/seat_three"
+        app:layout_constraintTop_toBottomOf="@id/offeringSeats" />
+
+    <Button
+        android:id="@+id/seat_five"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/verify_driver_layout_background"
+        android:fontFamily="@font/regular"
+        android:text="5"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/seat_six"
+        app:layout_constraintStart_toEndOf="@id/seat_four"
+        app:layout_constraintTop_toBottomOf="@id/offeringSeats" />
+
+    <Button
+        android:id="@+id/seat_six"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/verify_driver_layout_background"
+        android:fontFamily="@font/regular"
+        android:text="6"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/seat_seven"
+        app:layout_constraintStart_toEndOf="@id/seat_five"
+        app:layout_constraintTop_toBottomOf="@id/offeringSeats" />
+
+    <Button
+        android:id="@+id/seat_seven"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/verify_driver_layout_background"
+        android:fontFamily="@font/regular"
+        android:text="7"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/guide_right"
+        app:layout_constraintStart_toEndOf="@id/seat_six"
+        app:layout_constraintTop_toBottomOf="@id/offeringSeats" />
+
+    <Button
+        android:id="@+id/Save"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_background"
+        android:fontFamily="@font/medium"
+        android:padding="10dp"
+        android:text="Save"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@id/guide_right"
+        app:layout_constraintStart_toStartOf="@+id/guide_left"
+        app:layout_constraintTop_toTopOf="@id/guide_four" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_one"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.010010" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_two"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.0881" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_three"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.157" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_four"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.849" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_left"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.048" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_right"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.952" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+

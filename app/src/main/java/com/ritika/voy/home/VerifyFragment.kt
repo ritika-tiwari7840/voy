@@ -37,6 +37,9 @@ class VerifyFragment : Fragment() {
         binding.driverVerificationStatus.setOnClickListener {
             navController.navigate(R.id.action_verifyFragment_to_driverVerificationFragment)
         }
+        binding.vehicleDetailsStatus.setOnClickListener {
+            navController.navigate(R.id.action_verifyFragment_to_vehicleDetailsFragment)
+        }
     }
 
 }

@@ -28,7 +28,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
+import com.ritika.voy.R.id.action_uploadLicenseFragment_to_driverVerificationFragment
 import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.UserResponseData
@@ -54,11 +56,10 @@ import java.net.SocketTimeoutException
 import java.util.concurrent.TimeoutException
 
 
-class UploadLicenseFragment : Fragment() {
+class UploadLicenseFragment : BaseFragment() {
     lateinit var _binding: FragmentUploadLicenseBinding
     private val binding get() = _binding!!
     lateinit var navController: NavController
-    private var isDiverVerified: Boolean? = null ?: false
     private var imageUri: Uri? = null
     private val filePath: String = ""
     private var uploadJob: Job? = null
@@ -90,7 +91,7 @@ class UploadLicenseFragment : Fragment() {
         checkAndRequestPermissions()
 
         binding.btnBack.setOnClickListener {
-            navController.navigate(R.id.action_uploadLicenseFragment_to_driverVerificationFragment)
+            navController.navigate(action_uploadLicenseFragment_to_driverVerificationFragment)
         }
         binding.capturePhoto.setOnClickListener {
             var layoutParams =
@@ -283,18 +284,11 @@ class UploadLicenseFragment : Fragment() {
         context: android.content.Context,
         imageView: ImageView,
         filePath: String,
-        backgroundColor: Int = android.R.color.transparent,
-        cornerRadius: Int = 30,
-        imageWidth: Int = 300,
-        imageHeight: Int = 300,
-    ) {
-        Glide.with(context).load(java.io.File(filePath)).apply(
-            RequestOptions().override(imageWidth, imageHeight)
-                .transform(RoundedCorners(cornerRadius)).transform(CircleCrop())
 
+        ) {
+        Glide.with(context).load(java.io.File(filePath)).apply(
+            RequestOptions().transform()
         ).into(imageView)
-        Log.d(TAG, "loadImageWithGlide: $filePath")
-        imageView.setBackgroundColor(ContextCompat.getColor(context, backgroundColor))
     }
 
     private suspend fun updateUserWithRetry(
@@ -419,4 +413,7 @@ class UploadLicenseFragment : Fragment() {
     }
 
 
+    override fun onBackPressed() {
+        navController.navigate(action_uploadLicenseFragment_to_driverVerificationFragment)
+    }
 }

@@ -59,7 +59,7 @@
             android:fontFamily="@font/regular"
             android:lineHeight="17sp"
             android:lineSpacingExtra="-7sp"
-            android:text="Confirm your ID document to boost\n trust as a Driver or as Passenger."
+            android:text="Confirm your ID document to boost\n trust as a Driver."
             android:textColor="@color/white"
             android:textSize="16sp"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -76,9 +76,9 @@
             android:fontFamily="@font/medium"
             android:padding="10dp"
             android:text="Get Verified"
+            android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="18sp"
-            android:textAllCaps="false"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

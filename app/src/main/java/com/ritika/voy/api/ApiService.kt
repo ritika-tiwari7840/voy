@@ -1,5 +1,6 @@
 package com.ritika.voy.api
 
+import com.google.android.gms.common.api.Response
 import com.ritika.voy.api.dataclasses.AvailableRides
 import com.ritika.voy.api.dataclasses.AvailableRidesSearchRequest
 import com.ritika.voy.api.dataclasses.ForgotRequest
@@ -90,7 +91,6 @@ interface ApiService {
         @Field("gender") gender: String?,
     ): UserResponseData
 
-
     @FormUrlEncoded
     @PUT("auth/user/")
     suspend fun updateUserName(
@@ -106,11 +106,14 @@ interface ApiService {
         @Field("emergency_contact_phone") emergencyContactNo: String?,
     ): UserResponseData
 
-    @POST("rides/passenger/search/")
-    suspend fun getAvailableRides(
-        @Header("Authorization") authHeader: String,
-        @Body requestBody: AvailableRidesSearchRequest,
-    ): AvailableRides
+    @FormUrlEncoded
+    @PUT("auth/user/")
+    suspend fun addVehicleDetails(
+        @Header("Authorization") token: String,
+        @Field("vehicle_model") vehicleModel: String?,
+        @Field("vehicle_number") vehicleNumber: String?,
+        @Field("total_seats") vehicleSeats: String?,
+    ): UserResponseData
 
     @Multipart
     @PUT("auth/user/")
@@ -118,4 +121,12 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Part drivers_license_image: MultipartBody.Part,
     ): UserResponseData
+
+    @POST("rides/passenger/search/")
+    suspend fun getAvailableRides(
+        @Header("Authorization") authHeader: String,
+        @Body requestBody: AvailableRidesSearchRequest,
+    ): AvailableRides
+
+
 }

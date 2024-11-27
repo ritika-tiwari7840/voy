@@ -65,8 +65,7 @@
         android:src="@drawable/driver_verification_image"
         app:layout_constraintLeft_toLeftOf="@id/guide_left"
         app:layout_constraintRight_toRightOf="@id/guide_right"
-        app:layout_constraintTop_toBottomOf="@id/guide_four">
-    </ImageView>
+        app:layout_constraintTop_toBottomOf="@id/guide_four"></ImageView>
 
     <Button
         android:id="@+id/capture_photo"
@@ -74,31 +73,30 @@
         android:layout_height="wrap_content"
         android:background="@drawable/button_background"
         android:fontFamily="@font/medium"
-        android:textSize="18sp"
         android:padding="10dp"
         android:text="Capture Photo"
         android:textAllCaps="false"
         android:textColor="@color/white"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="@id/guide_right"
         app:layout_constraintStart_toStartOf="@+id/guide_left"
         app:layout_constraintTop_toBottomOf="@id/driver_verification_layout_image" />
 
-<Button
-    android:id="@+id/upload_from_gallery"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="16dp"
-    android:background="@drawable/verify_driver_layout_background"
-    android:fontFamily="@font/medium"
-    android:textSize="18sp"
-    android:padding="10dp"
-    android:text="Upload from Gallery"
-    android:textAllCaps="false"
-    android:textColor="@color/white"
-    app:layout_constraintEnd_toEndOf="@id/guide_right"
-    app:layout_constraintStart_toStartOf="@+id/guide_left"
-    app:layout_constraintTop_toBottomOf="@id/capture_photo" />
-
+    <Button
+        android:id="@+id/upload_from_gallery"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/verify_driver_layout_background"
+        android:fontFamily="@font/medium"
+        android:padding="10dp"
+        android:text="Upload from Gallery"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@id/guide_right"
+        app:layout_constraintStart_toStartOf="@+id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/capture_photo" />
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -114,18 +112,21 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.0881" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guide_three"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.153" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guide_four"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.2966" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guide_left"
         android:layout_width="wrap_content"

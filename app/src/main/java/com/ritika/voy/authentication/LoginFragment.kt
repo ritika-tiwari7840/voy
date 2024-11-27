@@ -47,7 +47,7 @@ class LoginFragment : BaseFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
@@ -89,10 +89,12 @@ class LoginFragment : BaseFragment() {
 
         togglePasswordButton.setOnClickListener {
             if (isPasswordVisible) {
-                passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                passwordEditText.inputType =
+                    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
                 togglePasswordButton.setImageResource(R.drawable.baseline_visibility_24)
             } else {
-                passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                passwordEditText.inputType =
+                    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
                 togglePasswordButton.setImageResource(R.drawable.baseline_visibility_off_24)
             }
             isPasswordVisible = !isPasswordVisible
@@ -109,14 +111,18 @@ class LoginFragment : BaseFragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val email = s.toString()
                 if (email.contains("@")) {
-                    emailEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background)
+                    emailEditText.background =
+                        ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background)
                     emailErrorTextView.visibility = View.GONE
-                } else if(email.isEmpty()){
-                    emailEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background)
+                } else if (email.isEmpty()) {
+                    emailEditText.background =
+                        ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background)
                     emailErrorTextView.visibility = View.GONE
-                }
-                else{
-                    emailEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background_error)
+                } else {
+                    emailEditText.background = ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.edit_text_background_error
+                    )
                     emailErrorTextView.visibility = View.VISIBLE
                 }
             }
@@ -139,9 +145,10 @@ class LoginFragment : BaseFragment() {
             val password = passwordEditText.text.toString()
 
             if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(requireContext(), "Please fill all the fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please fill all the fields", Toast.LENGTH_SHORT)
+                    .show()
             } else {
-               login(email, password)
+                login(email, password)
             }
         }
 
@@ -164,7 +171,6 @@ class LoginFragment : BaseFragment() {
                 passwordEditText.hint = getString(R.string.enter_your_password)
             }
         }
-
 
 
     }
@@ -201,8 +207,8 @@ class LoginFragment : BaseFragment() {
                             it.gender!!.toString(),
                             it.emergency_contact_phone!!.toString(),
                             it.profile_photo!!.toString(),
-                            "5.0",
-                                    "5.0",
+                            it.rating_as_driver!!.toString(),
+                            it.rating_as_passenger!!.toString(),
                             it.is_driver_verified!!.toString()
                         )
                     }
@@ -211,25 +217,29 @@ class LoginFragment : BaseFragment() {
                     navController.navigate(R.id.action_loginFragment_to_homeActivity)
                 } else {
                     Log.e("LoginFragment", "Error: ${response.message}")
-                    Toast.makeText(requireContext(), "Invalid email or password", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Invalid email or password",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } catch (e: HttpException) {
                 Log.e("LoginFragment", "Error: ${e.message()}")
-                Toast.makeText(requireContext(), "Invalid email or password", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Invalid email or password", Toast.LENGTH_SHORT)
+                    .show()
             } catch (e: IOException) {
                 Log.e("LoginFragment", "Error: ${e.message}")
                 Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 Log.e("LoginFragment", "Error: ${e.message}")
-                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
+                    .show()
             } finally {
                 progressDialog.dismiss()
                 clearFields()
             }
         }
     }
-
-
 
     override fun onBackPressed() {
         navController.navigate(R.id.action_loginFragment_to_continueWithEmail)

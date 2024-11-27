@@ -33,6 +33,7 @@ class SplashFragment : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_splash, container, false)
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -46,23 +47,23 @@ class SplashFragment : Fragment() {
                     if (userResponse.success) {
                         DataStoreManager.SaveUserData(
                             requireContext(),
-                            id = userResponse.user.id.toString()?:"",
-                            email = userResponse.user.email?:"",
-                            firstName = userResponse.user.first_name.toString()?:"",
-                            lastName = userResponse.user.last_name.toString()?:"",
-                            fullName = userResponse.user.full_name.toString()?:"",
-                            createdAt = userResponse.user.created_at?:"",
-                            phoneNo = userResponse.user.phone_number.toString()?:"",
-                            gender = userResponse.user.gender.toString()?:"",
-                            emergencyContact = userResponse.user.emergency_contact_phone.toString()?:"",
-                            profilePhoto = userResponse.user.profile_photo.toString()?:"",
-                            ratingAsDriver = "5.0",
-                            ratingAsPassenger = "5.0",
-                            isDriverVerified = userResponse.user.toString()?:""
+                            userResponse.user.id!!.toString(),
+                            userResponse.user.email!!,
+                            userResponse.user.first_name!!,
+                            userResponse.user.last_name!!,
+                            userResponse.user.full_name!!,
+                            userResponse.user.created_at!!,
+                            userResponse.user.phone_number!!,
+                            userResponse.user.gender!!.toString(),
+                            userResponse.user.emergency_contact_phone!!.toString(),
+                            userResponse.user.profile_photo!!.toString(),
+                            userResponse.user.rating_as_driver!!.toString(),
+                            userResponse.user.rating_as_passenger!!.toString(),
+                            userResponse.user.is_driver_verified!!.toString()
                         )
-                        DataStoreManager.getUserData(requireContext(), "email").first().let {
-                            val email = it.toString()
-                            Toast.makeText(requireContext(), "token $email", Toast.LENGTH_SHORT)
+                        DataStoreManager.getUserData(requireContext(), "isDriverVerified").first().let {
+                            val verified = it.toString()
+                            Toast.makeText(requireContext(), "token $verified", Toast.LENGTH_SHORT)
                                 .show()
                         }
                         navController.navigate(R.id.action_splashFragment_to_homeActivity)

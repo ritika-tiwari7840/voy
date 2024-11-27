@@ -93,6 +93,9 @@
         <action
             android:id="@+id/action_verifyFragment_to_driverVerificationFragment"
             app:destination="@id/driverVerificationFragment" />
+        <action
+            android:id="@+id/action_verifyFragment_to_vehicleDetailsFragment"
+            app:destination="@id/vehicleDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/driverVerificationFragment"
@@ -117,6 +120,17 @@
             android:id="@+id/action_uploadLicenseFragment_to_driverVerificationFragment"
             app:destination="@id/driverVerificationFragment"
             app:popUpTo="@id/driverVerificationFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/vehicleDetailsFragment"
+        android:name="com.ritika.voy.home.VehicleDetailsFragment"
+        android:label="fragment_vehicle_details"
+        tools:layout="@layout/fragment_vehicle_details">
+        <action
+            android:id="@+id/action_vehicleDetailsFragment_to_verifyFragment"
+            app:destination="@id/verifyFragment"
+            app:popUpTo="@id/verifyFragment"
             app:popUpToInclusive="true" />
     </fragment>
 </navigation>
