@@ -734,7 +734,8 @@ class EditInfo : Fragment() {
                 response.user.emergency_contact_phone,
                 filePath,
                 response.user.rating_as_driver.toString(),
-                response.user.rating_as_passenger.toString()
+                response.user.rating_as_passenger.toString(),
+                response.user.is_driver_verified.toString()
             )
             writeUserDataOnView(binding)
         }

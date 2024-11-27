@@ -64,21 +64,6 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         }
-
-        binding.chat.setOnClickListener {
-            Toast.makeText(this, "Chat Screen opens", Toast.LENGTH_SHORT).show()
-            val dialog = Dialog(this)
-            dialog.setContentView(R.layout.verification)
-            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-            dialog.show()
-            val textView = dialog.findViewById<TextView>(R.id.user_name)
-            val button = dialog.findViewById<Button>(R.id.get_verification)
-            textView.text =
-                "$firstName, you’re only missing few steps\n from having a Verified profile."
-            button.setOnClickListener {
-                dialog.dismiss()
-            }
-        }
     }
 
     override fun onBackPressed() {

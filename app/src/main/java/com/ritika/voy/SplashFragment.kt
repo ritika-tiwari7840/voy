@@ -58,6 +58,7 @@ class SplashFragment : Fragment() {
                             profilePhoto = userResponse.user.profile_photo.toString()?:"",
                             ratingAsDriver = "5.0",
                             ratingAsPassenger = "5.0",
+                            isDriverVerified = userResponse.user.toString()?:""
                         )
                         DataStoreManager.getUserData(requireContext(), "email").first().let {
                             val email = it.toString()

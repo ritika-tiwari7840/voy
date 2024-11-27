@@ -203,7 +203,8 @@ class LoginFragment : BaseFragment() {
                             it.profile_photo!!.toString(),
                             "5.0",
                                     "5.0",
-                            )
+                            it.is_driver_verified!!.toString()
+                        )
                     }
 
                     Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()

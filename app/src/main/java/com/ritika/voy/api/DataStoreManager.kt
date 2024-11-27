@@ -25,6 +25,7 @@ object DataStoreManager {
         profilePhoto: String,
         ratingAsDriver: String,
         ratingAsPassenger: String,
+        isDriverVerified: String
     ) {
         val idKey = stringPreferencesKey("id")
         val emailKey = stringPreferencesKey("email")
@@ -38,6 +39,8 @@ object DataStoreManager {
         val profileKey = stringPreferencesKey("profilePhoto")
         val ratingAsDriverKey = stringPreferencesKey("ratingAsDriver")
         val ratingAsPassengerKey = stringPreferencesKey("ratingAsPassenger")
+        val isDriverVerifiedKey = stringPreferencesKey("isDriverVerified")
+
         context.dataStore1.edit { preferences ->
             preferences[idKey] = id
             preferences[emailKey] = email
@@ -51,6 +54,7 @@ object DataStoreManager {
             preferences[profileKey] = profilePhoto.toString()
             preferences[ratingAsDriverKey] = ratingAsDriver
             preferences[ratingAsPassengerKey] = ratingAsPassenger
+            preferences[isDriverVerifiedKey] = isDriverVerified
         }
     }
 

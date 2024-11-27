@@ -87,7 +87,7 @@ interface ApiService {
     @PUT("auth/user/")
     suspend fun updateGender(
         @Header("Authorization") token: String,
-        @Field("gender") gender: String?
+        @Field("gender") gender: String?,
     ): UserResponseData
 
 
@@ -96,20 +96,26 @@ interface ApiService {
     suspend fun updateUserName(
         @Header("Authorization") token: String,
         @Field("first_name") firstName: String?,
-        @Field("last_name") lastName: String?
+        @Field("last_name") lastName: String?,
     ): UserResponseData
 
     @FormUrlEncoded
     @PUT("auth/user/")
     suspend fun updateEmergencyContactNo(
         @Header("Authorization") token: String,
-        @Field("emergency_contact_phone") emergencyContactNo: String?
+        @Field("emergency_contact_phone") emergencyContactNo: String?,
     ): UserResponseData
 
     @POST("rides/passenger/search/")
     suspend fun getAvailableRides(
         @Header("Authorization") authHeader: String,
-        @Body requestBody: AvailableRidesSearchRequest
+        @Body requestBody: AvailableRidesSearchRequest,
     ): AvailableRides
 
+    @Multipart
+    @PUT("auth/user/")
+    suspend fun VerifyUser(
+        @Header("Authorization") token: String,
+        @Part drivers_license_image: MultipartBody.Part,
+    ): UserResponseData
 }

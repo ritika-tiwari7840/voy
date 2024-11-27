@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context=".home.UploadLicenseFragment">
+
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Back button"
+        app:layout_constraintBottom_toTopOf="@id/guide_two"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintTop_toBottomOf="@+id/guide_one"
+        app:srcCompat="@drawable/back_button" />
+
+    <TextView
+        android:id="@+id/driver_verifification_heading_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:fontFamily="@font/medium"
+        android:gravity="center"
+        android:text="Drivers Verification"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_back"
+        app:layout_constraintStart_toEndOf="@+id/btn_back"
+        app:layout_constraintTop_toTopOf="@+id/btn_back" />
+
+    <TextView
+        android:id="@+id/verify_your_driving_license"
+        android:layout_width="317dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/medium"
+        android:text="Driving Licence Capture tips"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/guide_three" />
+
+    <TextView
+        android:id="@+id/verify_your_driving_license_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:fontFamily="@font/regular"
+        android:text="Ensure a clear picture of ID card to get approved faster"
+        android:textColor="@color/gev_id_proof_text"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@id/guide_right"
+        app:layout_constraintStart_toStartOf="@+id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/verify_your_driving_license" />
+
+
+    <ImageView
+        android:id="@+id/driver_verification_layout_image"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/driver_verification_image"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/guide_four">
+    </ImageView>
+
+    <Button
+        android:id="@+id/capture_photo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_background"
+        android:fontFamily="@font/medium"
+        android:textSize="18sp"
+        android:padding="10dp"
+        android:text="Capture Photo"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="@id/guide_right"
+        app:layout_constraintStart_toStartOf="@+id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/driver_verification_layout_image" />
+
+<Button
+    android:id="@+id/upload_from_gallery"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp"
+    android:background="@drawable/verify_driver_layout_background"
+    android:fontFamily="@font/medium"
+    android:textSize="18sp"
+    android:padding="10dp"
+    android:text="Upload from Gallery"
+    android:textAllCaps="false"
+    android:textColor="@color/white"
+    app:layout_constraintEnd_toEndOf="@id/guide_right"
+    app:layout_constraintStart_toStartOf="@+id/guide_left"
+    app:layout_constraintTop_toBottomOf="@id/capture_photo" />
+
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_one"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.010010" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_two"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.0881" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_three"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.153" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_four"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.2966" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_left"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.048" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_right"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.952" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+

@@ -12,5 +12,6 @@ data class User(
     val last_name: String?,
     val phone_number: String,
     val phone_verified: Boolean,
-    val profile_photo: Any?
+    val profile_photo: Any?,
+    val is_driver_verified:Boolean
 )
