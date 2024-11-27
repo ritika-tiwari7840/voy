@@ -71,8 +71,7 @@ class HomeActivity : AppCompatActivity() {
             // Exit the app when at the "home" destination
             finishAffinity() // Exits the app completely
         } else {
-            // Navigate to the "home" destination
-            navController.navigate(R.id.home)
+            super.onBackPressed()
         }
     }
 

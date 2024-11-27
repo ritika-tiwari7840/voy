@@ -1063,6 +1063,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                         destinationLatLng = null
                                     })
                             }
+
+                            binding.backButton.setOnClickListener {
+                                startLocation = null
+                                destinationLocation = null
+                                val intent = intent
+                                finish()
+                                startActivity(intent)
+
+                            }
                         }
                     },
 
