@@ -114,6 +114,9 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+        binding.contributionTextView.setOnClickListener{
+            navController.navigate(R.id.action_home_to_eco)
+        }
 
         binding.whereTo.setOnClickListener {
             val bundle = Bundle()
@@ -121,7 +124,5 @@ class HomeFragment : Fragment() {
             Toast.makeText(requireContext(), "You are $role", Toast.LENGTH_SHORT).show()
             navController.navigate(R.id.action_home_to_chooseSpotFragment, bundle)
         }
-
-
     }
 }

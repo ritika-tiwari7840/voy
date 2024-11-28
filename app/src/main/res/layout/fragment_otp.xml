@@ -36,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppinsmedium"
-        android:text="Please enter the verifcation code we have sent to \n someone@gmail.com"
+        android:text="Please enter the verification code we have sent to \n someone@gmail.com"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="12sp"
@@ -64,6 +64,7 @@
         android:gravity="center"
         android:inputType="number"
         android:maxLength="1"
+        android:textCursorDrawable="@drawable/custom_cursor"
         app:layout_constraintEnd_toStartOf="@id/otpBox2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline7" />
@@ -76,8 +77,9 @@
         android:gravity="center"
         android:inputType="number"
         android:maxLength="1"
-        app:layout_constraintStart_toEndOf="@+id/otpBox1"
+        android:textCursorDrawable="@drawable/custom_cursor"
         app:layout_constraintEnd_toStartOf="@id/otpBox3"
+        app:layout_constraintStart_toEndOf="@+id/otpBox1"
         app:layout_constraintTop_toTopOf="@+id/guideline7" />
 
     <EditText
@@ -88,6 +90,7 @@
         android:gravity="center"
         android:inputType="number"
         android:maxLength="1"
+        android:textCursorDrawable="@drawable/custom_cursor"
         app:layout_constraintEnd_toStartOf="@+id/otpBox4"
         app:layout_constraintStart_toEndOf="@+id/otpBox2"
         app:layout_constraintTop_toTopOf="@+id/guideline7" />
@@ -100,8 +103,9 @@
         android:gravity="center"
         android:inputType="number"
         android:maxLength="1"
-        app:layout_constraintStart_toEndOf="@id/otpBox3"
+        android:textCursorDrawable="@drawable/custom_cursor"
         app:layout_constraintEnd_toStartOf="@id/otpBox5"
+        app:layout_constraintStart_toEndOf="@id/otpBox3"
         app:layout_constraintTop_toTopOf="@+id/guideline7" />
 
     <EditText
@@ -112,6 +116,7 @@
         android:gravity="center"
         android:inputType="number"
         android:maxLength="1"
+        android:textCursorDrawable="@drawable/custom_cursor"
         app:layout_constraintEnd_toStartOf="@+id/otpBox6"
         app:layout_constraintStart_toEndOf="@id/otpBox4"
         app:layout_constraintTop_toTopOf="@+id/guideline7" />
@@ -132,9 +137,9 @@
         android:id="@+id/ivOtpErrorIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:layout_marginTop="4dp"
         android:src="@drawable/warning"
+        android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@+id/tvOtpError"
         app:layout_constraintTop_toBottomOf="@+id/otpBox1" />
 
@@ -143,8 +148,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:paddingStart="4dp"
         android:fontFamily="@font/poppinsmedium"
+        android:paddingStart="4dp"
         android:text="Otp cannot be empty"
         android:textColor="#B12F24"
         android:textSize="12sp"
@@ -180,7 +185,6 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline5"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toTopOf="@+id/guideline1" />
-
 
 
     <androidx.constraintlayout.widget.Guideline

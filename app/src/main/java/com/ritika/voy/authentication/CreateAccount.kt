@@ -175,7 +175,7 @@ class CreateAccount : BaseFragment() {
                 Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
                     .show()
             } finally {
-                clearFields()
+//                clearFields()
             }
         }
     }

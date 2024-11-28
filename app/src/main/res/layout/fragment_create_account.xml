@@ -81,10 +81,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_corner"
+            android:fontFamily="@font/medium"
             android:inputType="number"
-            android:padding="16dp"
+            android:padding="14dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
+            android:textCursorDrawable="@drawable/custom_cursor"
             android:textSize="15sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -124,10 +126,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_corner"
+            android:fontFamily="@font/medium"
             android:inputType="textEmailAddress"
-            android:padding="16dp"
+            android:padding="14dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
+            android:textCursorDrawable="@drawable/custom_cursor"
             android:textSize="15sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -168,10 +172,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_corner"
+            android:fontFamily="@font/medium"
             android:inputType="textPassword"
-            android:padding="16dp"
+            android:padding="14dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
+            android:textCursorDrawable="@drawable/custom_cursor"
             android:textSize="15sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -190,8 +196,8 @@
             android:id="@+id/criteria_heading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="16dp"
             android:fontFamily="@font/poppinsmedium"
+            android:paddingStart="16dp"
             android:paddingTop="16dp"
             android:paddingBottom="16dp"
             android:text="Password must contain:"
@@ -203,8 +209,8 @@
             android:id="@+id/criteria_length"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="16dp"
             android:fontFamily="@font/poppinsmedium"
+            android:paddingStart="16dp"
             android:text="• At least 8 characters"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
@@ -214,9 +220,9 @@
             android:id="@+id/criteria_upper"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="16dp"
             android:fontFamily="@font/poppinsmedium"
-            android:text="• At least one uppercase letter"
+            android:paddingStart="16dp"
+            android:text="• 1 Uppercase letter"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/criteria_length" />
@@ -225,9 +231,9 @@
             android:id="@+id/criteria_lower"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="16dp"
             android:fontFamily="@font/poppinsmedium"
-            android:text="• At least one lowercase letter"
+            android:paddingStart="16dp"
+            android:text="• 1 Lowercase letter"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/criteria_upper" />
@@ -236,9 +242,9 @@
             android:id="@+id/criteria_digit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="16dp"
             android:fontFamily="@font/poppinsmedium"
-            android:text="• At least one digit"
+            android:paddingStart="16dp"
+            android:text="• 1 Special character"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/criteria_lower" />
@@ -247,10 +253,10 @@
             android:id="@+id/criteria_special"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/poppinsmedium"
             android:paddingStart="16dp"
             android:paddingBottom="16dp"
-            android:fontFamily="@font/poppinsmedium"
-            android:text="• At least one special character"
+            android:text="• 1 Digit"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/criteria_digit" />
@@ -291,10 +297,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_corner"
+            android:fontFamily="@font/medium"
             android:inputType="textPassword"
-            android:padding="16dp"
+            android:padding="14dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
+            android:textCursorDrawable="@drawable/custom_cursor"
             android:textSize="15sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -307,7 +315,7 @@
         android:background="@drawable/rounded_corner"
         android:backgroundTint="@color/theme_color"
         android:fontFamily="@font/medium"
-        android:padding="16dp"
+        android:padding="14dp"
         android:text="Sign up"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
@@ -366,6 +374,5 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent=".95" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

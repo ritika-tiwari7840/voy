@@ -213,26 +213,26 @@ class LoginFragment : BaseFragment() {
                         )
                     }
 
-                    Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "${response.message}", Toast.LENGTH_SHORT).show()
                     navController.navigate(R.id.action_loginFragment_to_homeActivity)
                 } else {
                     Log.e("LoginFragment", "Error: ${response.message}")
                     Toast.makeText(
                         requireContext(),
-                        "Invalid email or password",
+                        " ${response.message}",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
             } catch (e: HttpException) {
                 Log.e("LoginFragment", "Error: ${e.message()}")
-                Toast.makeText(requireContext(), "Invalid email or password", Toast.LENGTH_SHORT)
+                Toast.makeText(requireContext(), "${e.message()}", Toast.LENGTH_SHORT)
                     .show()
             } catch (e: IOException) {
                 Log.e("LoginFragment", "Error: ${e.message}")
                 Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 Log.e("LoginFragment", "Error: ${e.message}")
-                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
+                Toast.makeText(requireContext(), "${e.message}", Toast.LENGTH_SHORT)
                     .show()
             } finally {
                 progressDialog.dismiss()

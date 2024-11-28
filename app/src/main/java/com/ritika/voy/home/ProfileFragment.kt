@@ -47,7 +47,10 @@ class ProfileFragment : Fragment() {
         binding.editProfile.setOnClickListener {
             navController.navigate(R.id.action_profile_to_editInfo)
         }
+        binding.contributionText.setOnClickListener {
+            navController.navigate(R.id.action_profile_to_eco)
 
+        }
         binding.btnBack.setOnClickListener {
             navController.navigate(R.id.action_profile_to_home)
         }

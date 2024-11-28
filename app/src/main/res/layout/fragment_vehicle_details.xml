@@ -58,6 +58,7 @@
         android:padding="10dp"
         android:textColorHint="@color/verification_layout_text"
         android:textSize="18sp"
+        android:textCursorDrawable="@drawable/custom_cursor"
         app:layout_constraintLeft_toLeftOf="@id/guide_left"
         app:layout_constraintRight_toRightOf="@id/guide_right"
         app:layout_constraintTop_toBottomOf="@id/model_text"
@@ -89,6 +90,7 @@
         android:padding="10dp"
         android:textColorHint="#B0B0B0"
         android:textSize="18sp"
+        android:textCursorDrawable="@drawable/custom_cursor"
         app:layout_constraintLeft_toLeftOf="@id/guide_left"
         app:layout_constraintRight_toRightOf="@id/guide_right"
         app:layout_constraintTop_toBottomOf="@id/vehicle_number_text" />

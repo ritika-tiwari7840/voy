@@ -465,7 +465,6 @@
             app:layout_constraintLeft_toLeftOf="@id/edit_name_popup_guide_left"
             app:layout_constraintTop_toBottomOf="@id/edit_name_popup_divider" />
 
-
         <EditText
             android:id="@+id/first_name"
             android:layout_width="0dp"
@@ -479,6 +478,7 @@
             android:padding="10dp"
             android:text="Tripti"
             android:textColor="@color/white"
+            android:textCursorDrawable="@drawable/custom_cursor"
             android:textSize="16sp"
             app:layout_constraintLeft_toLeftOf="@id/edit_name_popup_guide_left"
             app:layout_constraintRight_toRightOf="@id/edit_name_popup_guide_right"
@@ -497,6 +497,7 @@
             android:padding="10dp"
             android:text="Sharma"
             android:textColor="@color/white"
+            android:textCursorDrawable="@drawable/custom_cursor"
             android:textSize="16sp"
             app:layout_constraintLeft_toLeftOf="@id/edit_name_popup_guide_left"
             app:layout_constraintRight_toRightOf="@id/edit_name_popup_guide_right"
@@ -731,11 +732,12 @@
             android:drawableEnd="@drawable/cross"
             android:drawablePadding="18dp"
             android:fontFamily="@font/light"
-            android:padding="10dp"
             android:hint="Help is here"
             android:maxLength="10"
-            android:textColorHint="@color/white"
+            android:padding="10dp"
             android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:textCursorDrawable="@drawable/custom_cursor"
             android:textSize="16sp"
             app:layout_constraintLeft_toLeftOf="@id/edit_emergency_popup_guide_left"
             app:layout_constraintRight_toRightOf="@id/edit_emergency_popup_guide_right"

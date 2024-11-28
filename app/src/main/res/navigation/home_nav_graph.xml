@@ -19,6 +19,11 @@
         <action
             android:id="@+id/action_home_to_verifyFragment"
             app:destination="@id/verifyFragment" />
+        <action
+            android:id="@+id/action_home_to_eco"
+            app:destination="@id/eco"
+            app:popUpTo="@id/home"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <fragment
@@ -46,6 +51,16 @@
         <action
             android:id="@+id/action_profile_to_home"
             app:destination="@id/home" />
+        <action
+            android:id="@+id/action_profile_to_eco"
+            app:destination="@id/eco"
+            app:popUpTo="@id/profile"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_profile_to_settingsFragment"
+            app:destination="@id/settingsFragment"
+            app:popUpTo="@id/profile"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <!-- Fragments outside bottom navigation -->
@@ -133,4 +148,9 @@
             app:popUpTo="@id/verifyFragment"
             app:popUpToInclusive="true" />
     </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.ritika.voy.home.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>

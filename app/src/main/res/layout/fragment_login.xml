@@ -64,6 +64,7 @@
         android:padding="16dp"
         android:textColor="@color/white"
         android:textColorHint="#ffffff"
+        android:textCursorDrawable="@drawable/custom_cursor"
         app:layout_constraintEnd_toStartOf="@+id/guideline5"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/tvEmailLabel" />
@@ -106,6 +107,7 @@
         android:padding="16dp"
         android:textColor="@color/white"
         android:textColorHint="#ffffff"
+        android:textCursorDrawable="@drawable/custom_cursor"
         app:layout_constraintEnd_toStartOf="@+id/guideline5"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/tvPasswordLabel" />
