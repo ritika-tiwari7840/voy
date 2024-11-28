@@ -39,13 +39,14 @@
 
         <Button
             android:id="@+id/find_pool"
-            android:layout_width="165dp"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="214dp"
             android:background="@drawable/find_pool_background"
             android:fontFamily="@font/regular"
             android:padding="16dp"
             android:text="Find Pool"
+            android:textColor="@color/white"
             android:textAllCaps="false"
             android:textSize="16sp"
             app:layout_constraintEnd_toStartOf="@+id/offer_pool"
@@ -55,7 +56,7 @@
 
         <Button
             android:id="@+id/offer_pool"
-            android:layout_width="165dp"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="214dp"
             android:background="@drawable/offer_pool_background"

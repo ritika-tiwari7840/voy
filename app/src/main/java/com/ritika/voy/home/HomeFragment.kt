@@ -52,10 +52,10 @@ class HomeFragment : Fragment() {
         lifecycleScope.launch {
             DataStoreManager.getUserData(requireContext(), "fullName").first().let {
                 val fullName = it.toString()
-                if (fullName.isNotEmpty()) {
-                    binding.homeGreetingText.text = "Hello, $fullName"
+                if (fullName.isNotEmpty() && fullName != null) {
+                    binding.homeGreetingText.text = "hello, $fullName"
                 } else {
-                    binding.homeGreetingText.text = "Hello, User"
+                    binding.homeGreetingText.text = "hello, User"
                 }
             }
             DataStoreManager.getUserData(requireContext(), "isDriverVerified").first().let {
@@ -114,7 +114,7 @@ class HomeFragment : Fragment() {
                 }
             }
         }
-        binding.contributionTextView.setOnClickListener{
+        binding.contributionTextView.setOnClickListener {
             navController.navigate(R.id.action_home_to_eco)
         }
 

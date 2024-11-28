@@ -304,6 +304,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         adjustRouteViewMargins()
         updateRouteViewTextColors()
     }
+
     private fun setupLoaderBackground() {
         val gradientDrawable = GradientDrawable(
             GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(
@@ -477,7 +478,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 setRouteViewBackground()
                 adjustRouteViewMargins()
                 updateRouteViewTextColors()
-                binding.riderImage.visibility=View.INVISIBLE
+                binding.riderImage.visibility = View.INVISIBLE
             } else {
                 Toast.makeText(this, "No rides available", Toast.LENGTH_SHORT).show()
                 recyclerView.visibility = View.GONE // Hide RecyclerView

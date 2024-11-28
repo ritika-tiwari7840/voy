@@ -144,13 +144,21 @@ class ResetPassword : BaseFragment() {
             }
 
             confirmPassword != password -> {
-                setErrorState(confirmPasswordInputLayout, "Passwords do not match", confirmPasswordEditText)
+                setErrorState(
+                    confirmPasswordInputLayout,
+                    "Passwords do not match",
+                    confirmPasswordEditText
+                )
                 confirmPasswordInputLayout.boxStrokeColor = errorColor
                 newPasswordInputLayout.boxStrokeColor = defaultColor
             }
 
             !isValidPassword(confirmPassword) -> {
-                setErrorState(confirmPasswordInputLayout, "Password must contain 8 characters, including uppercase, lowercase, number, and special character", confirmPasswordEditText)
+                setErrorState(
+                    confirmPasswordInputLayout,
+                    "Password must contain 8 characters, including uppercase, lowercase, number, and special character",
+                    confirmPasswordEditText
+                )
                 confirmPasswordInputLayout.boxStrokeColor = errorColor
                 newPasswordInputLayout.boxStrokeColor = defaultColor
             }
@@ -178,7 +186,7 @@ class ResetPassword : BaseFragment() {
             ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background_error)
     }
 
-    private fun setValidState(inputLayout: TextInputLayout, editText: TextInputEditText,) {
+    private fun setValidState(inputLayout: TextInputLayout, editText: TextInputEditText) {
         inputLayout.helperText = null
         inputLayout.setHelperTextColor(null)
         editText.background =
@@ -194,7 +202,7 @@ class ResetPassword : BaseFragment() {
 
     private fun isValidPassword(password: String): Boolean {
         val passwordRegex =
-            "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$".toRegex()
+            "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$".toRegex()
         return password.matches(passwordRegex)
     }
 

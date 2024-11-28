@@ -34,6 +34,176 @@
         app:layout_constraintStart_toEndOf="@+id/btn_back"
         app:layout_constraintTop_toTopOf="@+id/btn_back" />
 
+    <TextView
+        android:id="@+id/shortcut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="52dp"
+        android:fontFamily="@font/medium"
+        android:text="Shortcuts"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        app:layout_constraintStart_toStartOf="@id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/settings_heading_text" />
+
+    <ImageView
+        android:id="@+id/home_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="187dp"
+        android:src="@drawable/home_shortcut"
+        app:layout_constraintStart_toStartOf="@id/guide_left"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/home"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="28dp"
+        android:layout_marginTop="28dp"
+        android:fontFamily="@font/regular"
+        android:text="Home"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintStart_toStartOf="@id/home_icon"
+        app:layout_constraintTop_toBottomOf="@id/shortcut" />
+
+    <TextView
+        android:id="@+id/home_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="28dp"
+        android:fontFamily="@font/regular"
+        android:text="Delhi, India"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintStart_toStartOf="@id/home_icon"
+        app:layout_constraintTop_toBottomOf="@id/home" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider_one"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:layout_marginTop="15dp"
+        app:dividerColor="#242424"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/home_text" />
+
+
+    <ImageView
+        android:id="@+id/work_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:src="@drawable/work_shortcut"
+        app:layout_constraintStart_toStartOf="@id/guide_left"
+        app:layout_constraintTop_toTopOf="@id/divider_one" />
+
+    <TextView
+        android:id="@+id/work"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="28dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/regular"
+        android:text="Work"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintStart_toStartOf="@id/work_icon"
+        app:layout_constraintTop_toBottomOf="@id/divider_one" />
+
+    <TextView
+        android:id="@+id/work_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="28dp"
+        android:fontFamily="@font/regular"
+        android:text="Add Shortcut"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintStart_toStartOf="@id/work_icon"
+        app:layout_constraintTop_toBottomOf="@id/work" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider_two"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_marginTop="32dp"
+        app:dividerColor="#242424"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/work_text" />
+
+    <TextView
+        android:id="@+id/Safety"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/medium"
+        android:text="Safety"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        app:layout_constraintStart_toStartOf="@id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/divider_two" />
+
+    <TextView
+        android:id="@+id/safety_tool"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/regular"
+        android:text="Safety tools"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintStart_toStartOf="@id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/Safety" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider_three"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:layout_marginTop="15dp"
+        app:dividerColor="#242424"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/safety_tool" />
+
+
+    <TextView
+        android:id="@+id/legal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/regular"
+        android:text="Legal"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintStart_toStartOf="@id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/divider_three" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider_four"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_marginTop="32dp"
+        app:dividerColor="#242424"
+        app:layout_constraintLeft_toLeftOf="@id/guide_left"
+        app:layout_constraintRight_toRightOf="@id/guide_right"
+        app:layout_constraintTop_toBottomOf="@id/legal" />
+
+    <TextView
+        android:id="@+id/logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/regular"
+        android:text="Log out"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintStart_toStartOf="@id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/divider_four" />
+
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/heading_text_top_guide"
@@ -49,6 +219,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.0881" />
+
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guide_left"

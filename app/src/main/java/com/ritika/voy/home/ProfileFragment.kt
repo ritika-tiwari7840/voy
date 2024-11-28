@@ -54,6 +54,9 @@ class ProfileFragment : Fragment() {
         binding.btnBack.setOnClickListener {
             navController.navigate(R.id.action_profile_to_home)
         }
+        binding.settings.setOnClickListener{
+            navController.navigate(R.id.action_profile_to_settingsFragment)
+        }
 
         lifecycleScope.launch {
             var totalRating: Double? = 0.0

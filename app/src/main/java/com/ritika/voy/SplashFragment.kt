@@ -61,11 +61,16 @@ class SplashFragment : Fragment() {
                             userResponse.user.rating_as_passenger!!.toString(),
                             userResponse.user.is_driver_verified!!.toString()
                         )
-                        DataStoreManager.getUserData(requireContext(), "isDriverVerified").first().let {
-                            val verified = it.toString()
-                            Toast.makeText(requireContext(), "token $verified", Toast.LENGTH_SHORT)
-                                .show()
-                        }
+                        DataStoreManager.getUserData(requireContext(), "isDriverVerified").first()
+                            .let {
+                                val verified = it.toString()
+                                Toast.makeText(
+                                    requireContext(),
+                                    "token $verified",
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                            }
                         navController.navigate(R.id.action_splashFragment_to_homeActivity)
                     }
                 } else {
