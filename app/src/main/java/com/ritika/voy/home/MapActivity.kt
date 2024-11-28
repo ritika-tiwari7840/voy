@@ -1,5 +1,6 @@
 package com.ritika.voy.home
 
+import RideAdapter
 import android.Manifest
 import android.animation.ObjectAnimator
 import android.app.Activity
@@ -33,6 +34,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -100,18 +103,24 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var hasSetInitialLocations = false
     private lateinit var role: String
     private lateinit var authToken: String
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var rideAdapter: RideAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         binding = ActivityMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        recyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
         // Initialize geocodingHelper
         geocodingHelper = GeocodingHelper(this)
 
@@ -146,17 +155,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         setupSearchBox()
 
         markerIcon = getBitmapDescriptorFromResource(R.drawable.location)
-//
-//        binding.logoutButton.setOnClickListener {
-//            lifecycleScope.launch {
-//                DataStoreManager.clearTokens(applicationContext)
-//            }
-//            val intent = Intent(this, MainActivity::class.java)
-//            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//            startActivity(intent)
-//            finish()
-//        }
-
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
@@ -306,8 +304,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         adjustRouteViewMargins()
         updateRouteViewTextColors()
     }
-
-
     private fun setupLoaderBackground() {
         val gradientDrawable = GradientDrawable(
             GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(
@@ -424,6 +420,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val response = fetchApiResponse(authToken) // Pass the auth token
             if (response != null) {
                 onApiSuccess(response)
+                Toast.makeText(
+                    this@MapActivity,
+                    " response null $response.data",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Log.d("API", "proceedButtonClicked: ${response.data} ")
             } else {
                 onApiFailure()
             }
@@ -434,11 +436,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val requestBody = AvailableRidesSearchRequest(
             pickup_point = LocationPoint(
                 type = "Point",
-                coordinates = listOf(startLatLng!!.latitude, startLatLng!!.longitude)
+                coordinates = listOf(-122.084, 37.422)
             ),
             destination_point = LocationPoint(
                 type = "Point",
-                coordinates = listOf(destinationLatLng!!.latitude, destinationLatLng!!.longitude)
+                coordinates = listOf(-122.032, 37.387)
             ),
             seats_needed = selectedButtonValue!!.toInt(),
             radius = 5000.0
@@ -465,10 +467,21 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun onApiSuccess(availableRides: AvailableRides) {
         // Handle the successful API response
         availableRides.data?.let { rides ->
-            // Process and display the list of rides
-            for (ride in rides) {
-                println("Ride from ${ride.data.start_location} to ${ride.data.end_location}")
-                Log.d("API", "onApiSuccess:  ${availableRides.data} ")
+            if (rides.isNotEmpty()) {
+                // Set up the adapter with the rides data
+                rideAdapter = RideAdapter(rides)
+                recyclerView.adapter = rideAdapter
+                recyclerView.visibility = View.VISIBLE // Show RecyclerView
+                adjustConstraints()
+                toggleViewVisibility()
+                setRouteViewBackground()
+                adjustRouteViewMargins()
+                updateRouteViewTextColors()
+                binding.riderImage.visibility=View.INVISIBLE
+            } else {
+                Toast.makeText(this, "No rides available", Toast.LENGTH_SHORT).show()
+                recyclerView.visibility = View.GONE // Hide RecyclerView
+
             }
         }
         // Update the loader to 100% completion
@@ -491,6 +504,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // Send the response status (e.g., navigate to the next screen or show a toast)
         if (status) {
             Toast.makeText(this, "API call successful", Toast.LENGTH_SHORT).show()
+            Log.d("API", "sendResponseStatus: $status ")
         } else {
             Toast.makeText(this, "API call failed", Toast.LENGTH_SHORT).show()
         }

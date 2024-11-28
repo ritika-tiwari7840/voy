@@ -166,13 +166,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline5" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/cancel_button"
+        app:layout_constraintEnd_toEndOf="@id/bottom_widget"
+        app:layout_constraintStart_toStartOf="@id/bottom_widget"
+        app:layout_constraintTop_toBottomOf="@id/loader" />
+
     <View
         android:id="@+id/white_bar"
         android:layout_width="48dp"
         android:layout_height="2dp"
         android:layout_marginTop="8dp"
         android:background="#888888"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="@id/bottom_widget"
         app:layout_constraintStart_toStartOf="@id/bottom_widget"
         app:layout_constraintTop_toTopOf="@id/bottom_widget" />
