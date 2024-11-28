@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import com.ritika.voy.MainActivity
 import com.ritika.voy.R
 import com.ritika.voy.api.DataStoreManager
@@ -27,8 +28,15 @@ class SettingsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        navController = findNavController()
+
+        binding.btnBack.setOnClickListener {
+            navController.navigate(R.id.action_settingsFragment_to_profile2)
+        }
+        binding.safetyTool.setOnClickListener{
+            navController.navigate(R.id.action_settingsFragment_to_safetyToolsFragment)
+        }
 
         binding.logout.setOnClickListener {
             // Clear tokens from DataStore
