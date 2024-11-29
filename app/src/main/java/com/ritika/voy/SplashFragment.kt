@@ -45,32 +45,6 @@ class SplashFragment : Fragment() {
                 if (accessToken != null) {
                     val userResponse = getUserData(accessToken)
                     if (userResponse.success) {
-                        DataStoreManager.SaveUserData(
-                            requireContext(),
-                            userResponse.user.id!!.toString(),
-                            userResponse.user.email!!,
-                            userResponse.user.first_name!!,
-                            userResponse.user.last_name!!,
-                            userResponse.user.full_name!!,
-                            userResponse.user.created_at!!,
-                            userResponse.user.phone_number!!,
-                            userResponse.user.gender!!.toString(),
-                            userResponse.user.emergency_contact_phone!!.toString(),
-                            userResponse.user.profile_photo!!.toString(),
-                            userResponse.user.rating_as_driver!!.toString(),
-                            userResponse.user.rating_as_passenger!!.toString(),
-                            userResponse.user.is_driver_verified!!.toString()
-                        )
-                        DataStoreManager.getUserData(requireContext(), "isDriverVerified").first()
-                            .let {
-                                val verified = it.toString()
-                                Toast.makeText(
-                                    requireContext(),
-                                    "token $verified",
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
-                            }
                         navController.navigate(R.id.action_splashFragment_to_homeActivity)
                     }
                 } else {

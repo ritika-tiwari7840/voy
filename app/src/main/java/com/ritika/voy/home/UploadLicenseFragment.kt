@@ -311,7 +311,6 @@ class UploadLicenseFragment : BaseFragment() {
                 withContext(Dispatchers.Main) {
                     if (response.success) {
                         showToast("License updated successfully")
-                        saveUserDataInDataStore(context, response)
                         Log.d(TAG, "Update response: $response \n file path is $filePath")
                     } else {
                         showToast("Error uploading License: ${response.message}")
@@ -385,31 +384,6 @@ class UploadLicenseFragment : BaseFragment() {
 
     private fun showToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-    }
-
-
-    private fun saveUserDataInDataStore(
-        context: Context,
-        response: UserResponseData,
-    ) {
-        lifecycleScope.launch {
-            DataStoreManager.SaveUserData(
-                context,
-                response.user.id.toString(),
-                response.user.email,
-                response.user.first_name.toString(),
-                response.user.last_name.toString(),
-                response.user.full_name.toString(),
-                response.user.created_at.toString(),
-                response.user.phone_number.toString(),
-                response.user.gender.toString(),
-                response.user.emergency_contact_phone,
-                filePath,
-                response.user.rating_as_driver.toString(),
-                response.user.rating_as_passenger.toString(),
-                response.user.is_driver_verified.toString()
-            )
-        }
     }
 
 

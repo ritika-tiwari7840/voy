@@ -12,42 +12,29 @@
         android:id="@+id/settings_heading_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="38.2dp"
         android:fontFamily="@font/semibold"
         android:gravity="center"
         android:text="History"
         android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="@id/heading_text_bottom_guide"
+        android:textSize="24sp"
         app:layout_constraintStart_toStartOf="@id/guide_left"
-        app:layout_constraintTop_toTopOf="@id/heading_text_top_guide" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewRideHistory"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="27dp"
         android:clipToPadding="false"
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/heading_text_bottom_guide" />
+        app:layout_constraintTop_toBottomOf="@id/settings_heading_text" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/heading_text_top_guide"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.010010" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/heading_text_bottom_guide"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.0881" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guide_left"

@@ -38,18 +38,6 @@ class DriverVerificationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         navController = findNavController()
-        lifecycleScope.launch {
-            DataStoreManager.getUserData(requireContext(), "isDriverVerified").first().let {
-                isDiverVerified = it.toBoolean()
-                if (isDiverVerified == true) {
-                    binding.uploadStatusButton.text = "uploaded"
-                    binding.uploadStatusButton.setBackground(resources.getDrawable(R.drawable.button_background))
-                } else {
-                    binding.uploadStatusButton.text = "Not uploaded"
-                    binding.uploadStatusButton.setBackground(resources.getDrawable(R.drawable.upload_button_status_background))
-                }
-            }
-        }
 
         binding.uploadStatusButton.setOnClickListener {
             navController.navigate(R.id.action_driverVerificationFragment_to_uploadLicenseFragment)

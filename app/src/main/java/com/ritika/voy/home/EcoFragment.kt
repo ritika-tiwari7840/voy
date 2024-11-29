@@ -38,11 +38,6 @@ class EcoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        lifecycleScope.launch {
-            DataStoreManager.getUserData(requireContext(), "fullName").first()!!.let {
-                val fullName = it.toString()
-                binding.userName.text = fullName
-            }
-        }
+
     }
 }

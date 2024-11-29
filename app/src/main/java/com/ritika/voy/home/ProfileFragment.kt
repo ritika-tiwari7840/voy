@@ -57,39 +57,6 @@ class ProfileFragment : Fragment() {
         binding.settings.setOnClickListener{
             navController.navigate(R.id.action_profile_to_settingsFragment)
         }
-
-        lifecycleScope.launch {
-            var totalRating: Double? = 0.0
-            DataStoreManager.getUserData(requireContext(), "fullName").first().let {
-                val fullName = it.toString()
-                if (fullName.isNotEmpty()) {
-                    binding.userName.text = "$fullName"
-                } else {
-                    binding.userName.text = "User Name"
-                }
-            }
-            DataStoreManager.getUserData(requireContext(), "ratingAsDriver").first().let {
-                val ratingAsDriver = it.toString()
-                if (ratingAsDriver.isNotEmpty()) {
-                    setSpannableText(binding.ratingAsHost, "$ratingAsDriver \nAs Host")
-                    totalRating = totalRating?.plus(ratingAsDriver.toDouble())
-                } else {
-                    setSpannableText(binding.ratingAsHost, "5.0 \nAs Host")
-                }
-            }
-            DataStoreManager.getUserData(requireContext(), "ratingAsPassenger").first().let {
-                val ratingAsPassenger = it.toString()
-                if (ratingAsPassenger.isNotEmpty()) {
-                    setSpannableText(binding.ratingAsGuest, "$ratingAsPassenger \nAs Host")
-                    totalRating = totalRating?.plus(ratingAsPassenger.toDouble())
-                } else {
-                    setSpannableText(binding.ratingAsGuest, "$5.0 \nAs Host")
-                }
-            }
-            setSpannableText(
-                binding.totalRatings, "${(totalRating ?: 0.0).div(2)} \nRatings"
-            )
-        }
     }
 
     private fun setSpannableText(textView: TextView, text: String) {

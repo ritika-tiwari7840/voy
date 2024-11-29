@@ -145,65 +145,65 @@ class EditInfo : Fragment() {
         binding: FragmentEditInfoBinding,
 
         ) {
-        lifecycleScope.launch {
-
-            DataStoreManager.getUserData(requireContext(), "email").first().let {
-                val email = it.toString()
-                binding.email.text = email
-            }
-            DataStoreManager.getUserData(requireContext(), "fullName").first().let {
-                val fullName = it.toString()
-                if (fullName.isNotEmpty()) {
-                    binding.name.text = fullName
-                    binding.firstName.setText(fullName.split(" ")[0])
-                    binding.lastName.setText(fullName.split(" ")[1])
-                } else {
-                    binding.name.text = "User Name"
-                    binding.firstName.setText("Update First Name")
-                    binding.lastName.setText("Update Last Name")
-                }
-            }
-            DataStoreManager.getUserData(requireContext(), "phoneNo").first().let {
-                val phoneNo = it.toString()
-                binding.phoneNumber.text = phoneNo
-                Log.d(TAG, "writeUserDataOnView: $phoneNo")
-            }
-            DataStoreManager.getUserData(requireContext(), "gender").first().let {
-                val gender = it.toString()
-                if (gender.isNotEmpty()) {
-                    binding.gender.text = gender
-                    selectedGender = gender
-                    if (selectedGender != null) {
-                        if (selectedGender == "FEMALE") {
-                            binding.female.isChecked = true
-                        } else if (selectedGender == "MALE") {
-                            binding.male.isChecked = true
-                        } else if (selectedGender == "OTHER") {
-                            binding.other.isChecked = true
-                        }
-                    }
-                } else {
-                    binding.gender.text = "Not Specified"
-                }
-            }
-
-            DataStoreManager.getUserData(requireContext(), "emergencyContact").first().let {
-                    val emergencyContactPhone = it.toString()
-                    if (emergencyContactPhone.isNotEmpty() && emergencyContactPhone != "null") {
-                        binding.emergencyContact.text = emergencyContactPhone
-                    } else {
-                        binding.emergencyContact.text = "Help is here"
-                    }
-                }
-            DataStoreManager.getUserData(requireContext(), "emergencyContact").first().let {
-                val emergencyContactPhone = it.toString()
-                if (emergencyContactPhone.isNotEmpty() && emergencyContactPhone != "null") {
-                    binding.emergencyContact.text = emergencyContactPhone
-                } else {
-                    binding.emergencyContact.text = "Help is here"
-                }
-            }
-        }
+//        lifecycleScope.launch {
+//
+//            DataStoreManager.getUserData(requireContext(), "email").first().let {
+//                val email = it.toString()
+//                binding.email.text = email
+//            }
+//            DataStoreManager.getUserData(requireContext(), "fullName").first().let {
+//                val fullName = it.toString()
+//                if (fullName.isNotEmpty()) {
+//                    binding.name.text = fullName
+//                    binding.firstName.setText(fullName.split(" ")[0])
+//                    binding.lastName.setText(fullName.split(" ")[1])
+//                } else {
+//                    binding.name.text = "User Name"
+//                    binding.firstName.setText("Update First Name")
+//                    binding.lastName.setText("Update Last Name")
+//                }
+//            }
+//            DataStoreManager.getUserData(requireContext(), "phoneNo").first().let {
+//                val phoneNo = it.toString()
+//                binding.phoneNumber.text = phoneNo
+//                Log.d(TAG, "writeUserDataOnView: $phoneNo")
+//            }
+//            DataStoreManager.getUserData(requireContext(), "gender").first().let {
+//                val gender = it.toString()
+//                if (gender.isNotEmpty()) {
+//                    binding.gender.text = gender
+//                    selectedGender = gender
+//                    if (selectedGender != null) {
+//                        if (selectedGender == "FEMALE") {
+//                            binding.female.isChecked = true
+//                        } else if (selectedGender == "MALE") {
+//                            binding.male.isChecked = true
+//                        } else if (selectedGender == "OTHER") {
+//                            binding.other.isChecked = true
+//                        }
+//                    }
+//                } else {
+//                    binding.gender.text = "Not Specified"
+//                }
+//            }
+//
+//            DataStoreManager.getUserData(requireContext(), "emergencyContact").first().let {
+//                    val emergencyContactPhone = it.toString()
+//                    if (emergencyContactPhone.isNotEmpty() && emergencyContactPhone != "null") {
+//                        binding.emergencyContact.text = emergencyContactPhone
+//                    } else {
+//                        binding.emergencyContact.text = "Help is here"
+//                    }
+//                }
+//            DataStoreManager.getUserData(requireContext(), "emergencyContact").first().let {
+//                val emergencyContactPhone = it.toString()
+//                if (emergencyContactPhone.isNotEmpty() && emergencyContactPhone != "null") {
+//                    binding.emergencyContact.text = emergencyContactPhone
+//                } else {
+//                    binding.emergencyContact.text = "Help is here"
+//                }
+//            }
+//        }
     }
 
 
@@ -371,10 +371,10 @@ class EditInfo : Fragment() {
         imageHeight: Int = 300,
     ) {
         Glide.with(context).load(java.io.File(filePath)).apply(
-                RequestOptions().override(imageWidth, imageHeight)
-                    .transform(RoundedCorners(cornerRadius)).transform(CircleCrop())
+            RequestOptions().override(imageWidth, imageHeight)
+                .transform(RoundedCorners(cornerRadius)).transform(CircleCrop())
 
-            ).into(imageView)
+        ).into(imageView)
         Log.d(TAG, "loadImageWithGlide: $filePath")
         imageView.setBackgroundColor(ContextCompat.getColor(context, backgroundColor))
     }
@@ -544,7 +544,6 @@ class EditInfo : Fragment() {
                 withContext(Dispatchers.Main) {
                     if (response.success) {
                         showToast("Profile updated successfully")
-                        saveUserDataInDataStore(context, response)
                         Log.d(TAG, "Update response: $response \n file path is $filePath")
                     } else {
                         showToast("Error updating profile: ${response.message}")
@@ -609,7 +608,6 @@ class EditInfo : Fragment() {
                     withContext(Dispatchers.Main) {
                         if (response.success) {
                             showToast("Gender updated successfully")
-                            saveUserDataInDataStore(context, response)
                             Log.d(TAG, "Update response: $response")
                         } else {
                             Log.e(TAG, "Error updating gender: ${response.message} ")
@@ -641,7 +639,6 @@ class EditInfo : Fragment() {
                     withContext(Dispatchers.Main) {
                         if (response.success) {
                             showToast("UserName updated successfully")
-                            saveUserDataInDataStore(context, response)
                             Log.d(TAG, "Update response: $response")
                         } else {
                             Log.e(TAG, "Error updating gender: ${response.message} ")
@@ -673,7 +670,6 @@ class EditInfo : Fragment() {
                     withContext(Dispatchers.Main) {
                         if (response.success) {
                             showToast("Emergency Contact updated successfully")
-                            saveUserDataInDataStore(context, response)
                             Log.d(TAG, "Update response: $response, $emergencyContactNo")
                         } else {
                             Log.e(TAG, "Error Adding Emergency Contact: ${response.message} ")
@@ -714,33 +710,6 @@ class EditInfo : Fragment() {
     private fun showToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
-
-
-    private fun saveUserDataInDataStore(
-        context: Context,
-        response: UserResponseData,
-    ) {
-        lifecycleScope.launch {
-            DataStoreManager.SaveUserData(
-                context,
-                response.user.id.toString(),
-                response.user.email,
-                response.user.first_name.toString(),
-                response.user.last_name.toString(),
-                response.user.full_name.toString(),
-                response.user.created_at.toString(),
-                response.user.phone_number.toString(),
-                response.user.gender.toString(),
-                response.user.emergency_contact_phone,
-                filePath,
-                response.user.rating_as_driver.toString(),
-                response.user.rating_as_passenger.toString(),
-                response.user.is_driver_verified.toString()
-            )
-            writeUserDataOnView(binding)
-        }
-    }
-
 
     override fun onResume() {
         super.onResume()

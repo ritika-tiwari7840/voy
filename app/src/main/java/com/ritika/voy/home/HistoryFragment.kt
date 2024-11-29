@@ -42,13 +42,12 @@ class HistoryFragment : Fragment() {
     private fun fetchRideHistory() {
         lifecycleScope.launch {
             val token = DataStoreManager.getToken(requireContext(), "access")?.first()
-            Toast.makeText(requireContext(), "$token", Toast.LENGTH_SHORT).show()
             try {
                 val response = RetrofitInstance.api.getRideHistory("Bearer $token")
                 if (response.success) {
                     val rideHistory = response.data.as_passenger
                     setupRecyclerView(rideHistory)
-                    Log.d("history", "fetchRideHistory: $rideHistory")
+                    Log.d("history", "fetchRideHistory: $rideHistory $token")
                 } else {
                     Toast.makeText(requireContext(), "Failed to fetch data", Toast.LENGTH_SHORT)
                         .show()

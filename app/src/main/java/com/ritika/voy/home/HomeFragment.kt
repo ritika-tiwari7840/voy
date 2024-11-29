@@ -19,6 +19,8 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.ritika.voy.R
 import com.ritika.voy.api.DataStoreManager
+import com.ritika.voy.api.RetrofitInstance
+import com.ritika.voy.api.dataclasses.GetUserResponse
 import com.ritika.voy.databinding.FragmentHomeBinding
 import com.ritika.voy.databinding.FragmentLoginBinding
 import kotlinx.coroutines.flow.first
@@ -48,26 +50,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         navController = Navigation.findNavController(view)
         role = "passenger"
-
-        lifecycleScope.launch {
-            DataStoreManager.getUserData(requireContext(), "fullName").first().let {
-                val fullName = it.toString()
-                if (fullName.isNotEmpty() && fullName != null) {
-                    binding.homeGreetingText.text = "hello, $fullName"
-                } else {
-                    binding.homeGreetingText.text = "hello, User"
-                }
-            }
-            DataStoreManager.getUserData(requireContext(), "isDriverVerified").first().let {
-                isDiverVerified = it.toBoolean()
-                Toast.makeText(requireContext(), "$isDiverVerified", Toast.LENGTH_SHORT).show()
-            }
-            DataStoreManager.getUserData(requireContext(), "firstName").first().let {
-                firstName = it.toString()
-            }
-
-        }
-
         binding.findPool.setOnClickListener {
             binding.findPool.backgroundTintList =
                 ContextCompat.getColorStateList(requireContext(), R.color.theme_color)
@@ -124,5 +106,10 @@ class HomeFragment : Fragment() {
             Toast.makeText(requireContext(), "You are $role", Toast.LENGTH_SHORT).show()
             navController.navigate(R.id.action_home_to_chooseSpotFragment, bundle)
         }
+    }
+
+
+    private suspend fun getUserData(accessToken: String): GetUserResponse {
+        return RetrofitInstance.api.getUserData("Bearer $accessToken")
     }
 }

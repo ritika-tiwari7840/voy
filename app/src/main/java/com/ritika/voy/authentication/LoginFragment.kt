@@ -171,10 +171,7 @@ class LoginFragment : BaseFragment() {
                 passwordEditText.hint = getString(R.string.enter_your_password)
             }
         }
-
-
     }
-
     private fun clearFields() {
         binding.etEmail.text?.clear()
         binding.etPassword.text?.clear()
@@ -194,26 +191,9 @@ class LoginFragment : BaseFragment() {
                     response.tokens?.let {
                         DataStoreManager.saveTokens(requireContext(), it.access!!, it.refresh!!)
                     }
-                    response.user?.let {
-                        DataStoreManager.SaveUserData(
-                            requireContext(),
-                            it.id!!.toString(),
-                            it.email!!,
-                            it.first_name!!,
-                            it.last_name!!,
-                            it.full_name!!,
-                            it.created_at!!,
-                            it.phone_number!!,
-                            it.gender!!.toString(),
-                            it.emergency_contact_phone!!.toString(),
-                            it.profile_photo!!.toString(),
-                            it.rating_as_driver!!.toString(),
-                            it.rating_as_passenger!!.toString(),
-                            it.is_driver_verified!!.toString()
-                        )
-                    }
 
-                    Toast.makeText(requireContext(), "${response.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "${response.message}", Toast.LENGTH_SHORT)
+                        .show()
                     navController.navigate(R.id.action_loginFragment_to_homeActivity)
                 } else {
                     Log.e("LoginFragment", "Error: ${response.message}")

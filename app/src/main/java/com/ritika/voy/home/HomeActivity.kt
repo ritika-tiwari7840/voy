@@ -26,15 +26,6 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //      enableEdgeToEdge()
-        lifecycleScope.launch {
-            DataStoreManager.getUserData(this@HomeActivity, "firstName").first().let {
-                firstName = it.toString()
-                if (firstName.isEmpty()) {
-                    firstName = "User"
-                }
-            }
-        }
-
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

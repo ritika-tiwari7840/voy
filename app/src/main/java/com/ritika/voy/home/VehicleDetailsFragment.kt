@@ -176,7 +176,6 @@ class VehicleDetailsFragment : Fragment() {
                     withContext(Dispatchers.Main) {
                         if (response.success) {
                             showToast("Vehicle Details updated successfully")
-                            saveUserDataInDataStore(context, response)
                             Log.d("VehicleUpdate", "Update response: $response, ")
                         } else {
                             Log.e(
@@ -199,31 +198,6 @@ class VehicleDetailsFragment : Fragment() {
             }
         }
 
-
-    private fun saveUserDataInDataStore(
-        context: Context,
-        response: UserResponseData,
-    ) {
-        lifecycleScope.launch {
-            DataStoreManager.SaveUserData(
-                context,
-                response.user.id.toString(),
-                response.user.email,
-                response.user.first_name,
-                response.user.last_name,
-                response.user.full_name,
-                response.user.created_at,
-                response.user.phone_number,
-                response.user.gender,
-                response.user.emergency_contact_phone,
-                filePath,
-                response.user.rating_as_driver.toString(),
-                response.user.rating_as_passenger.toString(),
-                response.user.is_driver_verified.toString()
-            )
-        }
-    }
-
     private fun showToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
@@ -232,6 +206,5 @@ class VehicleDetailsFragment : Fragment() {
         Log.e("VehicleUpdate", "Error in EditInfo", error)
         showToast("Error: ${error.message}")
     }
-
 
 }
