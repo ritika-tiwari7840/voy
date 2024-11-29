@@ -1,60 +1,66 @@
 package com.ritika.voy.home
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.ritika.voy.R
+import com.ritika.voy.adapter.RideHistoryAdapter
+import com.ritika.voy.api.DataStoreManager
+import com.ritika.voy.api.RetrofitInstance
+import com.ritika.voy.api.dataclasses.RideDetails
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [HistoryFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class HistoryFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: RideHistoryAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_history, container, false)
+        val view = inflater.inflate(R.layout.fragment_history, container, false)
+
+        // Initialize RecyclerView
+        recyclerView = view.findViewById(R.id.recyclerViewRideHistory)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // Fetch data and set to RecyclerView
+        fetchRideHistory()
+
+        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment HistoryFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            HistoryFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    private fun fetchRideHistory() {
+        lifecycleScope.launch {
+            val token = DataStoreManager.getToken(requireContext(), "access")?.first()
+            Toast.makeText(requireContext(), "$token", Toast.LENGTH_SHORT).show()
+            try {
+                val response = RetrofitInstance.api.getRideHistory("Bearer $token")
+                if (response.success) {
+                    val rideHistory = response.data.as_passenger
+                    setupRecyclerView(rideHistory)
+                    Log.d("history", "fetchRideHistory: $rideHistory")
+                } else {
+                    Toast.makeText(requireContext(), "Failed to fetch data", Toast.LENGTH_SHORT)
+                        .show()
                 }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
+        }
+    }
+
+    private fun setupRecyclerView(rideHistory: List<RideDetails>) {
+        adapter = RideHistoryAdapter(rideHistory)
+        recyclerView.adapter = adapter
     }
 }

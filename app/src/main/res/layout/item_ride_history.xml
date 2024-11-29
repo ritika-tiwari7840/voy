@@ -1,0 +1,102 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/ride_history_item_background"
+    android:orientation="vertical"
+    android:padding="22dp">
+
+    <ImageView
+        android:id="@+id/car_image"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="26dp"
+        android:src="@drawable/history_car"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/profile_photo"
+        android:layout_width="51dp"
+        android:layout_height="51dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/profile_image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/car_image" />
+
+    <TextView
+        android:id="@+id/start_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="70.63dp"
+        android:paddingBottom="10dp"
+        android:text="Start Location"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@id/profile_photo"
+        app:layout_constraintTop_toTopOf="@id/profile_photo" />
+
+    <ImageView
+        android:id="@+id/arrow"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:src="@drawable/arrow"
+        app:layout_constraintStart_toEndOf="@id/start_location"
+        app:layout_constraintTop_toTopOf="@id/start_location"
+        app:tint="@color/white" />
+
+    <TextView
+        android:id="@+id/end_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
+        android:text="End Location"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@id/arrow"
+        app:layout_constraintTop_toTopOf="@id/arrow" />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Status"
+        android:textColor="#B0B0B0"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@id/car_image"
+        app:layout_constraintTop_toBottomOf="@id/end_location" />
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Day,Month,Date"
+        android:textColor="#B0B0B0"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@id/car_image"
+        app:layout_constraintTop_toBottomOf="@id/status" />
+
+    <ImageView
+        android:id="@+id/clock"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_marginLeft="8dp"
+        android:src="@drawable/clock"
+        app:layout_constraintBottom_toBottomOf="@id/date"
+        app:layout_constraintStart_toEndOf="@id/date"
+        app:layout_constraintTop_toTopOf="@id/date"
+        app:tint="@color/white" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:text="time"
+        android:textColor="#B0B0B0"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/clock"
+        app:layout_constraintStart_toEndOf="@id/clock"
+        app:layout_constraintTop_toTopOf="@id/clock" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

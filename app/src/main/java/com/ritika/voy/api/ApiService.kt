@@ -15,6 +15,7 @@ import com.ritika.voy.api.dataclasses.GetUserResponse
 import com.ritika.voy.api.dataclasses.mapsDataClasses.RoutesRequest
 import com.ritika.voy.api.dataclasses.mapsDataClasses.RoutesResponse
 import com.ritika.voy.api.dataclasses.PhoneVerifyRequest
+import com.ritika.voy.api.dataclasses.RideHistoryResponse
 import com.ritika.voy.api.dataclasses.UserResponseData
 import com.ritika.voy.api.dataclasses.VerifyRequest
 import com.ritika.voy.api.dataclasses.VerifyResponse
@@ -128,5 +129,9 @@ interface ApiService {
         @Body requestBody: AvailableRidesSearchRequest,
     ): AvailableRides
 
+    @GET("rides/ride-history/")
+    suspend fun getRideHistory(
+        @Header("Authorization") authHeader: String,
+    ): RideHistoryResponse
 
 }
