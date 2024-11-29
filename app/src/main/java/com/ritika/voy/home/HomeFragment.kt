@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -37,7 +38,7 @@ class HomeFragment : Fragment() {
     ): View? {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        var sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+        val sharedViewModel: SharedViewModel by activityViewModels()
 
         val user = sharedViewModel.user
         if (user != null) {
@@ -118,8 +119,4 @@ class HomeFragment : Fragment() {
         }
     }
 
-
-    private suspend fun getUserData(accessToken: String): GetUserResponse {
-        return RetrofitInstance.api.getUserData("Bearer $accessToken")
-    }
 }

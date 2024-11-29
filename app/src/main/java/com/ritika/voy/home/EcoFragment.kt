@@ -7,9 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.ritika.voy.R
 import com.ritika.voy.api.DataStoreManager
+import com.ritika.voy.api.datamodels.SharedViewModel
 import com.ritika.voy.databinding.FragmentChooseSpotBinding
 import com.ritika.voy.databinding.FragmentEcoBinding
 import com.ritika.voy.databinding.FragmentHomeBinding
@@ -33,11 +36,18 @@ class EcoFragment : Fragment() {
 
         // Inflate the layout for this fragment
         _binding = FragmentEcoBinding.inflate(inflater, container, false)
+
+        val sharedViewModel: SharedViewModel by activityViewModels()
+
+        val user = sharedViewModel.user
+        if (user != null) {
+            binding.userName.text = user.first_name
+        }
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
     }
 }
