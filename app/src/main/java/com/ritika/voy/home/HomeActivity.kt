@@ -1,24 +1,15 @@
 package com.ritika.voy.home
 
-import SharedViewModel
-import android.app.Dialog
+import com.ritika.voy.api.datamodels.SharedViewModel
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.ritika.voy.R
-import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.dataclasses.UserXX
 import com.ritika.voy.databinding.ActivityHomeBinding
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
 

@@ -1,5 +1,6 @@
 package com.ritika.voy.home
 
+import com.ritika.voy.api.datamodels.SharedViewModel
 import android.Manifest
 import android.animation.Animator
 import android.animation.ObjectAnimator
@@ -12,7 +13,6 @@ import android.graphics.Bitmap
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
-import android.provider.ContactsContract.Data
 import android.provider.MediaStore
 import android.text.Editable
 import android.util.Log
@@ -21,12 +21,14 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -37,14 +39,11 @@ import com.bumptech.glide.request.RequestOptions
 import com.ritika.voy.R
 import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.RetrofitInstance
-import com.ritika.voy.api.dataclasses.GetUserResponse
-import com.ritika.voy.api.dataclasses.UserResponseData
 import com.ritika.voy.databinding.FragmentEditInfoBinding
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
@@ -52,7 +51,6 @@ import java.io.*
 import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeoutException
-import kotlin.math.log
 
 @Suppress("UNUSED_EXPRESSION")
 class EditInfo : Fragment() {
@@ -62,10 +60,10 @@ class EditInfo : Fragment() {
     private var selectedGender: String? = null
     private var imageUri: Uri? = null
     private var uploadJob: Job? = null
-    private val firstName: String = ""
-    private val lastName: String = ""
-    private val emergencyContactNo: String = ""
-    private val filePath: String = ""
+    private var updatedImage = ""
+    private var updatedName = ""
+    private lateinit var sharedViewModel: SharedViewModel
+
 
     companion object {
         const val PICK_IMAGE_REQUEST = 1
@@ -82,27 +80,86 @@ class EditInfo : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentEditInfoBinding.inflate(inflater, container, false)
+        sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+        val user = sharedViewModel.user
+        if (user != null) {
+            binding.name.text = user.full_name
+            binding.phoneNumber.text = user.phone_number
+            binding.gender.text = user.gender
+            binding.emergencyContact.text = user.emergency_contact_phone
+            binding.email.text = user.email
+            binding.firstName.setText(user.first_name)
+            binding.lastName.setText(user.last_name)
+            selectedGender = user.gender
+            if (selectedGender != null) {
+                if (selectedGender == "FEMALE") {
+                    binding.female.isChecked = true
+                } else if (selectedGender == "MALE") {
+                    binding.male.isChecked = true
+                } else if (selectedGender == "OTHER") {
+                    binding.other.isChecked = true
+                }
+            }
+
+            val imageUrl = user.profile_photo.toString()
+
+            val textView = binding.setProfile
+            Log.d("Image", "onLoadCleared:  $imageUrl")
+
+            Glide.with(requireContext())
+                .load(imageUrl)
+                .placeholder(R.drawable.profile_image)
+                .error(R.drawable.profile_image)
+                .transform(CircleCrop())
+                .into(binding.setProfile)
+
+        }
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         navController = findNavController()
-        writeUserDataOnView(binding)
         checkAndRequestPermissions()
         setupClickListeners()
+        setDrawableClickListener(binding.firstName)
+        setDrawableClickListener(binding.lastName)
+        setDrawableClickListener(binding.emergency)
     }
+
+    fun setDrawableClickListener(editText: EditText) {
+        editText.setOnTouchListener { v, event ->
+            val drawableEnd = editText.compoundDrawables[2]
+            if (drawableEnd != null && event.x >= editText.width - editText.paddingRight - drawableEnd.intrinsicWidth) {
+                editText.text.clear()
+                return@setOnTouchListener true
+            }
+            return@setOnTouchListener false
+        }
+    }
+
 
     private fun setupClickListeners() {
         with(binding) {
             btnBack.setOnClickListener {
+                if (updatedName.isNotEmpty()) {
+                    val updatedUser = sharedViewModel.user?.copy(
+                        full_name = updatedName,
+                    )
+                    sharedViewModel.user = updatedUser
+                }
+                if (updatedImage.isNotEmpty()) {
+                    val updatedUser = sharedViewModel.user?.copy(
+                        profile_photo = updatedImage,
+                    )
+                    sharedViewModel.user = updatedUser
+                }
                 navController.navigate(R.id.action_editInfo_to_profile)
             }
-
             setProfile.setOnClickListener {
                 pickImageFromGallery()
             }
-
             takeImageUsingCamera.setOnClickListener {
                 captureImageWithCamera()
             }
@@ -140,13 +197,6 @@ class EditInfo : Fragment() {
         }
         setupGenderSelection()
     }
-
-    private fun writeUserDataOnView(
-        binding: FragmentEditInfoBinding,
-
-        ) {
-    }
-
 
     private fun checkAndRequestPermissions() {
         val permissions = arrayOf(
@@ -281,10 +331,6 @@ class EditInfo : Fragment() {
 
 
     private fun updateImageAndUpload(uri: Uri, filePath: String) {
-//        val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
-//        val resizedBitmap = resizeBitmap(bitmap, 200, 200)
-//        binding.setProfile.setImageBitmap(resizedBitmap)
-
         loadImageWithGlide(requireContext(), binding.setProfile, filePath)
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("Loading...")
@@ -397,7 +443,7 @@ class EditInfo : Fragment() {
                     progressDialog.setMessage("Loading...")
                     progressDialog.setCancelable(false)
                     progressDialog.show()
-//                    uploadJob?.cancel() // Cancel any existing upload
+                    uploadJob?.cancel() // Cancel any existing upload
                     uploadJob = lifecycleScope.launch {
                         try {
                             updateGender(
@@ -485,6 +531,7 @@ class EditInfo : Fragment() {
                 withContext(Dispatchers.Main) {
                     if (response.success) {
                         showToast("Profile updated successfully")
+                        updatedImage = response.user.profile_photo.toString()
                         Log.d(TAG, "Update response: $response \n file path is $filePath")
                     } else {
                         showToast("Error updating profile: ${response.message}")
@@ -550,6 +597,22 @@ class EditInfo : Fragment() {
                         if (response.success) {
                             showToast("Gender updated successfully")
                             Log.d(TAG, "Update response: $response")
+                            val gender = response.user.gender
+                            if (gender.isNotEmpty()) {
+                                binding.gender.text = gender
+                                selectedGender = gender
+                                if (selectedGender != null) {
+                                    if (selectedGender == "FEMALE") {
+                                        binding.female.isChecked = true
+                                    } else if (selectedGender == "MALE") {
+                                        binding.male.isChecked = true
+                                    } else if (selectedGender == "OTHER") {
+                                        binding.other.isChecked = true
+                                    }
+                                }
+                            } else {
+                                binding.gender.text = "Not Specified"
+                            }
                         } else {
                             Log.e(TAG, "Error updating gender: ${response.message} ")
                             showToast("Error updating gender: ${response.message}")
@@ -581,6 +644,9 @@ class EditInfo : Fragment() {
                         if (response.success) {
                             showToast("UserName updated successfully")
                             Log.d(TAG, "Update response: $response")
+                            updatedName = response.user.full_name
+                            binding.firstName.setText(response.user.first_name)
+                            binding.lastName.setText(response.user.last_name)
                         } else {
                             Log.e(TAG, "Error updating gender: ${response.message} ")
                             showToast("Error updating gender: ${response.message}")
@@ -654,7 +720,6 @@ class EditInfo : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        writeUserDataOnView(binding)
     }
 
     override fun onDestroyView() {

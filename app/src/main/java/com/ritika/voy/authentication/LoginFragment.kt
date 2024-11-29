@@ -48,6 +48,7 @@ class LoginFragment : BaseFragment() {
     private lateinit var navController: NavController
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
+    private var bundle = Bundle()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -196,11 +197,18 @@ class LoginFragment : BaseFragment() {
                 if (response.success) {
                     response.tokens?.let {
                         DataStoreManager.saveTokens(requireContext(), it.access!!, it.refresh!!)
+                        val userResponse = getUserData(it.access)
+                        if (userResponse.success) {
+                            Log.d("User Details", "User Details: ${userResponse.user}")
+                            bundle = Bundle().apply {
+                                putParcelable("user_details", userResponse.user)
+                            }
+                        }
                     }
 
                     Toast.makeText(requireContext(), "${response.message}", Toast.LENGTH_SHORT)
                         .show()
-                    navController.navigate(R.id.action_loginFragment_to_homeActivity)
+                    navController.navigate(R.id.action_loginFragment_to_homeActivity,bundle)
                 } else {
                     Log.e("LoginFragment", "Error: ${response.message}")
                     Toast.makeText(
@@ -231,8 +239,12 @@ class LoginFragment : BaseFragment() {
         navController.navigate(R.id.action_loginFragment_to_continueWithEmail)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     private suspend fun getUserData(accessToken: String): GetUserResponse {
         return RetrofitInstance.api.getUserData("Bearer $accessToken")
     }
-
 }

@@ -1,10 +1,8 @@
 package com.ritika.voy.home
 
-import SharedViewModel
+import com.ritika.voy.api.datamodels.SharedViewModel
 import android.app.Dialog
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,22 +10,14 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import androidx.compose.ui.semantics.Role
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.ritika.voy.R
-import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.GetUserResponse
-import com.ritika.voy.api.dataclasses.UserXX
 import com.ritika.voy.databinding.FragmentHomeBinding
-import com.ritika.voy.databinding.FragmentLoginBinding
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 
 class HomeFragment : Fragment() {
