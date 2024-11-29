@@ -186,7 +186,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:fontFamily="@font/light"
-                android:text="+91 1234567890"
+                android:text="+91 "
                 android:textColor="@color/white"
                 android:textSize="14sp" />
         </LinearLayout>

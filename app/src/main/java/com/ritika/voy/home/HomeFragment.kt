@@ -1,5 +1,6 @@
 package com.ritika.voy.home
 
+import SharedViewModel
 import android.app.Dialog
 import android.os.Bundle
 import android.os.Handler
@@ -14,6 +15,7 @@ import android.widget.Toast
 import androidx.compose.ui.semantics.Role
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -21,6 +23,7 @@ import com.ritika.voy.R
 import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.GetUserResponse
+import com.ritika.voy.api.dataclasses.UserXX
 import com.ritika.voy.databinding.FragmentHomeBinding
 import com.ritika.voy.databinding.FragmentLoginBinding
 import kotlinx.coroutines.flow.first
@@ -44,6 +47,25 @@ class HomeFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+
+        var sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+        // Access the user object
+        val user = sharedViewModel.user
+        if (user != null) {
+            if (user.first_name != null) {
+                firstName = user.first_name
+            } else {
+                firstName = "hello User"
+            }
+            if (user.is_driver_verified != null) {
+                isDiverVerified = user.is_driver_verified
+            } else {
+                isDiverVerified = false
+            }
+            binding.homeGreetingText.text = "hello, ${user.first_name}"
+        }
+
+
         return binding.root
     }
 
@@ -62,6 +84,7 @@ class HomeFragment : Fragment() {
         }
         binding.offerPool.setOnClickListener {
             if (isDiverVerified == true) {
+                isDiverVerified = false
                 role = "driver"
                 Toast.makeText(requireContext(), "You are Driver now", Toast.LENGTH_SHORT).show()
                 binding.offerPool.backgroundTintList =

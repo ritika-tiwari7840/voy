@@ -1,6 +1,6 @@
 package com.ritika.voy.api
 
-import com.google.android.gms.common.api.Response
+import com.google.gson.JsonObject
 import com.ritika.voy.api.dataclasses.AvailableRides
 import com.ritika.voy.api.dataclasses.AvailableRidesSearchRequest
 import com.ritika.voy.api.dataclasses.ForgotRequest
@@ -16,6 +16,7 @@ import com.ritika.voy.api.dataclasses.mapsDataClasses.RoutesRequest
 import com.ritika.voy.api.dataclasses.mapsDataClasses.RoutesResponse
 import com.ritika.voy.api.dataclasses.PhoneVerifyRequest
 import com.ritika.voy.api.dataclasses.RideHistoryResponse
+import com.ritika.voy.api.dataclasses.RideRequestResponse
 import com.ritika.voy.api.dataclasses.UserResponseData
 import com.ritika.voy.api.dataclasses.VerifyRequest
 import com.ritika.voy.api.dataclasses.VerifyResponse
@@ -27,7 +28,6 @@ import com.ritika.voy.api.dataclasses.resendOTPRequest
 import com.ritika.voy.api.dataclasses.resendPhoneOTP
 import com.ritika.voy.api.dataclasses.resendPhoneRequest
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -37,6 +37,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -128,6 +129,13 @@ interface ApiService {
         @Header("Authorization") authHeader: String,
         @Body requestBody: AvailableRidesSearchRequest,
     ): AvailableRides
+
+    @POST("rides/passenger/{passengerId}/request/")
+    suspend fun requestRide(
+        @Header("Authorization") authHeader: String,
+        @Path("passengerId") passengerId: Int,
+        @Body rideRequest: JsonObject
+    ): RideRequestResponse
 
     @GET("rides/ride-history/")
     suspend fun getRideHistory(

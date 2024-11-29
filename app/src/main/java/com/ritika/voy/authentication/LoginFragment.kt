@@ -3,6 +3,8 @@ package com.ritika.voy.authentication
 import android.app.ProgressDialog
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.InputType
 import android.text.Spannable
@@ -38,6 +40,8 @@ import retrofit2.HttpException
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.ritika.voy.api.DataStoreManager
+import com.ritika.voy.api.dataclasses.GetUserResponse
+import kotlinx.coroutines.flow.first
 
 class LoginFragment : BaseFragment() {
 
@@ -172,6 +176,7 @@ class LoginFragment : BaseFragment() {
             }
         }
     }
+
     private fun clearFields() {
         binding.etEmail.text?.clear()
         binding.etPassword.text?.clear()
@@ -186,6 +191,7 @@ class LoginFragment : BaseFragment() {
 
         lifecycleScope.launch {
             try {
+
                 val response = RetrofitInstance.api.login(LoginRequest(email, password))
                 if (response.success) {
                     response.tokens?.let {
@@ -224,4 +230,9 @@ class LoginFragment : BaseFragment() {
     override fun onBackPressed() {
         navController.navigate(R.id.action_loginFragment_to_continueWithEmail)
     }
+
+    private suspend fun getUserData(accessToken: String): GetUserResponse {
+        return RetrofitInstance.api.getUserData("Bearer $accessToken")
+    }
+
 }

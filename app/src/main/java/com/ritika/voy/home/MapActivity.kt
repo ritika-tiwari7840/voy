@@ -1,6 +1,6 @@
 package com.ritika.voy.home
 
-import RideAdapter
+import com.ritika.voy.adapter.RideAdapter
 import android.Manifest
 import android.animation.ObjectAnimator
 import android.app.Activity
@@ -36,11 +36,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.BuildConfig
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.ritika.voy.R.id.map_fragment
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -54,8 +54,6 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
-import com.ritika.voy.BuildConfig
-import com.ritika.voy.MainActivity
 import com.ritika.voy.R
 import com.ritika.voy.api.ApiService
 import com.ritika.voy.api.DataStoreManager
@@ -79,7 +77,6 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-import kotlin.math.log
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -269,7 +266,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.proceedButton.setOnClickListener {
 
             if (selectedButtonValue != null) {
-                Toast.makeText(this, "$selectedButtonValue", Toast.LENGTH_SHORT).show()
                 lifecycleScope.launch {
                     DataStoreManager.getToken(this@MapActivity, "access").first()!!.let {
                         authToken = it
@@ -321,10 +317,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         constraintSet.clone(binding.root)
 
         constraintSet.connect(
-            binding.bottomWidget.id,
-            ConstraintSet.TOP,
-            binding.guideline8.id,
-            ConstraintSet.BOTTOM
+            binding.bottomWidget.id, ConstraintSet.TOP, binding.guideline8.id, ConstraintSet.BOTTOM
         )
 
         TransitionManager.beginDelayedTransition(binding.root)
@@ -418,14 +411,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // Fetch API
         lifecycleScope.launch {
             startLoaderAnimation() // Start loader animation
-            val response = fetchApiResponse(authToken) // Pass the auth token
+            val response = fetchAvailableRideApiResponse(authToken) // Pass the auth token
             if (response != null) {
-                onApiSuccess(response)
-                Toast.makeText(
-                    this@MapActivity,
-                    " response null $response.data",
-                    Toast.LENGTH_SHORT
-                ).show()
+                onApiSuccess(response, authToken)
                 Log.d("API", "proceedButtonClicked: ${response.data} ")
             } else {
                 onApiFailure()
@@ -433,20 +421,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private suspend fun fetchApiResponse(authToken: String): AvailableRides? {
+    private suspend fun fetchAvailableRideApiResponse(authToken: String): AvailableRides? {
         val requestBody = AvailableRidesSearchRequest(
             pickup_point = LocationPoint(
                 type = "Point",
-                coordinates = listOf(-122.084, 37.422)
-            ),
-            destination_point = LocationPoint(
+                coordinates = listOf(firstMarkerLatLng!!.latitude, firstMarkerLatLng!!.longitude)
+            ), destination_point = LocationPoint(
                 type = "Point",
-                coordinates = listOf(-122.032, 37.387)
-            ),
-            seats_needed = selectedButtonValue!!.toInt(),
-            radius = 5000.0
+                coordinates = listOf(secondMarkerLatLng!!.latitude, secondMarkerLatLng!!.longitude)
+            ), seats_needed = selectedButtonValue!!.toInt(), radius = 5000.0
         )
-
+        Log.d("MyLocation", "MyLocation: $firstMarkerLatLng $secondMarkerLatLng ")
         return withContext(Dispatchers.IO) {
             try {
                 val response =
@@ -464,28 +449,38 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
-    private fun onApiSuccess(availableRides: AvailableRides) {
-        // Handle the successful API response
+    private fun onApiSuccess(availableRides: AvailableRides, authToken: String) {
         availableRides.data?.let { rides ->
             if (rides.isNotEmpty()) {
-                // Set up the adapter with the rides data
-                rideAdapter = RideAdapter(rides)
-                recyclerView.adapter = rideAdapter
-                recyclerView.visibility = View.VISIBLE // Show RecyclerView
+                if (recyclerView.adapter == null) {
+                    val rideAdapter = RideAdapter(rides, authToken) { rideRequestResponse ->
+                        rideRequestResponse?.let {
+                            Log.d("RideRequest", "Response: $it")
+                        } ?: run {
+                            Toast.makeText(this, "Failed to request ride", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    recyclerView.adapter = rideAdapter
+                } else {
+                    (recyclerView.adapter as RideAdapter).updateRides(rides)
+                }
+
+                recyclerView.visibility = View.VISIBLE
+
                 adjustConstraints()
                 toggleViewVisibility()
                 setRouteViewBackground()
                 adjustRouteViewMargins()
                 updateRouteViewTextColors()
+
                 binding.riderImage.visibility = View.INVISIBLE
             } else {
                 Toast.makeText(this, "No rides available", Toast.LENGTH_SHORT).show()
-                recyclerView.visibility = View.GONE // Hide RecyclerView
-
+                recyclerView.visibility = View.GONE
+                (recyclerView.adapter as? RideAdapter)?.clearRides()
             }
         }
-        // Update the loader to 100% completion
+
         val gradientDrawable = binding.loader.background as GradientDrawable
         gradientDrawable.colors = intArrayOf(
             ContextCompat.getColor(this, android.R.color.holo_green_light),

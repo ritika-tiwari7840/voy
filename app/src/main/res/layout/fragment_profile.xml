@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:drawableTop="@drawable/profile_image"
             android:fontFamily="@font/semibold"
-            android:text="Tripti Sharma"
+            android:text="User Name"
             android:textColor="@color/white"
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -1,5 +1,6 @@
 package com.ritika.voy.home
 
+import SharedViewModel
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.SpannableString
@@ -14,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -38,6 +40,19 @@ class ProfileFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
+
+        var sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+        // Access the user object
+        val user = sharedViewModel.user
+        if (user != null) {
+            binding.userName.text = user.full_name
+            setSpannableText(binding.ratingAsHost, "${user.rating_as_driver} \nAs Host")
+            setSpannableText(binding.ratingAsGuest, "${user.rating_as_passenger} \nAs Host")
+            setSpannableText(
+                binding.totalRatings,
+                "${(user.rating_as_driver + user.rating_as_passenger ?: 0.0).div(2)} \nRatings"
+            )
+        }
         return binding.root
     }
 
@@ -54,7 +69,7 @@ class ProfileFragment : Fragment() {
         binding.btnBack.setOnClickListener {
             navController.navigate(R.id.action_profile_to_home)
         }
-        binding.settings.setOnClickListener{
+        binding.settings.setOnClickListener {
             navController.navigate(R.id.action_profile_to_settingsFragment)
         }
     }
@@ -71,5 +86,4 @@ class ProfileFragment : Fragment() {
 
         textView.text = spannable
     }
-
 }

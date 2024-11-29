@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     kotlin("kapt")
+    id ("kotlin-parcelize")
 }
 
 val secretPropertiesFile = rootProject.file("secret.properties")

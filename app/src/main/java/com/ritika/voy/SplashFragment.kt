@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +22,7 @@ import com.ritika.voy.api.dataclasses.GetUserResponse
 import com.ritika.voy.authentication.CreateAccount
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlin.math.log
 
 class SplashFragment : Fragment() {
 
@@ -45,7 +47,11 @@ class SplashFragment : Fragment() {
                 if (accessToken != null) {
                     val userResponse = getUserData(accessToken)
                     if (userResponse.success) {
-                        navController.navigate(R.id.action_splashFragment_to_homeActivity)
+                        Log.d("User Details", "User Details: ${userResponse.user}")
+                        val bundle = Bundle().apply {
+                            putParcelable("user_details", userResponse.user)
+                        }
+                        navController.navigate(R.id.action_splashFragment_to_homeActivity, bundle)
                     }
                 } else {
                     navController.navigate(R.id.action_splashFragment_to_continueWithEmail)
