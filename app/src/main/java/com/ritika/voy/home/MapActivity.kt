@@ -1,6 +1,5 @@
 package com.ritika.voy.home
 
-import com.ritika.voy.adapter.RideAdapter
 import android.Manifest
 import android.animation.ObjectAnimator
 import android.app.Activity
@@ -36,11 +35,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.android.volley.BuildConfig
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.ritika.voy.R.id.map_fragment
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -54,7 +53,10 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
+import com.ritika.voy.BuildConfig
+import com.ritika.voy.MainActivity
 import com.ritika.voy.R
+import com.ritika.voy.adapter.RideAdapter
 import com.ritika.voy.api.ApiService
 import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.RetrofitInstance
@@ -77,6 +79,7 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import kotlin.math.log
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -146,7 +149,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         if (!Places.isInitialized()) {
-            Places.initialize(applicationContext, BuildConfig.MAP_API_KEY)
+            Places.initialize(
+                applicationContext, BuildConfig.MAP_API_KEY
+            )
         }
 
         setupSearchBox()
