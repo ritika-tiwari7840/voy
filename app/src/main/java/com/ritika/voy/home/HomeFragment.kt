@@ -35,11 +35,10 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        // Inflate the layout for this fragment
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
         var sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
-        // Access the user object
+
         val user = sharedViewModel.user
         if (user != null) {
             if (user.first_name != null) {
@@ -54,7 +53,6 @@ class HomeFragment : Fragment() {
             }
             binding.homeGreetingText.text = "hello, ${user.first_name}"
         }
-
 
         return binding.root
     }
@@ -74,7 +72,6 @@ class HomeFragment : Fragment() {
         }
         binding.offerPool.setOnClickListener {
             if (isDiverVerified == true) {
-                isDiverVerified = false
                 role = "driver"
                 Toast.makeText(requireContext(), "You are Driver now", Toast.LENGTH_SHORT).show()
                 binding.offerPool.backgroundTintList =

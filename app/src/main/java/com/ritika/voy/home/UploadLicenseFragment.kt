@@ -21,6 +21,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.marginTop
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -34,6 +35,7 @@ import com.ritika.voy.R.id.action_uploadLicenseFragment_to_driverVerificationFra
 import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.UserResponseData
+import com.ritika.voy.api.datamodels.SharedViewModel
 import com.ritika.voy.databinding.FragmentHomeBinding
 import com.ritika.voy.databinding.FragmentUploadLicenseBinding
 import kotlinx.coroutines.Dispatchers
@@ -61,8 +63,8 @@ class UploadLicenseFragment : BaseFragment() {
     private val binding get() = _binding!!
     lateinit var navController: NavController
     private var imageUri: Uri? = null
-    private val filePath: String = ""
     private var uploadJob: Job? = null
+    private lateinit var sharedViewModel: SharedViewModel
 
     companion object {
         const val PICK_IMAGE_REQUEST = 1
@@ -82,6 +84,7 @@ class UploadLicenseFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ): View? {
         _binding = FragmentUploadLicenseBinding.inflate(inflater, container, false)
+        sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
         return binding.root
     }
 
@@ -257,12 +260,7 @@ class UploadLicenseFragment : BaseFragment() {
         }
     }
 
-
     private fun updateImageAndUpload(uri: Uri, filePath: String) {
-//        val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
-//        val resizedBitmap = resizeBitmap(bitmap, 200, 200)
-//        binding.setProfile.setImageBitmap(resizedBitmap)
-
         loadImageWithGlide(requireContext(), binding.driverVerificationLayoutImage, filePath)
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("Loading...")
@@ -276,6 +274,7 @@ class UploadLicenseFragment : BaseFragment() {
                 handleError(e)
             } finally {
                 progressDialog.dismiss()
+                navController.navigate(action_uploadLicenseFragment_to_driverVerificationFragment)
             }
         }
     }
@@ -307,11 +306,14 @@ class UploadLicenseFragment : BaseFragment() {
                     token = "Bearer $token",
                     drivers_license_image = createMultipartBody(file, "drivers_license_image"),
                 )
-
                 withContext(Dispatchers.Main) {
                     if (response.success) {
                         showToast("License updated successfully")
                         Log.d(TAG, "Update response: $response \n file path is $filePath")
+                        val updatedVerification = sharedViewModel.user?.copy(
+                            is_driver_verified = response.user.is_driver_verified,
+                        )
+                        sharedViewModel.user = updatedVerification
                     } else {
                         showToast("Error uploading License: ${response.message}")
                     }
@@ -322,7 +324,6 @@ class UploadLicenseFragment : BaseFragment() {
             handleUploadError(e, context, filePath, retryCount)
         }
     }
-
 
     private suspend fun handleUploadError(
         error: Exception,
@@ -364,18 +365,10 @@ class UploadLicenseFragment : BaseFragment() {
         }
     }
 
-
     private fun createMultipartBody(file: File, key: String): MultipartBody.Part {
         val requestBody = file.asRequestBody("image/*".toMediaTypeOrNull())
         return MultipartBody.Part.createFormData(key, file.name, requestBody)
     }
-
-    private fun createRequestBody(value: String) =
-        value.toRequestBody("text/plain".toMediaTypeOrNull())
-
-    private fun resizeBitmap(bitmap: Bitmap, newWidth: Int, newHeight: Int): Bitmap =
-        Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
-
 
     private fun handleError(error: Exception) {
         Log.e(TAG, "Error in EditInfo", error)

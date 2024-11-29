@@ -724,7 +724,7 @@ class EditInfo : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        uploadJob?.cancel() // Cancel any ongoing upload when the view is destroyed
+        uploadJob?.cancel()
         _binding = null
     }
 }
