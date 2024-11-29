@@ -457,7 +457,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         rideRequestResponse?.let {
                             Log.d("RideRequest", "Response: $it")
                         } ?: run {
-                            Toast.makeText(this, "Failed to request ride", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "Failed to request ride", Toast.LENGTH_SHORT)
+                                .show()
                         }
                     }
                     recyclerView.adapter = rideAdapter
