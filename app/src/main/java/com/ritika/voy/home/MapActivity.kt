@@ -118,6 +118,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             insets
         }
 
+        // recycler view
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -189,21 +190,49 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 firstMarkerLatLng != null && secondMarkerLatLng != null -> {
                     isRouteAllowed = true
                     getOptimalRoute()
-
                     binding.confirmButton.visibility = View.GONE
                     binding.satellite.visibility = View.GONE
                     binding.descText.visibility = View.GONE
                     binding.backButton.visibility = View.VISIBLE
-                    binding.bottomWidget.visibility = View.VISIBLE
                     binding.whiteBar.visibility = View.VISIBLE
-                    binding.bottomWidgetText.visibility = View.VISIBLE
-                    binding.button1.visibility = View.VISIBLE
-                    binding.button2.visibility = View.VISIBLE
-                    binding.button3.visibility = View.VISIBLE
-                    binding.button4.visibility = View.VISIBLE
-                    binding.button5.visibility = View.VISIBLE
-                    binding.proceedButton.visibility = View.VISIBLE
                     binding.routeView.root.visibility = View.VISIBLE
+
+                    if (role == "passenger") {
+                        Toast.makeText(this@MapActivity, " hii $role", Toast.LENGTH_SHORT).show()
+                        binding.bottomWidgetText.visibility = View.VISIBLE
+                        binding.button1.visibility = View.VISIBLE
+                        binding.button2.visibility = View.VISIBLE
+                        binding.button3.visibility = View.VISIBLE
+                        binding.button4.visibility = View.VISIBLE
+                        binding.button5.visibility = View.VISIBLE
+                        binding.proceedButton.visibility = View.VISIBLE
+                    } else {
+                        binding.bottomWidget.visibility = View.GONE
+                        val modalBottomSheet = ModalBottomSheet()
+
+                        val bundle = Bundle()
+                        bundle.putString("startLocation", startLocation ?: "Unknown Start")
+                        bundle.putString(
+                            "destinationLocation",
+                            destinationLocation ?: "Unknown Destination"
+                        )
+                        bundle.putString(
+                            "firstMarkerLatLng",
+                            firstMarkerLatLng?.toString() ?: "No First Marker"
+                        )
+                        bundle.putString(
+                            "secondMarkerLatLng",
+                            secondMarkerLatLng?.toString() ?: "No Second Marker"
+                        )
+
+                        Log.d(
+                            "MainActivity",
+                            "Sending data: $startLocation, $destinationLocation, $firstMarkerLatLng, $secondMarkerLatLng"
+                        )
+
+                        modalBottomSheet.arguments = bundle
+                        modalBottomSheet.show(supportFragmentManager, "ModalBottomSheet")
+                    }
 
                     Log.d(
                         "reverseGeoCoding",
@@ -352,7 +381,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             binding.button5,
             binding.proceedButton
         ).forEach { it.visibility = View.GONE }
-
         binding.findingRidersText.visibility = View.VISIBLE
         binding.findingRidersDesc.visibility = View.VISIBLE
         binding.loader.visibility = View.VISIBLE
@@ -360,6 +388,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.cancelButton.visibility = View.VISIBLE
         binding.backButton.visibility = View.GONE
         binding.routeView.swapButton.visibility = View.GONE
+
     }
 
     private fun setRouteViewBackground() {
@@ -1022,20 +1051,24 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                         if (firstMarkerLatLng != null && secondMarkerLatLng != null) {
                                             isRouteAllowed = true
                                             getOptimalRoute()
+
                                             binding.confirmButton.visibility = View.GONE
                                             binding.satellite.visibility = View.GONE
                                             binding.descText.visibility = View.GONE
                                             binding.backButton.visibility = View.VISIBLE
-                                            binding.bottomWidget.visibility = View.VISIBLE
                                             binding.whiteBar.visibility = View.VISIBLE
-                                            binding.bottomWidgetText.visibility = View.VISIBLE
-                                            binding.button1.visibility = View.VISIBLE
-                                            binding.button2.visibility = View.VISIBLE
-                                            binding.button3.visibility = View.VISIBLE
-                                            binding.button4.visibility = View.VISIBLE
-                                            binding.button5.visibility = View.VISIBLE
-                                            binding.proceedButton.visibility = View.VISIBLE
                                             binding.routeView.root.visibility = View.VISIBLE
+
+                                            if (role == "passenger") {
+                                                binding.bottomWidget.visibility = View.VISIBLE
+                                                binding.bottomWidgetText.visibility = View.VISIBLE
+                                                binding.button1.visibility = View.VISIBLE
+                                                binding.button2.visibility = View.VISIBLE
+                                                binding.button3.visibility = View.VISIBLE
+                                                binding.button4.visibility = View.VISIBLE
+                                                binding.button5.visibility = View.VISIBLE
+                                                binding.proceedButton.visibility = View.VISIBLE
+                                            }
                                             Log.d(
                                                 "hii",
                                                 "onCreate: $firstMarkerLatLng $secondMarkerLatLng"
@@ -1062,6 +1095,40 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                                         binding.routeView.root.findViewById<TextView>(
                                                             R.id.drop_address
                                                         )?.text = destinationAddress
+                                                        binding.bottomWidget.visibility = View.GONE
+                                                        val modalBottomSheet = ModalBottomSheet()
+
+                                                        val bundle = Bundle()
+                                                        bundle.putString(
+                                                            "startLocation",
+                                                            startAddress ?: "Unknown Start"
+                                                        )
+                                                        bundle.putString(
+                                                            "destinationLocation",
+                                                            destinationAddress
+                                                                ?: "Unknown Destination"
+                                                        )
+                                                        bundle.putString(
+                                                            "firstMarkerLatLng",
+                                                            firstMarkerLatLng?.toString()
+                                                                ?: "No First Marker"
+                                                        )
+                                                        bundle.putString(
+                                                            "secondMarkerLatLng",
+                                                            secondMarkerLatLng?.toString()
+                                                                ?: "No Second Marker"
+                                                        )
+
+                                                        Log.d(
+                                                            "MainActivity",
+                                                            "Sending data: $startAddress, $destinationAddress, $firstMarkerLatLng, $secondMarkerLatLng"
+                                                        )
+
+                                                        modalBottomSheet.arguments = bundle
+                                                        modalBottomSheet.show(
+                                                            supportFragmentManager,
+                                                            "ModalBottomSheet"
+                                                        )
                                                     }
                                                 } catch (e: Exception) {
                                                     Log.e(

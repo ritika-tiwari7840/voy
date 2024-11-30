@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:backgroundTint="@color/background"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:paddingHorizontal="20dp">
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider"
+        android:layout_width="56dp"
+        android:layout_height="2dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="10dp"
+        app:dividerColor="@color/foreground_field"
+        app:dividerThickness="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    />
+
+    <TextView
+        android:id="@+id/date_time_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:drawableEnd="@drawable/calender"
+        android:background="@drawable/popup_edit_view_background"
+        android:padding="17dp"
+        android:text="Day,Mon,Date,Time"
+        android:textColor="@color/helper_text"
+        android:textSize="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider" />
+    <TextView
+        android:id="@+id/bottom_widget_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppinsmedium"
+        android:text="Select Number Of Seats"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/date_time_picker" />
+
+    <Button
+        android:id="@+id/button_1"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/seats_background"
+        android:text="1"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bottom_widget_text" />
+
+    <Button
+        android:id="@+id/button_2"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/seats_background"
+        android:text="2"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:visibility="visible"
+        app:layout_constraintStart_toEndOf="@+id/button_1"
+        app:layout_constraintTop_toBottomOf="@+id/bottom_widget_text" />
+
+    <Button
+        android:id="@+id/button_3"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/seats_background"
+        android:text="3"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:visibility="visible"
+        app:layout_constraintStart_toEndOf="@+id/button_2"
+        app:layout_constraintTop_toBottomOf="@+id/bottom_widget_text" />
+
+    <Button
+        android:id="@+id/button_4"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/seats_background"
+        android:text="4"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:visibility="visible"
+        app:layout_constraintStart_toEndOf="@+id/button_3"
+        app:layout_constraintTop_toBottomOf="@+id/bottom_widget_text" />
+
+    <Button
+        android:id="@+id/button_5"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/seats_background"
+        android:text="5"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:visibility="visible"
+        app:layout_constraintStart_toEndOf="@+id/button_4"
+        app:layout_constraintTop_toBottomOf="@+id/bottom_widget_text" />
+
+    <Button
+        android:id="@+id/proceed_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_background"
+        android:letterSpacing="0.07"
+      android:padding="10dp"
+        android:text="Offer Pool"
+        android:layout_marginTop="45dp"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@+id/button_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
