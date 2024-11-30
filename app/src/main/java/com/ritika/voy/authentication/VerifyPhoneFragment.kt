@@ -40,7 +40,7 @@ class VerifyPhoneFragment : BaseFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         _binding = FragmentVerifyPhoneBinding.inflate(inflater, container, false)
         return binding.root
@@ -140,7 +140,8 @@ class VerifyPhoneFragment : BaseFragment() {
             val phone = arguments?.getString("phone")
 
             if (phone_otp.length != 6) {
-                Toast.makeText(requireContext(), "Please enter a valid otp", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please enter a valid otp", Toast.LENGTH_SHORT)
+                    .show()
                 return@setOnClickListener
             } else {
                 phoneVerify(user_id ?: "", phone_otp)
@@ -163,7 +164,8 @@ class VerifyPhoneFragment : BaseFragment() {
         resendTimer = object : CountDownTimer(30000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsRemaining = millisUntilFinished / 1000
-                binding.resendTextView.text = "Didn’t receive any code? Resend Code ($secondsRemaining)"
+                binding.resendTextView.text =
+                    "Didn’t receive any code? Resend Code ($secondsRemaining)"
                 val resendText = "Didn’t receive any code? Resend Code ($secondsRemaining)"
                 val spannable = SpannableString(resendText)
                 spannable.setSpan(
@@ -228,13 +230,14 @@ class VerifyPhoneFragment : BaseFragment() {
                 Log.e("VerifyPhoneFragment", "Phone number: $phone_number")
                 val response = RetrofitInstance.api.resendPhoneOtp(resendPhoneRequest(phone_number))
                 if (response.success) {
-                    Toast.makeText(requireContext(), "OTP sent successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "OTP sent successfully", Toast.LENGTH_SHORT)
+                        .show()
                 } else {
                     Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Log.e("VerifyPhoneFragment", "Error: ${e.message}")
-                Toast.makeText(requireContext(),"Failed to Resend OTP", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Failed to Resend OTP", Toast.LENGTH_SHORT).show()
             } finally {
                 progressDialog.dismiss()
             }
@@ -258,19 +261,25 @@ class VerifyPhoneFragment : BaseFragment() {
 
         lifecycleScope.launch {
             try {
-                val response = RetrofitInstance.api.PhoneVerify(PhoneVerifyRequest(user_id, phone_otp))
+                val response =
+                    RetrofitInstance.api.PhoneVerify(PhoneVerifyRequest(user_id, phone_otp))
                 if (response.success) {
                     response.tokens.let {
                         DataStoreManager.saveTokens(requireContext(), it.access, it.refresh)
                     }
-                    Toast.makeText(requireContext(), "Otp verified, Registration Successful", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Otp verified, Registration Successful",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     navController.navigate(R.id.action_verifyPhoneFragment_to_homeActivity)
                 } else {
                     Log.e("VerifyPhoneFragment", "Error: ${response.message}")
                     Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
+                    .show()
                 Log.e("VerifyPhoneFragment", "Error: ${e.message}")
             } finally {
                 progressDialog.dismiss()

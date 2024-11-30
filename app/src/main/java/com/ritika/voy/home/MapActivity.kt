@@ -213,12 +213,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         val bundle = Bundle()
                         bundle.putString("startLocation", startLocation ?: "Unknown Start")
                         bundle.putString(
-                            "destinationLocation",
-                            destinationLocation ?: "Unknown Destination"
+                            "destinationLocation", destinationLocation ?: "Unknown Destination"
                         )
                         bundle.putString(
-                            "firstMarkerLatLng",
-                            firstMarkerLatLng?.toString() ?: "No First Marker"
+                            "firstMarkerLatLng", firstMarkerLatLng?.toString() ?: "No First Marker"
                         )
                         bundle.putString(
                             "secondMarkerLatLng",
@@ -515,7 +513,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 (recyclerView.adapter as? RideAdapter)?.clearRides()
             }
         }
-
         val gradientDrawable = binding.loader.background as GradientDrawable
         gradientDrawable.colors = intArrayOf(
             ContextCompat.getColor(this, android.R.color.holo_green_light),
@@ -1068,6 +1065,39 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                                 binding.button4.visibility = View.VISIBLE
                                                 binding.button5.visibility = View.VISIBLE
                                                 binding.proceedButton.visibility = View.VISIBLE
+                                            } else {
+                                                binding.bottomWidget.visibility = View.GONE
+                                                val modalBottomSheet = ModalBottomSheet()
+
+                                                val bundle = Bundle()
+                                                bundle.putString(
+                                                    "startLocation",
+                                                    startLocation ?: "Unknown Start"
+                                                )
+                                                bundle.putString(
+                                                    "destinationLocation",
+                                                    destinationLocation ?: "Unknown Destination"
+                                                )
+                                                bundle.putString(
+                                                    "firstMarkerLatLng",
+                                                    firstMarkerLatLng?.toString()
+                                                        ?: "No First Marker"
+                                                )
+                                                bundle.putString(
+                                                    "secondMarkerLatLng",
+                                                    secondMarkerLatLng?.toString()
+                                                        ?: "No Second Marker"
+                                                )
+
+                                                Log.d(
+                                                    "MainActivity",
+                                                    "Sending data: $startLocation, $destinationLocation, $firstMarkerLatLng, $secondMarkerLatLng"
+                                                )
+
+                                                modalBottomSheet.arguments = bundle
+                                                modalBottomSheet.show(
+                                                    supportFragmentManager, "ModalBottomSheet"
+                                                )
                                             }
                                             Log.d(
                                                 "hii",
@@ -1095,40 +1125,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                                         binding.routeView.root.findViewById<TextView>(
                                                             R.id.drop_address
                                                         )?.text = destinationAddress
-                                                        binding.bottomWidget.visibility = View.GONE
-                                                        val modalBottomSheet = ModalBottomSheet()
 
-                                                        val bundle = Bundle()
-                                                        bundle.putString(
-                                                            "startLocation",
-                                                            startAddress ?: "Unknown Start"
-                                                        )
-                                                        bundle.putString(
-                                                            "destinationLocation",
-                                                            destinationAddress
-                                                                ?: "Unknown Destination"
-                                                        )
-                                                        bundle.putString(
-                                                            "firstMarkerLatLng",
-                                                            firstMarkerLatLng?.toString()
-                                                                ?: "No First Marker"
-                                                        )
-                                                        bundle.putString(
-                                                            "secondMarkerLatLng",
-                                                            secondMarkerLatLng?.toString()
-                                                                ?: "No Second Marker"
-                                                        )
-
-                                                        Log.d(
-                                                            "MainActivity",
-                                                            "Sending data: $startAddress, $destinationAddress, $firstMarkerLatLng, $secondMarkerLatLng"
-                                                        )
-
-                                                        modalBottomSheet.arguments = bundle
-                                                        modalBottomSheet.show(
-                                                            supportFragmentManager,
-                                                            "ModalBottomSheet"
-                                                        )
                                                     }
                                                 } catch (e: Exception) {
                                                     Log.e(
