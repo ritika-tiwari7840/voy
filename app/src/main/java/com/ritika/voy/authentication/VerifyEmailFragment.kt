@@ -23,13 +23,16 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.ritika.voy.BaseFragment
 import com.ritika.voy.KeyboardUtils
 import com.ritika.voy.R
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.EmailVerifyRequest
+import com.ritika.voy.api.dataclasses.EmailVerifyResponse
 import com.ritika.voy.api.dataclasses.ErrorResponse
+import com.ritika.voy.api.dataclasses.LoginResponse
 import com.ritika.voy.api.dataclasses.resendEmailRequest
 import com.ritika.voy.databinding.FragmentVerifyEmailBinding
 import kotlinx.coroutines.launch
@@ -297,9 +300,91 @@ class VerifyEmailFragment : BaseFragment() {
                 } else {
                     showToast(response.message)
                 }
+            } catch (e: retrofit2.HttpException) {
+                when (e.code()) {
+                    400 -> {
+                        try {
+                            val errorBody = e.response()?.errorBody()?.string()
+                            val gson = Gson()
+                            val errorResponse = gson.fromJson(
+                                errorBody,
+                                EmailVerifyResponse::class.java
+                            ) // Replace with your response class
+                            if (errorResponse.errors.containsKey("user_id")) {
+                                view?.let {
+                                    Snackbar.make(
+                                        it,
+                                        errorResponse.errors["user_id"]!![0],
+                                        Snackbar.LENGTH_LONG
+                                    )
+                                        .show()
+                                }
+                            } else if (errorResponse.errors.containsKey("email_otp")) {
+                                binding.tvOtpError.visibility = View.VISIBLE
+                                binding.ivOtpErrorIcon.visibility = View.VISIBLE
+                                binding.tvOtpError.text = errorResponse.errors["email_otp"]?.get(0)
+                                view?.let {
+                                    Snackbar.make(
+                                        it,
+                                        "${errorResponse.errors["email_otp"]?.get(0)}",
+                                        Snackbar.LENGTH_LONG
+                                    )
+                                        .show()
+                                }
+                            } else {
+                                view?.let {
+                                    Snackbar.make(
+                                        it,
+                                        "Invalid input, please check all fields",
+                                        Snackbar.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                            Log.e("CreateAccount", "Bad Request: ${errorResponse.message}")
+                        } catch (parseException: Exception) {
+                            Log.e(
+                                "CreateAccount",
+                                "Error parsing response: ${parseException.message}",
+                                parseException
+                            )
+                            view?.let {
+                                Snackbar.make(
+                                    it,
+                                    "Invalid input, please check all fields",
+                                    Snackbar.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                    }
+
+                    401 -> {
+                        Log.e("LoginFragment", "Unauthorized: ${e.message()}")
+                        view?.let {
+                            Snackbar.make(
+                                it,
+                                "Unauthorized access please check your credentials",
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+
+                    else -> {
+                        Log.e("LoginFragment", "HTTP Error: ${e.code()} - ${e.message()}")
+                        view?.let {
+                            Snackbar.make(it, "${e.message}", Snackbar.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            } catch (e: IOException) {
+                Log.e("LoginFragment", "Error: ${e.message}")
+                view?.let {
+                    Snackbar.make(it, "Network error", Snackbar.LENGTH_LONG).show()
+                }
             } catch (e: Exception) {
-                Log.e("VerifyEmailFragment", "Error: ${e.message}")
-                showToast("An unexpected error occurred")
+                Log.e("LoginFragment", "Error: ${e.message}")
+                view?.let {
+                    Snackbar.make(it, "${e.message}", Snackbar.LENGTH_LONG).show()
+                }
             } finally {
                 progressDialog.dismiss()
                 clearFields()
@@ -315,6 +400,7 @@ class VerifyEmailFragment : BaseFragment() {
                     nextBox.requestFocus()
                 }
             }
+
             override fun afterTextChanged(s: Editable?) {}
         })
     }
@@ -340,6 +426,8 @@ class VerifyEmailFragment : BaseFragment() {
     }
 
     private fun showToast(message: String) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+        view?.let {
+            Snackbar.make(it, message, Snackbar.LENGTH_LONG).show()
+        }
     }
 }

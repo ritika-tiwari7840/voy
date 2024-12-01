@@ -20,10 +20,11 @@
             android:id="@+id/btnBack"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:layout_marginTop="68.2dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Back button"
             app:layout_constraintStart_toStartOf="@+id/guideline4"
-            app:layout_constraintTop_toTopOf="@+id/guideline2"
+            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/back_button" />
 
         <TextView
@@ -50,9 +51,10 @@
             android:textColor="@color/white"
             android:textSize="12sp"
             android:textStyle="bold"
+            android:layout_marginTop="32dp"
             app:layout_constraintEnd_toStartOf="@+id/guideline5"
             app:layout_constraintStart_toStartOf="@+id/guideline4"
-            app:layout_constraintTop_toTopOf="@+id/guideline6" />
+            app:layout_constraintTop_toBottomOf="@id/tvOtpTitle" />
 
 
         <View
@@ -62,15 +64,27 @@
             android:background="@drawable/layer_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/enter_otp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="49dp"
+            android:fontFamily="@font/poppinsmedium"
+            android:text="Enter OTP"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@+id/guideline4"
+            app:layout_constraintTop_toTopOf="@+id/bottomSection" />
+
 
         <EditText
             android:id="@+id/otpBox1"
             android:layout_width="45dp"
             android:layout_height="40dp"
+            android:layout_marginTop="28dp"
             android:background="@drawable/otp_text_background"
             android:gravity="center"
             android:inputType="number"
@@ -78,36 +92,41 @@
             android:textCursorDrawable="@drawable/custom_cursor"
             app:layout_constraintEnd_toStartOf="@id/otpBox2"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline7" />
+            app:layout_constraintTop_toTopOf="@+id/enter_otp" />
 
         <EditText
             android:id="@+id/otpBox2"
             android:layout_width="45dp"
             android:layout_height="40dp"
+            android:layout_marginTop="28dp"
             android:background="@drawable/otp_text_background"
             android:gravity="center"
             android:inputType="number"
+            android:maxLength="1"
             android:textCursorDrawable="@drawable/custom_cursor"
             app:layout_constraintEnd_toStartOf="@id/otpBox3"
             app:layout_constraintStart_toEndOf="@+id/otpBox1"
-            app:layout_constraintTop_toTopOf="@+id/guideline7" />
+            app:layout_constraintTop_toTopOf="@+id/enter_otp" />
 
         <EditText
             android:id="@+id/otpBox3"
             android:layout_width="45dp"
             android:layout_height="40dp"
+            android:layout_marginTop="28dp"
             android:background="@drawable/otp_text_background"
             android:gravity="center"
             android:inputType="number"
+            android:maxLength="1"
             android:textCursorDrawable="@drawable/custom_cursor"
             app:layout_constraintEnd_toStartOf="@+id/otpBox4"
             app:layout_constraintStart_toEndOf="@+id/otpBox2"
-            app:layout_constraintTop_toTopOf="@+id/guideline7" />
+            app:layout_constraintTop_toTopOf="@+id/enter_otp" />
 
         <EditText
             android:id="@+id/otpBox4"
             android:layout_width="45dp"
             android:layout_height="40dp"
+            android:layout_marginTop="28dp"
             android:background="@drawable/otp_text_background"
             android:gravity="center"
             android:inputType="number"
@@ -115,12 +134,13 @@
             android:textCursorDrawable="@drawable/custom_cursor"
             app:layout_constraintEnd_toStartOf="@id/otpBox5"
             app:layout_constraintStart_toEndOf="@id/otpBox3"
-            app:layout_constraintTop_toTopOf="@+id/guideline7" />
+            app:layout_constraintTop_toTopOf="@+id/enter_otp" />
 
         <EditText
             android:id="@+id/otpBox5"
             android:layout_width="45dp"
             android:layout_height="40dp"
+            android:layout_marginTop="28dp"
             android:background="@drawable/otp_text_background"
             android:gravity="center"
             android:inputType="number"
@@ -128,12 +148,13 @@
             android:textCursorDrawable="@drawable/custom_cursor"
             app:layout_constraintEnd_toStartOf="@+id/otpBox6"
             app:layout_constraintStart_toEndOf="@id/otpBox4"
-            app:layout_constraintTop_toTopOf="@+id/guideline7" />
+            app:layout_constraintTop_toTopOf="@+id/enter_otp" />
 
         <EditText
             android:id="@+id/otpBox6"
             android:layout_width="45dp"
             android:layout_height="40dp"
+            android:layout_marginTop="28dp"
             android:background="@drawable/otp_text_background"
             android:gravity="center"
             android:inputType="number"
@@ -141,7 +162,7 @@
             android:textCursorDrawable="@drawable/custom_cursor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/otpBox5"
-            app:layout_constraintTop_toTopOf="@+id/guideline7" />
+            app:layout_constraintTop_toTopOf="@+id/enter_otp" />
 
         <ImageView
             android:id="@+id/ivOtpErrorIcon"
@@ -172,6 +193,7 @@
             android:id="@+id/btnVerify"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="75dp"
             android:background="@drawable/button_background"
             android:fontFamily="@font/poppinsmedium"
             android:lineHeight="18.9dp"
@@ -182,17 +204,17 @@
             android:textSize="18sp"
             app:layout_constraintEnd_toStartOf="@+id/guideline5"
             app:layout_constraintStart_toStartOf="@+id/guideline4"
-            app:layout_constraintTop_toTopOf="@+id/guideline3" />
+            app:layout_constraintTop_toBottomOf="@id/otpBox1" />
 
         <TextView
             android:id="@+id/resendTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:fontFamily="@font/poppinsmedium"
             android:text="Didn’t receive any code? Resend Code"
             android:textColor="@color/white"
             android:textSize="16sp"
-            android:layout_marginTop="10dp"
             app:layout_constraintEnd_toStartOf="@+id/guideline5"
             app:layout_constraintStart_toStartOf="@+id/guideline4"
             app:layout_constraintTop_toBottomOf="@id/btnVerify" />

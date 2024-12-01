@@ -4,6 +4,7 @@ import android.app.ProgressDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -15,22 +16,30 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.gson.Gson
 import com.ritika.voy.BaseFragment
+import com.ritika.voy.KeyboardUtils
 import com.ritika.voy.R
 import com.ritika.voy.api.RetrofitInstance
+import com.ritika.voy.api.dataclasses.ForgotResponse
 import com.ritika.voy.api.dataclasses.ResetRequest
+import com.ritika.voy.api.dataclasses.ResetResponse
 import com.ritika.voy.databinding.FragmentResetPasswordBinding
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 
 class ResetPassword : BaseFragment() {
     private var _binding: FragmentResetPasswordBinding? = null
     private val binding get() = _binding!!
-
+    lateinit var keyboardUtils: KeyboardUtils
     private lateinit var navController: NavController
     private lateinit var passwordPopup: PopupWindow
+    private val TAG: String = "ResetPassword"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,6 +47,8 @@ class ResetPassword : BaseFragment() {
     ): View {
         _binding = FragmentResetPasswordBinding.inflate(inflater, container, false)
         setupValidation()
+        val scrollView = binding.scrollView
+        keyboardUtils = KeyboardUtils(scrollView.id)
         return binding.root
     }
 
@@ -229,7 +240,7 @@ class ResetPassword : BaseFragment() {
         }
 
         binding.btnBack.setOnClickListener {
-            navController.navigate(R.id.action_resetPassword_to_otpFragment)
+            navController.navigate(R.id.action_resetPassword_to_forgotPasswordFragment)
         }
     }
 
@@ -260,22 +271,72 @@ class ResetPassword : BaseFragment() {
                     )
                 )
                 if (response.success) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Password reset successfully",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    view?.let {
+                        Snackbar.make(it, response.message, Snackbar.LENGTH_LONG)
+                            .show()
+                    }
                     navController.navigate(R.id.action_resetPassword_to_loginFragment)
                 } else {
-                    Toast.makeText(
-                        requireContext(),
-                        "Failed to reset password: ${response.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    view?.let {
+                        Snackbar.make(it, response.message, Snackbar.LENGTH_LONG).show()
+                    }
+                }
+            } catch (e: HttpException) {
+                when (e.code()) {
+                    400 -> {
+                        try {
+                            val errorBody = e.response()?.errorBody()?.string()
+                            val gson = Gson()
+                            val errorResponse = gson.fromJson(
+                                errorBody, ResetResponse::class.java
+                            ) // Replace with your response class
+                            view?.let {
+                                Snackbar.make(it, "${errorResponse.message}", Snackbar.LENGTH_LONG)
+                                    .show()
+                            }
+                            Log.e(TAG, "${errorResponse.errors}")
+                        } catch (parseException: Exception) {
+                            Log.e(
+                                TAG,
+                                "Error parsing response: ${parseException.message}",
+                                parseException
+                            )
+                            view?.let {
+                                Snackbar.make(it, "${parseException.message}", Snackbar.LENGTH_LONG)
+                                    .show()
+                            }
+                        }
+                    }
+
+                    401 -> {
+                        Log.e(TAG, "Unauthorized: ${e.message()}")
+                        view?.let {
+                            Snackbar.make(
+                                it,
+                                "Unauthorized access, Sign Up please",
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+
+                    else -> {
+                        Log.e(TAG, "HTTP Error: ${e.code()} - ${e.message()}")
+                        view?.let {
+                            Snackbar.make(it, "${e.message}", Snackbar.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            } catch (e: IOException) {
+                Log.e(TAG, "Error: ${e.message}")
+                view?.let {
+                    Snackbar.make(it, "Check your network connection please", Snackbar.LENGTH_LONG)
+                        .show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
-                    .show()
+                Log.e(TAG, "Error: ${e.message}")
+                view?.let {
+                    Snackbar.make(it, "${e.message}", Snackbar.LENGTH_LONG).show()
+                }
             } finally {
                 progressDialog.dismiss()
                 clearFields()
@@ -284,6 +345,6 @@ class ResetPassword : BaseFragment() {
     }
 
     override fun onBackPressed() {
-        navController.navigate(R.id.action_resetPassword_to_otpFragment)
+        navController.navigate(R.id.action_resetPassword_to_forgotPasswordFragment)
     }
 }

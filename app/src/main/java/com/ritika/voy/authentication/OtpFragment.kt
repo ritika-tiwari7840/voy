@@ -1,7 +1,6 @@
 package com.ritika.voy.authentication
 
 import android.app.ProgressDialog
-import android.content.IntentSender.OnFinished
 import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -13,7 +12,6 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 import android.util.Log
 import android.view.KeyEvent
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,13 +23,18 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.VerifyRequest
+import com.ritika.voy.api.dataclasses.VerifyResponse
 import com.ritika.voy.api.dataclasses.resendOTPRequest
 import com.ritika.voy.databinding.FragmentOtpBinding
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 class OtpFragment : BaseFragment() {
 
@@ -39,6 +42,7 @@ class OtpFragment : BaseFragment() {
     private var _binding: FragmentOtpBinding? = null
     private val binding get() = _binding!!
     private lateinit var resendTimer: CountDownTimer
+    private val TAG: String = "OtpFragment"
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +51,7 @@ class OtpFragment : BaseFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         // Inflate the layout for this fragment
         _binding = FragmentOtpBinding.inflate(inflater, container, false)
@@ -155,10 +159,10 @@ class OtpFragment : BaseFragment() {
 
 
             if (otp.length != 6) {
-                Toast.makeText(requireContext(), "Please enter a valid otp", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please enter a valid otp", Toast.LENGTH_SHORT)
+                    .show()
                 return@setOnClickListener
-            }else{
-
+            } else {
                 verifyOTP(email, otp)
             }
 
@@ -178,7 +182,8 @@ class OtpFragment : BaseFragment() {
         resendTimer = object : CountDownTimer(30000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsRemaining = millisUntilFinished / 1000
-                binding.resendTextView.text = "Didn’t receive any code? Resend Code ($secondsRemaining)"
+                binding.resendTextView.text =
+                    "Didn’t receive any code? Resend Code ($secondsRemaining)"
                 val resendText = "Didn’t receive any code? Resend Code ($secondsRemaining)"
                 val spannable = SpannableString(resendText)
                 spannable.setSpan(
@@ -242,8 +247,7 @@ class OtpFragment : BaseFragment() {
     }
 
 
-
-    private fun verifyOTP(email: String, otp: String){
+    private fun verifyOTP(email: String, otp: String) {
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("Loading...")
         progressDialog.setCancelable(false)
@@ -252,20 +256,86 @@ class OtpFragment : BaseFragment() {
         lifecycleScope.launch {
             try {
                 val response = RetrofitInstance.api.verifyOtp(VerifyRequest(email, otp))
-                if (response.success){
+                if (response.success) {
                     val otpBundle = Bundle().apply {
                         putString("otp", otp)
                         putString("email", email)
                     }
-                    Toast.makeText(requireContext(), "Otp verified", Toast.LENGTH_SHORT).show()
+                    view?.let {
+                        Snackbar.make(it, "OTP verified", Snackbar.LENGTH_LONG)
+                            .show()
+                    }
                     navController.navigate(R.id.action_otpFragment_to_resetPassword, otpBundle)
+                } else {
+                    view?.let {
+                        Snackbar.make(it, "${response.message}", Snackbar.LENGTH_LONG)
+                            .show()
+                    }
                 }
-                else {
-                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
+            } catch (e: HttpException) {
+                when (e.code()) {
+                    400 -> {
+                        try {
+                            val errorBody = e.response()?.errorBody()?.string()
+                            val gson = Gson()
+                            val errorResponse = gson.fromJson(
+                                errorBody, VerifyResponse::class.java
+                            ) // Replace with your response class
+                            binding.tvOtpError.visibility = View.VISIBLE
+                            binding.ivOtpErrorIcon.visibility = View.VISIBLE
+                            binding.tvOtpError.text = errorResponse.errors["otp"]?.get(0).toString()
+                            view?.let {
+                                Snackbar.make(
+                                    it,
+                                    errorResponse.errors["otp"]!![0],
+                                    Snackbar.LENGTH_LONG
+                                )
+                                    .show()
+                            }
+
+                            Log.e(TAG, "${errorResponse.errors}")
+                        } catch (parseException: Exception) {
+                            Log.e(
+                                TAG,
+                                "Error parsing response: ${parseException.message}",
+                                parseException
+                            )
+                            view?.let {
+                                Snackbar.make(it, "${parseException.message}", Snackbar.LENGTH_LONG)
+                                    .show()
+                            }
+                        }
+                    }
+
+                    401 -> {
+                        Log.e(TAG, "Unauthorized: ${e.message()}")
+                        view?.let {
+                            Snackbar.make(
+                                it,
+                                "Unauthorized access, Sign Up please",
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+
+                    else -> {
+                        Log.e(TAG, "HTTP Error: ${e.code()} - ${e.message()}")
+                        view?.let {
+                            Snackbar.make(it, "${e.message}", Snackbar.LENGTH_LONG).show()
+                        }
+                    }
                 }
-            }catch (e: Exception) {
-                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
-                    .show()
+            } catch (e: IOException) {
+                Log.e(TAG, "Error: ${e.message}")
+                view?.let {
+                    Snackbar.make(it, "Check your network connection please", Snackbar.LENGTH_LONG)
+                        .show()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error: ${e.message}")
+                view?.let {
+                    Snackbar.make(it, "${e.message}", Snackbar.LENGTH_LONG).show()
+                }
             } finally {
                 progressDialog.dismiss()
                 clearFields()
@@ -273,7 +343,7 @@ class OtpFragment : BaseFragment() {
         }
     }
 
-    private fun resendOTP(email: String){
+    private fun resendOTP(email: String) {
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("Loading...")
         progressDialog.setCancelable(false)
@@ -282,16 +352,23 @@ class OtpFragment : BaseFragment() {
         lifecycleScope.launch {
             try {
                 val response = RetrofitInstance.api.resendOtp(resendOTPRequest(email))
-                if (response.success){
-                    Toast.makeText(requireContext(), "Otp sent", Toast.LENGTH_SHORT).show()
+                if (response.success) {
+                    view?.let {
+                        Snackbar.make(it, "${response.message}", Snackbar.LENGTH_LONG)
+                            .show()
+                    }
+                } else {
+                    view?.let {
+                        Snackbar.make(it, "${response.message}", Snackbar.LENGTH_LONG)
+                            .show()
+                    }
                 }
-                else {
-                    Toast.makeText(requireContext(), "Failed to send otp: ${response.message}", Toast.LENGTH_SHORT).show()
-                }
-            }catch (e: Exception) {
+            } catch (e: Exception) {
                 Log.e("API Error", "Error resending OTP: ${e.message}", e)
-                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
-                    .show()
+                view?.let {
+                    Snackbar.make(it, "Unexpected error occurred", Snackbar.LENGTH_LONG)
+                        .show()
+                }
             } finally {
                 progressDialog.dismiss()
                 clearFields()
@@ -300,7 +377,7 @@ class OtpFragment : BaseFragment() {
 
     }
 
-    fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
+    private fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
         currentBox.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
@@ -317,7 +394,7 @@ class OtpFragment : BaseFragment() {
         })
     }
 
-    fun setupBackspace(currentBox: EditText, previousBox: EditText) {
+    private fun setupBackspace(currentBox: EditText, previousBox: EditText) {
         currentBox.setOnKeyListener { _, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_DEL && event.action == KeyEvent.ACTION_DOWN) {
                 if (currentBox.text.isNotEmpty()) {

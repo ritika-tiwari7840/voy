@@ -22,11 +22,11 @@
             android:id="@+id/btn_back"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:layout_marginTop="75.2dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Back button"
-            app:layout_constraintBottom_toTopOf="@+id/heading_text_bottom_guide"
             app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
-            app:layout_constraintTop_toBottomOf="@+id/heading_text_top_guide"
+            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/back_button" />
 
 
@@ -62,13 +62,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
+            android:layout_marginTop="49dp"
             android:fontFamily="@font/medium"
             android:text="Phone Number"
             android:textColor="@color/white"
             android:textSize="16.67sp"
             app:layout_constraintBottom_toTopOf="@id/phone_layout"
             app:layout_constraintLeft_toLeftOf="@id/form_left_guide"
-            app:layout_constraintTop_toBottomOf="@id/form_guide_one" />
+            app:layout_constraintTop_toTopOf="@id/bottomSection" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/phone_layout"

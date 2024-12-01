@@ -64,6 +64,7 @@
 
         <EditText
             android:id="@+id/etEmail"
+            style="@style/CustomHintTextAppearance"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -94,6 +95,7 @@
 
         <TextView
             android:id="@+id/tvPasswordLabel"
+            style="@style/CustomHintTextAppearance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"

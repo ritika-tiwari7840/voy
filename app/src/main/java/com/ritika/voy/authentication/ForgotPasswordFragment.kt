@@ -4,6 +4,7 @@ import android.app.ProgressDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,18 +17,26 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.ritika.voy.BaseFragment
+import com.ritika.voy.KeyboardUtils
 import com.ritika.voy.R
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.ForgotRequest
+import com.ritika.voy.api.dataclasses.ForgotResponse
+import com.ritika.voy.api.dataclasses.LoginResponse
 import com.ritika.voy.databinding.FragmentForgotPasswordBinding
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 class ForgotPasswordFragment : BaseFragment() {
 
     private var _binding: FragmentForgotPasswordBinding? = null
     private val binding get() = _binding!!
-
+    private val TAG: String = "ForgotPasswordFragment"
+    lateinit var keyboardUtils: KeyboardUtils
     private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,9 +45,12 @@ class ForgotPasswordFragment : BaseFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentForgotPasswordBinding.inflate(inflater, container, false)
+        val scrollView = binding.scrollView
+        keyboardUtils = KeyboardUtils(scrollView.id)
+
         return binding.root
     }
 
@@ -61,14 +73,19 @@ class ForgotPasswordFragment : BaseFragment() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val email = s.toString()
-                if (email.contains("@")) {
-                    emailEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background)
+                if (email.contains("@") && isValidEmail(email)) {
+                    emailEditText.background =
+                        ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background)
                     emailErrorTextView.visibility = View.GONE
                 } else if (email.isEmpty()) {
-                    emailEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background)
+                    emailEditText.background =
+                        ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background)
                     emailErrorTextView.visibility = View.GONE
                 } else {
-                    emailEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background_error)
+                    emailEditText.background = ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.edit_text_background_error
+                    )
                     emailErrorTextView.visibility = View.VISIBLE
                 }
             }
@@ -83,10 +100,13 @@ class ForgotPasswordFragment : BaseFragment() {
             val emailBundle = Bundle().apply {
                 putString("email", email)
             }
-            if (email.isNotEmpty() && email.contains("@")) {
+            if (email.isNotEmpty() && isValidEmail(email)) {
                 forgotpassword(email)
             } else {
-                emailEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background_error)
+                emailEditText.background = ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.edit_text_background_error
+                )
                 emailErrorTextView.visibility = View.VISIBLE
             }
         }
@@ -101,7 +121,7 @@ class ForgotPasswordFragment : BaseFragment() {
     }
 
 
-    private fun forgotpassword(email : String){
+    private fun forgotpassword(email: String) {
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("Loading...")
         progressDialog.setCancelable(false)
@@ -114,13 +134,78 @@ class ForgotPasswordFragment : BaseFragment() {
                     val emailBundle = Bundle().apply {
                         putString("email", email)
                     }
-                    Toast.makeText(requireContext(), "Password reset email sent", Toast.LENGTH_SHORT).show()
-                    navController.navigate(R.id.action_forgotPasswordFragment_to_otpFragment, emailBundle)
+                    view?.let {
+                        Snackbar.make(it, response.message, Snackbar.LENGTH_LONG).show()
+                    }
+                    navController.navigate(
+                        R.id.action_forgotPasswordFragment_to_otpFragment,
+                        emailBundle
+                    )
                 } else {
-                    Toast.makeText(requireContext(), "Failed to send reset email: ${response.message}", Toast.LENGTH_SHORT).show()
+                    view?.let {
+                        Snackbar.make(it, "${response.errors}", Snackbar.LENGTH_LONG).show()
+                    }
+                }
+            } catch (e: HttpException) {
+                when (e.code()) {
+                    400 -> {
+                        try {
+                            val errorBody = e.response()?.errorBody()?.string()
+                            val gson = Gson()
+                            val errorResponse = gson.fromJson(
+                                errorBody, ForgotResponse::class.java
+                            ) // Replace with your response class
+                            view?.let {
+                                Snackbar.make(
+                                    it,
+                                    errorResponse.errors["email"]!!.get(0),
+                                    Snackbar.LENGTH_LONG
+                                )
+                                    .show()
+                            }
+                            Log.e(TAG, "${errorResponse.errors}")
+                        } catch (parseException: Exception) {
+                            Log.e(
+                                TAG,
+                                "Error parsing response: ${parseException.message}",
+                                parseException
+                            )
+                            view?.let {
+                                Snackbar.make(it, "${parseException.message}", Snackbar.LENGTH_LONG)
+                                    .show()
+                            }
+                        }
+                    }
+
+                    401 -> {
+                        Log.e(TAG, "Unauthorized: ${e.message()}")
+                        view?.let {
+                            Snackbar.make(
+                                it,
+                                "Unauthorized access, Sign Up please",
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+
+                    else -> {
+                        Log.e(TAG, "HTTP Error: ${e.code()} - ${e.message()}")
+                        view?.let {
+                            Snackbar.make(it, "${e.message}", Snackbar.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            } catch (e: IOException) {
+                Log.e(TAG, "Error: ${e.message}")
+                view?.let {
+                    Snackbar.make(it, "Check your network connection please", Snackbar.LENGTH_LONG)
+                        .show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT).show()
+                Log.e(TAG, "Error: ${e.message}")
+                view?.let {
+                    Snackbar.make(it, "${e.message}", Snackbar.LENGTH_LONG).show()
+                }
             } finally {
                 progressDialog.dismiss()
                 clearFields()
@@ -131,5 +216,11 @@ class ForgotPasswordFragment : BaseFragment() {
 
     override fun onBackPressed() {
         navController.navigate(R.id.action_forgotPasswordFragment_to_loginFragment)
+    }
+
+    private fun isValidEmail(email: String): Boolean {
+        val emailRegex =
+            "^[A-Za-z0-9_+&*-]+(?:\\.[A-Za-z0-9_+&*-]+)*@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
+        return email.matches(emailRegex)
     }
 }

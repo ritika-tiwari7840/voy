@@ -18,33 +18,25 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.datastore.preferences.core.MutablePreferences
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.ritika.voy.BaseFragment
 import com.ritika.voy.R
 import com.ritika.voy.databinding.FragmentLoginBinding
-import com.ritika.voy.api.ApiService
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.LoginRequest
 import kotlinx.coroutines.launch
 import java.io.IOException
 import retrofit2.HttpException
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.preferencesDataStoreFile
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.ritika.voy.KeyboardUtils
 import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.dataclasses.GetUserResponse
 import com.ritika.voy.api.dataclasses.LoginResponse
-import kotlinx.coroutines.flow.first
 
 class LoginFragment : BaseFragment() {
 
@@ -53,6 +45,7 @@ class LoginFragment : BaseFragment() {
     private val binding get() = _binding!!
     private var bundle = Bundle()
     lateinit var keyboardUtils: KeyboardUtils
+    private val TAG: String = "LoginFragment"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -155,9 +148,11 @@ class LoginFragment : BaseFragment() {
             val email = emailEditText.text.toString()
             val password = passwordEditText.text.toString()
 
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(requireContext(), "Please fill all the fields", Toast.LENGTH_SHORT)
-                    .show()
+            if (email.isEmpty() || password.isEmpty() || !isValidEmail(email)) {
+                view?.let {
+                    Snackbar.make(it, "Please fill all the fields correctly", Snackbar.LENGTH_LONG)
+                        .show()
+                }
             } else {
                 login(email, password)
             }
@@ -190,7 +185,7 @@ class LoginFragment : BaseFragment() {
     }
 
     private fun login(email: String, password: String) {
-        Log.d("emailpassword", "Email: $email, Password: $password")
+        Log.d(TAG, "Email: $email, Password: $password")
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("Loading...")
         progressDialog.setCancelable(false)
@@ -205,22 +200,21 @@ class LoginFragment : BaseFragment() {
                         DataStoreManager.saveTokens(requireContext(), it.access!!, it.refresh!!)
                         val userResponse = getUserData(it.access)
                         if (userResponse.success) {
-                            Log.d("User Details", "User Details: ${userResponse.user}")
+                            Log.d(TAG, "User Details: ${userResponse.user}")
                             bundle = Bundle().apply {
                                 putParcelable("user_details", userResponse.user)
                             }
                         }
                     }
-                    Toast.makeText(requireContext(), "${response.message}", Toast.LENGTH_SHORT)
-                        .show()
+                    view?.let {
+                        Snackbar.make(it, "${response.message}", Snackbar.LENGTH_LONG).show()
+                    }
                     navController.navigate(R.id.action_loginFragment_to_homeActivity, bundle)
                 } else {
-                    Log.e("LoginFragment", "Error: ${response.message} ")
-                    Toast.makeText(
-                        requireContext(),
-                        " ${response.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Log.e(TAG, "Error: ${response.message} ")
+                    view?.let {
+                        Snackbar.make(it, "${response.message}", Snackbar.LENGTH_LONG).show()
+                    }
                 }
             } catch (e: HttpException) {
                 when (e.code()) {
@@ -232,11 +226,10 @@ class LoginFragment : BaseFragment() {
                                 errorBody,
                                 LoginResponse::class.java
                             ) // Replace with your response class
-                            Toast.makeText(
-                                requireContext(),
-                                errorResponse.message,
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            view?.let {
+                                Snackbar.make(it, "${errorResponse.message}", Snackbar.LENGTH_LONG)
+                                    .show()
+                            }
                             Log.e("CreateAccount", "Bad Request: ${errorResponse.message}")
                         } catch (parseException: Exception) {
                             Log.e(
@@ -244,39 +237,44 @@ class LoginFragment : BaseFragment() {
                                 "Error parsing response: ${parseException.message}",
                                 parseException
                             )
-                            Toast.makeText(
-                                requireContext(),
-                                "Invalid input. Please check your details.",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            view?.let {
+                                Snackbar.make(
+                                    it,
+                                    "Invalid input, please check all fields",
+                                    Snackbar.LENGTH_LONG
+                                ).show()
+                            }
                         }
                     }
 
                     401 -> {
                         Log.e("LoginFragment", "Unauthorized: ${e.message()}")
-                        Toast.makeText(
-                            requireContext(),
-                            "Unauthorized access. Please check your credentials.",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        view?.let {
+                            Snackbar.make(
+                                it,
+                                "Unauthorized access please check your credentials",
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
                     }
 
                     else -> {
                         Log.e("LoginFragment", "HTTP Error: ${e.code()} - ${e.message()}")
-                        Toast.makeText(
-                            requireContext(),
-                            "Unexpected error occurred: ${e.message()}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        view?.let {
+                            Snackbar.make(it, "${e.message}", Snackbar.LENGTH_LONG).show()
+                        }
                     }
                 }
             } catch (e: IOException) {
                 Log.e("LoginFragment", "Error: ${e.message}")
-                Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT).show()
+                view?.let {
+                    Snackbar.make(it, "Network error", Snackbar.LENGTH_LONG).show()
+                }
             } catch (e: Exception) {
                 Log.e("LoginFragment", "Error: ${e.message}")
-                Toast.makeText(requireContext(), "${e.message}", Toast.LENGTH_SHORT)
-                    .show()
+                view?.let {
+                    Snackbar.make(it, "${e.message}", Snackbar.LENGTH_LONG).show()
+                }
             } finally {
                 progressDialog.dismiss()
                 clearFields()

@@ -12,14 +12,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ScrollView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
@@ -81,16 +80,18 @@ class CreateAccount : BaseFragment() {
                         val phone = binding.phone.text.toString().removePrefix("+91 ")
                         apiCall(confirmPassword, email, password, phone)
                     } else {
-                        Toast.makeText(
-                            requireContext(),
-                            "Please fill all the fields correctly",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        view?.let {
+                            Snackbar.make(
+                                it,
+                                "Please fill all fields correctly",
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 } catch (e: Exception) {
-                    Toast.makeText(
-                        requireContext(), "An error occurred: ${e.message}", Toast.LENGTH_SHORT
-                    ).show()
+                    view?.let {
+                        Snackbar.make(it, "${e.message}", Snackbar.LENGTH_LONG).show()
+                    }
                     Log.e(TAG, "onApiCall ${e.message}:", e)
                 }
             }
@@ -145,11 +146,13 @@ class CreateAccount : BaseFragment() {
                             if (response.isSuccessful) {
                                 response.body()?.let { signUpResponse ->
                                     if (signUpResponse.success) {
-                                        Toast.makeText(
-                                            requireContext(),
-                                            "Registration Initiated, Please verify your Email and Phone Number",
-                                            Toast.LENGTH_LONG
-                                        ).show()
+                                        view?.let {
+                                            Snackbar.make(
+                                                it,
+                                                "Registration initiated please verify your email and phone number",
+                                                Snackbar.LENGTH_LONG
+                                            ).show()
+                                        }
                                         val bundle = Bundle().apply {
                                             putString("email", email)
                                             putString("phoneNumber", phoneNumber)
@@ -173,8 +176,9 @@ class CreateAccount : BaseFragment() {
                         override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
                             progressDialog.dismiss()
                             Log.e(TAG, "Network error: ${t.message}", t)
-                            Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT)
-                                .show()
+                            view?.let {
+                                Snackbar.make(it, "Network error", Snackbar.LENGTH_LONG).show()
+                            }
                         }
                     })
             } catch (e: HttpException) {
@@ -182,48 +186,60 @@ class CreateAccount : BaseFragment() {
                 when (e.code()) {
                     400 -> {
                         Log.e("CreateAccount", "Bad Request: ${e.message()}", e)
-                        Toast.makeText(
-                            context, "Invalid input. Please check your details.", Toast.LENGTH_SHORT
-                        ).show()
+                        view?.let {
+                            Snackbar.make(
+                                it,
+                                "Invalid inputs, please check your details",
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
                     }
 
                     404 -> {
                         Log.e("CreateAccount", "Not Found: ${e.message()}", e)
-                        Toast.makeText(
-                            context,
-                            "Resource not found. Please try again later.",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        view?.let {
+                            Snackbar.make(
+                                it,
+                                "Please try again after sometime",
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
                     }
 
                     409 -> {
                         Log.e("CreateAccount", "Conflict: ${e.message()}", e)
-                        Toast.makeText(
-                            context,
-                            "Conflict occurred. Email or phone may already be in use.",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        view?.let {
+                            Snackbar.make(
+                                it,
+                                "Conflict occur, email and phone number may already be in use",
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
                     }
 
                     else -> {
                         Log.e("CreateAccount", "HTTP Error: ${e.code()} - ${e.message()}", e)
-                        Toast.makeText(
-                            context, "An error occurred. Please try again.", Toast.LENGTH_SHORT
-                        ).show()
+                        view?.let {
+                            Snackbar.make(it, "Please try again", Snackbar.LENGTH_LONG).show()
+                        }
                     }
                 }
             } catch (e: IOException) {
                 progressDialog.dismiss()
                 Log.e("CreateAccount", "Network Error: ${e.message}", e)
-                Toast.makeText(
-                    context, "Network error. Please check your connection.", Toast.LENGTH_SHORT
-                ).show()
+                view?.let {
+                    Snackbar.make(it, "Network error", Snackbar.LENGTH_LONG).show()
+                }
             } catch (e: Exception) {
                 progressDialog.dismiss()
                 Log.e("CreateAccount", "Unexpected Error: ${e.message}", e)
-                Toast.makeText(
-                    context, "Something went wrong. Please try again.", Toast.LENGTH_SHORT
-                ).show()
+                view?.let {
+                    Snackbar.make(
+                        it,
+                        "Something went wrong please try again later",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                }
             } finally {
 //                clearFields()
             }
@@ -242,19 +258,23 @@ class CreateAccount : BaseFragment() {
             Log.e(TAG, "handleUserExist: ${response.code()}")
             if (response.code() == 409) {
                 if (response.body()?.registration_status?.verification_status?.email_verified == false) {
-                    Toast.makeText(
-                        context,
-                        "You have registered please verify your email address",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    view?.let {
+                        Snackbar.make(
+                            it,
+                            "You have already registered please verify your email address",
+                            Snackbar.LENGTH_LONG
+                        ).show()
+                    }
                     navController.navigate(R.id.action_createAccount_to_verifyEmailFragment, bundle)
                 } else if (response.body()?.registration_status?.verification_status?.phone_verified == false) {
                     resendPhone(phoneNumber)
-                    Toast.makeText(
-                        context,
-                        "You have registered please verify your phone number",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    view?.let {
+                        Snackbar.make(
+                            it,
+                            "You have already registered please verify your phone number",
+                            Snackbar.LENGTH_LONG
+                        ).show()
+                    }
                     navController.navigate(R.id.action_createAccount_to_verifyPhoneFragment, bundle)
 
                 } else {
@@ -285,39 +305,91 @@ class CreateAccount : BaseFragment() {
                 val registrationStatus = errorData.registration_status
                 if (registrationStatus != null) {
                     if (registrationStatus.email_verified == "False") {
-                        Toast.makeText(
-                            context,
-                            "You have registered please verify your email address",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        view?.let {
+                            Snackbar.make(
+                                it,
+                                "You have already registered please verify your email address",
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
                         Log.d(TAG, "Navigating to VerifyEmailFragment")
                         navController.navigate(
                             R.id.action_createAccount_to_verifyEmailFragment, bundle
                         )
                     } else if (registrationStatus.phone_verified == "False") {
                         Log.d(TAG, "Navigating to VerifyPhoneFragment")
-                        Toast.makeText(
-                            context,
-                            "You have registered please verify your phone number",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        view?.let {
+                            Snackbar.make(
+                                it,
+                                "You have already registered please verify your phone number",
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
                         resendPhone(phoneNumber)
                         navController.navigate(
                             R.id.action_createAccount_to_verifyPhoneFragment, bundle
                         )
                     } else {
-                        Toast.makeText(
-                            context,
-                            "Verification step unknown. Please try again.",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        view?.let {
+                            Snackbar.make(
+                                it,
+                                "Verification steps known please try again",
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                } else {
+                    view?.let {
+                        Snackbar.make(it, "Please register yourself again", Snackbar.LENGTH_LONG)
+                            .show()
                     }
                 }
             } else {
                 Log.d(TAG, "handleUserExist: User with these credentials already exists $errorData")
-                Toast.makeText(
-                    context, "${errorData.errors}", Toast.LENGTH_SHORT
-                ).show()
+                if (errorData.errors.containsKey("email")) {
+                    setErrorState(
+                        binding.emailLayout,
+                        errorData.errors["email"]?.get(0).toString(),
+                        binding.enterEmail
+                    )
+                    view?.let {
+                        Snackbar.make(
+                            it,
+                            errorData.errors["email"]?.get(0).toString(),
+                            Snackbar.LENGTH_LONG
+                        ).show()
+                    }
+                } else if (errorData.errors.containsKey("phone_number")) {
+                    setErrorState(
+                        binding.phoneLayout,
+                        errorData.errors["phone_number"]?.get(0).toString(),
+                        binding.phone
+                    )
+                    view?.let {
+                        Snackbar.make(
+                            it,
+                            errorData.errors["phone_number"]?.get(0).toString(),
+                            Snackbar.LENGTH_LONG
+                        ).show()
+                    }
+                } else if (errorData.errors.containsKey("password")) {
+                    setErrorState(
+                        binding.passwordLayout,
+                        errorData.errors["password"]?.get(0).toString(),
+                        binding.password
+                    )
+                    view?.let {
+                        Snackbar.make(
+                            it,
+                            errorData.errors["password"]?.get(0).toString(),
+                            Snackbar.LENGTH_LONG
+                        ).show()
+                    }
+                } else {
+                    view?.let {
+                        Snackbar.make(it, "Please try again", Snackbar.LENGTH_LONG).show()
+                    }
+                }
             }
 
         }
@@ -656,14 +728,19 @@ class CreateAccount : BaseFragment() {
                 Log.e("VerifyPhoneFragment", "Phone number: $phone_number")
                 val response = RetrofitInstance.api.resendPhoneOtp(resendPhoneRequest(phone_number))
                 if (response.success) {
-                    Toast.makeText(requireContext(), "OTP sent successfully", Toast.LENGTH_SHORT)
-                        .show()
+                    view?.let {
+                        Snackbar.make(it, response.message, Snackbar.LENGTH_LONG).show()
+                    }
                 } else {
-                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
+                    view?.let {
+                        Snackbar.make(it, response.message, Snackbar.LENGTH_LONG).show()
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("VerifyPhoneFragment", "Error: ${e.message}")
-                Toast.makeText(requireContext(), "Failed to Resend OTP", Toast.LENGTH_SHORT).show()
+                view?.let {
+                    Snackbar.make(it, e.message.toString(), Snackbar.LENGTH_LONG).show()
+                }
             } finally {
                 progressDialog.dismiss()
             }
