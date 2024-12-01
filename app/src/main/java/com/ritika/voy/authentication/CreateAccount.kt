@@ -9,36 +9,42 @@ import android.text.Spanned
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupWindow
+import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.isEmpty
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.gson.Gson
 import com.ritika.voy.BaseFragment
+import com.ritika.voy.KeyboardUtils
 import com.ritika.voy.R
-import com.ritika.voy.api.AuthService
+import com.ritika.voy.api.ApiService
+import com.ritika.voy.api.RetrofitInstance
+import com.ritika.voy.api.dataclasses.SignUpErrorResponse
 import com.ritika.voy.api.dataclasses.SignUpRequest
 import com.ritika.voy.api.dataclasses.SignUpResponse
+import com.ritika.voy.api.dataclasses.resendPhoneRequest
 import com.ritika.voy.databinding.FragmentCreateAccountBinding
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.HttpException
 import java.io.IOException
 
+
 class CreateAccount : BaseFragment() {
     private var _binding: FragmentCreateAccountBinding? = null
     private val binding get() = _binding!!
     private lateinit var navController: NavController
+    private val TAG = "CreateAccount"
+    lateinit var keyboardUtils: KeyboardUtils
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,6 +53,10 @@ class CreateAccount : BaseFragment() {
         _binding = FragmentCreateAccountBinding.inflate(inflater, container, false)
         setupSpannableText()
         setupValidation()
+
+        val scrollView = binding.scrollView
+        keyboardUtils = KeyboardUtils(scrollView.id)
+
         return binding.root
     }
 
@@ -56,7 +66,6 @@ class CreateAccount : BaseFragment() {
 
         val screenHeight = resources.displayMetrics.heightPixels
         val topMargin = (screenHeight * 0.203).toInt()
-
         val bottomSection: View = view.findViewById(R.id.bottomSection)
         val params = bottomSection.layoutParams as ConstraintLayout.LayoutParams
         params.topMargin = topMargin
@@ -74,7 +83,7 @@ class CreateAccount : BaseFragment() {
                     } else {
                         Toast.makeText(
                             requireContext(),
-                            "Please correct the errors in the form",
+                            "Please fill all the fields correctly",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -82,11 +91,10 @@ class CreateAccount : BaseFragment() {
                     Toast.makeText(
                         requireContext(), "An error occurred: ${e.message}", Toast.LENGTH_SHORT
                     ).show()
-                    Log.e("CreateAccount", "Error: ${e.message}", e)
+                    Log.e(TAG, "onApiCall ${e.message}:", e)
                 }
             }
         }
-
         binding.btnBack.setOnClickListener {
             navController.navigate(R.id.action_createAccount_to_loginFragment)
         }
@@ -118,7 +126,7 @@ class CreateAccount : BaseFragment() {
             password = password,
             phone_number = phoneNumber
         )
-        val authService = Retrofit.api.create(AuthService::class.java)
+        val authService = Retrofit.api.create(ApiService::class.java)
 
         val progressDialog = ProgressDialog(requireContext())
         progressDialog.setMessage("Loading...")
@@ -140,7 +148,7 @@ class CreateAccount : BaseFragment() {
                                         Toast.makeText(
                                             requireContext(),
                                             "Registration Initiated, Please verify your Email and Phone Number",
-                                            Toast.LENGTH_SHORT
+                                            Toast.LENGTH_LONG
                                         ).show()
                                         val bundle = Bundle().apply {
                                             putString("email", email)
@@ -164,16 +172,58 @@ class CreateAccount : BaseFragment() {
 
                         override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
                             progressDialog.dismiss()
-                            Log.e("API Error", "Network error: ${t.message}", t)
+                            Log.e(TAG, "Network error: ${t.message}", t)
                             Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT)
                                 .show()
                         }
                     })
+            } catch (e: HttpException) {
+                progressDialog.dismiss()
+                when (e.code()) {
+                    400 -> {
+                        Log.e("CreateAccount", "Bad Request: ${e.message()}", e)
+                        Toast.makeText(
+                            context, "Invalid input. Please check your details.", Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    404 -> {
+                        Log.e("CreateAccount", "Not Found: ${e.message()}", e)
+                        Toast.makeText(
+                            context,
+                            "Resource not found. Please try again later.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    409 -> {
+                        Log.e("CreateAccount", "Conflict: ${e.message()}", e)
+                        Toast.makeText(
+                            context,
+                            "Conflict occurred. Email or phone may already be in use.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    else -> {
+                        Log.e("CreateAccount", "HTTP Error: ${e.code()} - ${e.message()}", e)
+                        Toast.makeText(
+                            context, "An error occurred. Please try again.", Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } catch (e: IOException) {
+                progressDialog.dismiss()
+                Log.e("CreateAccount", "Network Error: ${e.message}", e)
+                Toast.makeText(
+                    context, "Network error. Please check your connection.", Toast.LENGTH_SHORT
+                ).show()
             } catch (e: Exception) {
                 progressDialog.dismiss()
-                Log.e("CreateAccount", "Error: ${e.message}", e)
-                Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
-                    .show()
+                Log.e("CreateAccount", "Unexpected Error: ${e.message}", e)
+                Toast.makeText(
+                    context, "Something went wrong. Please try again.", Toast.LENGTH_SHORT
+                ).show()
             } finally {
 //                clearFields()
             }
@@ -189,13 +239,87 @@ class CreateAccount : BaseFragment() {
                 putString("phoneNumber", phoneNumber)
                 putString("user_id", it.toString())
             }
-            navController.navigate(R.id.action_createAccount_to_verifyEmailFragment, bundle)
-            Toast.makeText(context, "User Already Exist", Toast.LENGTH_SHORT).show()
+            Log.e(TAG, "handleUserExist: ${response.code()}")
+            if (response.code() == 409) {
+                if (response.body()?.registration_status?.verification_status?.email_verified == false) {
+                    Toast.makeText(
+                        context,
+                        "You have registered please verify your email address",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    navController.navigate(R.id.action_createAccount_to_verifyEmailFragment, bundle)
+                } else if (response.body()?.registration_status?.verification_status?.phone_verified == false) {
+                    resendPhone(phoneNumber)
+                    Toast.makeText(
+                        context,
+                        "You have registered please verify your phone number",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    navController.navigate(R.id.action_createAccount_to_verifyPhoneFragment, bundle)
+
+                } else {
+                    setErrorState(
+                        binding.emailLayout, "user exist with this email", binding.enterEmail
+                    )
+                    setErrorState(
+                        binding.phoneLayout, "user exist with this phone number", binding.phone
+                    )
+                }
+            }
         } ?: run {
             val errorResponse = response.errorBody()?.string()
             Log.e("CreateAccount", "Error Response: $errorResponse")
-            Toast.makeText(context, "User with this credentials already exists", Toast.LENGTH_SHORT)
-                .show()
+
+            val gson = Gson()
+            val errorData = gson.fromJson(errorResponse, SignUpErrorResponse::class.java)
+
+            if (errorData?.message == "Registration already in progress") {
+                Log.d(TAG, "handleUserExist: Registration in progress")
+                val email = binding.enterEmail.text.toString()
+                val phoneNumber = binding.phone.text.toString().removePrefix("+91 ")
+                val bundle = Bundle().apply {
+                    putString("email", email)
+                    putString("phoneNumber", phoneNumber)
+                    putString("user_id", errorData.registration_status?.user_id.toString())
+                }
+                val registrationStatus = errorData.registration_status
+                if (registrationStatus != null) {
+                    if (registrationStatus.email_verified == "False") {
+                        Toast.makeText(
+                            context,
+                            "You have registered please verify your email address",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        Log.d(TAG, "Navigating to VerifyEmailFragment")
+                        navController.navigate(
+                            R.id.action_createAccount_to_verifyEmailFragment, bundle
+                        )
+                    } else if (registrationStatus.phone_verified == "False") {
+                        Log.d(TAG, "Navigating to VerifyPhoneFragment")
+                        Toast.makeText(
+                            context,
+                            "You have registered please verify your phone number",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        resendPhone(phoneNumber)
+                        navController.navigate(
+                            R.id.action_createAccount_to_verifyPhoneFragment, bundle
+                        )
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Verification step unknown. Please try again.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } else {
+                Log.d(TAG, "handleUserExist: User with these credentials already exists $errorData")
+                Toast.makeText(
+                    context, "${errorData.errors}", Toast.LENGTH_SHORT
+                ).show()
+            }
+
         }
     }
 
@@ -302,7 +426,6 @@ class CreateAccount : BaseFragment() {
         })
     }
 
-
     private fun setupEmailValidation(
         emailEditText: TextInputEditText,
         emailInputLayout: TextInputLayout,
@@ -370,24 +493,30 @@ class CreateAccount : BaseFragment() {
             }
         }
 
-
         val unmetColor = ContextCompat.getColor(requireContext(), R.color.white)
         val metColor = ContextCompat.getColor(requireContext(), R.color.green)
 
         passwordEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val password = s.toString()
-                binding.criteriaLength.setTextColor(if (password.length >= 8) metColor else unmetColor)
-                binding.criteriaUpper.setTextColor(if (password.any { it.isUpperCase() }) metColor else unmetColor)
-                binding.criteriaLower.setTextColor(if (password.any { it.isLowerCase() }) metColor else unmetColor)
-                binding.criteriaDigit.setTextColor(if (password.any { it.isDigit() }) metColor else unmetColor)
-                binding.criteriaSpecial.setTextColor(if (password.any { !it.isLetterOrDigit() }) metColor else unmetColor)
 
+                val passwordCriteria = mapOf(
+                    binding.criteriaLength to (password.length >= 8),
+                    binding.criteriaUpper to password.any { it.isUpperCase() },
+                    binding.criteriaLower to password.any { it.isLowerCase() },
+                    binding.criteriaSpecial to password.any { it in "@\$!%*?&" && !it.isDigit() },
+                    binding.criteriaDigit to password.any { it.isDigit() }
+                )
+                passwordCriteria.forEach { (criteriaView, isMet) ->
+                    criteriaView.setTextColor(if (isMet) metColor else unmetColor)
+                }
                 val isPasswordValid = isValidPassword(password)
                 if (isPasswordValid) {
                     passwordCriteriaLayout.visibility = View.GONE
                     setValidState(passwordInputLayout, "", passwordEditText)
                     resetToDefault(passwordInputLayout, passwordEditText)
+                } else {
+                    passwordCriteriaLayout.visibility = View.VISIBLE
                 }
             }
 
@@ -403,7 +532,6 @@ class CreateAccount : BaseFragment() {
             }
         })
     }
-
 
     private fun setupConfirmPasswordValidation(
         confirmPasswordEditText: TextInputEditText,
@@ -513,5 +641,33 @@ class CreateAccount : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+
     }
+
+
+    private fun resendPhone(phone_number: String) {
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Loading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
+        lifecycleScope.launch {
+            try {
+                Log.e("VerifyPhoneFragment", "Phone number: $phone_number")
+                val response = RetrofitInstance.api.resendPhoneOtp(resendPhoneRequest(phone_number))
+                if (response.success) {
+                    Toast.makeText(requireContext(), "OTP sent successfully", Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Log.e("VerifyPhoneFragment", "Error: ${e.message}")
+                Toast.makeText(requireContext(), "Failed to Resend OTP", Toast.LENGTH_SHORT).show()
+            } finally {
+                progressDialog.dismiss()
+            }
+        }
+    }
+
 }

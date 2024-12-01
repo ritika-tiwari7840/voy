@@ -17,32 +17,45 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.ritika.voy.BaseFragment
+import com.ritika.voy.KeyboardUtils
 import com.ritika.voy.R
 import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.RetrofitInstance
+import com.ritika.voy.api.dataclasses.GetUserResponse
 import com.ritika.voy.api.dataclasses.PhoneVerifyRequest
 import com.ritika.voy.api.dataclasses.resendPhoneRequest
 import com.ritika.voy.databinding.FragmentVerifyPhoneBinding
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import retrofit2.http.Tag
+import kotlin.math.log
 
 class VerifyPhoneFragment : BaseFragment() {
     private var _binding: FragmentVerifyPhoneBinding? = null
     private val binding get() = _binding!!
     private lateinit var navController: NavController
     private lateinit var resendTimer: CountDownTimer
+    lateinit var keyboardUtils: KeyboardUtils
+    private var TAG: String = "VerifyPhoneFragment"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
         _binding = FragmentVerifyPhoneBinding.inflate(inflater, container, false)
+
+        val scrollView: ScrollView = binding.scrollView
+        keyboardUtils = KeyboardUtils(scrollView.id)
+
         return binding.root
     }
 
@@ -62,10 +75,7 @@ class VerifyPhoneFragment : BaseFragment() {
         startResendTimer()
         val spannable = SpannableString(resendText)
         spannable.setSpan(
-            ForegroundColorSpan(Color.WHITE),
-            0,
-            24,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            ForegroundColorSpan(Color.WHITE), 0, 24, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
         spannable.setSpan(
@@ -75,10 +85,7 @@ class VerifyPhoneFragment : BaseFragment() {
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         spannable.setSpan(
-            UnderlineSpan(),
-            25,
-            resendText.length,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            UnderlineSpan(), 25, resendText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         resendTextview.text = spannable
 
@@ -128,12 +135,8 @@ class VerifyPhoneFragment : BaseFragment() {
         navController = Navigation.findNavController(view)
 
         binding.btnVerify.setOnClickListener {
-            val phone_otp = otpBox1.text.toString() +
-                    otpBox2.text.toString() +
-                    otpBox3.text.toString() +
-                    otpBox4.text.toString() +
-                    otpBox5.text.toString() +
-                    otpBox6.text.toString()
+            val phone_otp =
+                otpBox1.text.toString() + otpBox2.text.toString() + otpBox3.text.toString() + otpBox4.text.toString() + otpBox5.text.toString() + otpBox6.text.toString()
 
             val user_id = arguments?.getString("user_id")
             val email = arguments?.getString("email")
@@ -149,7 +152,11 @@ class VerifyPhoneFragment : BaseFragment() {
         }
 
         binding.btnBack.setOnClickListener {
-            navController.navigate(R.id.action_verifyPhoneFragment_to_verifyEmailFragment)
+            val user_id = arguments?.getString("user_id")
+            val email = arguments?.getString("email")
+            val phone = arguments?.getString("phone")
+            val bundle = bundleOf("user_id" to user_id, "email" to email, "phone" to phone)
+            navController.navigate(R.id.action_verifyPhoneFragment_to_createAccount, bundle)
         }
 
         binding.resendTextView.setOnClickListener {
@@ -169,10 +176,7 @@ class VerifyPhoneFragment : BaseFragment() {
                 val resendText = "Didn’t receive any code? Resend Code ($secondsRemaining)"
                 val spannable = SpannableString(resendText)
                 spannable.setSpan(
-                    ForegroundColorSpan(Color.WHITE),
-                    0,
-                    24,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    ForegroundColorSpan(Color.WHITE), 0, 24, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
 
                 spannable.setSpan(
@@ -182,10 +186,7 @@ class VerifyPhoneFragment : BaseFragment() {
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
                 spannable.setSpan(
-                    UnderlineSpan(),
-                    25,
-                    resendText.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    UnderlineSpan(), 25, resendText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
                 binding.resendTextView.text = spannable
             }
@@ -196,10 +197,7 @@ class VerifyPhoneFragment : BaseFragment() {
                 val resendText = "Didn’t receive any code? Resend Code"
                 val spannable = SpannableString(resendText)
                 spannable.setSpan(
-                    ForegroundColorSpan(Color.WHITE),
-                    0,
-                    24,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    ForegroundColorSpan(Color.WHITE), 0, 24, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
 
                 spannable.setSpan(
@@ -209,10 +207,7 @@ class VerifyPhoneFragment : BaseFragment() {
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
                 spannable.setSpan(
-                    UnderlineSpan(),
-                    25,
-                    resendText.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    UnderlineSpan(), 25, resendText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
                 binding.resendTextView.text = spannable
             }
@@ -227,7 +222,7 @@ class VerifyPhoneFragment : BaseFragment() {
 
         lifecycleScope.launch {
             try {
-                Log.e("VerifyPhoneFragment", "Phone number: $phone_number")
+                Log.e(tag, "Phone number: $phone_number")
                 val response = RetrofitInstance.api.resendPhoneOtp(resendPhoneRequest(phone_number))
                 if (response.success) {
                     Toast.makeText(requireContext(), "OTP sent successfully", Toast.LENGTH_SHORT)
@@ -236,7 +231,7 @@ class VerifyPhoneFragment : BaseFragment() {
                     Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Log.e("VerifyPhoneFragment", "Error: ${e.message}")
+                Log.e(tag, "Error: ${e.message}")
                 Toast.makeText(requireContext(), "Failed to Resend OTP", Toast.LENGTH_SHORT).show()
             } finally {
                 progressDialog.dismiss()
@@ -272,15 +267,37 @@ class VerifyPhoneFragment : BaseFragment() {
                         "Otp verified, Registration Successful",
                         Toast.LENGTH_SHORT
                     ).show()
-                    navController.navigate(R.id.action_verifyPhoneFragment_to_homeActivity)
+                    Log.d("PhoneVerification", "phoneVerify: ${response}")
+                    try {
+                        val accessToken = response.tokens?.access
+                        DataStoreManager.saveTokens(
+                            requireContext(), response.tokens?.access!!, response.tokens?.refresh!!
+                        )
+                        if (accessToken != null) {
+                            val userResponse = getUserData(accessToken)
+                            if (userResponse.success) {
+                                Log.d(tag, "User Details: ${userResponse.user}")
+                                val bundle = Bundle().apply {
+                                    putParcelable("user_details", userResponse.user)
+                                }
+                                navController.navigate(
+                                    R.id.action_verifyPhoneFragment_to_homeActivity, bundle
+                                )
+                            }
+                        } else {
+                            navController.navigate(R.id.action_verifyPhoneFragment_to_loginFragment)
+                        }
+                    } catch (e: Exception) {
+                        Log.e(tag, "Error: ${e.message}")
+                    }
                 } else {
-                    Log.e("VerifyPhoneFragment", "Error: ${response.message}")
+                    Log.e(tag, "Error: ${response.message}")
                     Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "An unexpected error occurred", Toast.LENGTH_SHORT)
                     .show()
-                Log.e("VerifyPhoneFragment", "Error: ${e.message}")
+                Log.e(tag, "Error: ${e.message}")
             } finally {
                 progressDialog.dismiss()
                 clearFields()
@@ -288,7 +305,7 @@ class VerifyPhoneFragment : BaseFragment() {
         }
     }
 
-    fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
+    private fun setupOtpInput(currentBox: EditText, nextBox: EditText) {
         currentBox.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -302,7 +319,7 @@ class VerifyPhoneFragment : BaseFragment() {
         })
     }
 
-    fun setupBackspace(currentBox: EditText, previousBox: EditText) {
+    private fun setupBackspace(currentBox: EditText, previousBox: EditText) {
         currentBox.setOnKeyListener { _, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_DEL && event.action == KeyEvent.ACTION_DOWN) {
                 if (currentBox.text.isNotEmpty()) {
@@ -319,6 +336,14 @@ class VerifyPhoneFragment : BaseFragment() {
     }
 
     override fun onBackPressed() {
-        navController.navigate(R.id.verifyEmailFragment)
+        val user_id = arguments?.getString("user_id")
+        val email = arguments?.getString("email")
+        val phone = arguments?.getString("phone")
+        val bundle = bundleOf("user_id" to user_id, "email" to email, "phone" to phone)
+        navController.navigate(R.id.action_verifyPhoneFragment_to_createAccount, bundle)
+    }
+
+    private suspend fun getUserData(accessToken: String): GetUserResponse {
+        return RetrofitInstance.api.getUserData("Bearer $accessToken")
     }
 }

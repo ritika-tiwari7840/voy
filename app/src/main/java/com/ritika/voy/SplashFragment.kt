@@ -43,17 +43,25 @@ class SplashFragment : Fragment() {
 
         Handler(Looper.getMainLooper()).postDelayed({
             lifecycleScope.launch {
-                val accessToken = DataStoreManager.getToken(requireContext(), "access").first()
-                if (accessToken != null) {
-                    val userResponse = getUserData(accessToken)
-                    if (userResponse.success) {
-                        Log.d("User Details", "User Details: ${userResponse.user}")
-                        val bundle = Bundle().apply {
-                            putParcelable("user_details", userResponse.user)
+                try {
+                    val accessToken = DataStoreManager.getToken(requireContext(), "access").first()
+                    if (accessToken != null) {
+                        val userResponse = getUserData(accessToken)
+                        if (userResponse.success) {
+                            Log.d("User Details", "User Details: ${userResponse.user}")
+                            val bundle = Bundle().apply {
+                                putParcelable("user_details", userResponse.user)
+                            }
+                            navController.navigate(
+                                R.id.action_splashFragment_to_homeActivity,
+                                bundle
+                            )
                         }
-                        navController.navigate(R.id.action_splashFragment_to_homeActivity, bundle)
+                    } else {
+                        navController.navigate(R.id.action_splashFragment_to_continueWithEmail)
                     }
-                } else {
+                } catch (e: Exception) {
+                    Log.e("SplashFragment", "Error: ${e.message}")
                     navController.navigate(R.id.action_splashFragment_to_continueWithEmail)
                 }
             }

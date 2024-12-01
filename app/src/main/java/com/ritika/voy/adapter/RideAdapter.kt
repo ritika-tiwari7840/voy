@@ -43,8 +43,7 @@ class RideAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RideViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.ride_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.ride_item, parent, false)
         return RideViewHolder(view)
     }
 
@@ -86,12 +85,10 @@ class RideAdapter(
             "pickup_location" to "Central Park",
             "dropoff_location" to "JFK Terminal 4",
             "pickup_point" to mapOf(
-                "type" to "Point",
-                "coordinates" to listOf(28.676932700000002, 77.5019882)
+                "type" to "Point", "coordinates" to listOf(28.676932700000002, 77.5019882)
             ),
             "dropoff_point" to mapOf(
-                "type" to "Point",
-                "coordinates" to listOf(28.66469254331024, 77.48862951993942)
+                "type" to "Point", "coordinates" to listOf(28.66469254331024, 77.48862951993942)
             ),
             "seats_needed" to 2
         )

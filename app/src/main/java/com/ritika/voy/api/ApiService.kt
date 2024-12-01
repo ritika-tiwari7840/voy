@@ -17,6 +17,8 @@ import com.ritika.voy.api.dataclasses.mapsDataClasses.RoutesResponse
 import com.ritika.voy.api.dataclasses.PhoneVerifyRequest
 import com.ritika.voy.api.dataclasses.RideHistoryResponse
 import com.ritika.voy.api.dataclasses.RideRequestResponse
+import com.ritika.voy.api.dataclasses.SignUpRequest
+import com.ritika.voy.api.dataclasses.SignUpResponse
 import com.ritika.voy.api.dataclasses.UserResponseData
 import com.ritika.voy.api.dataclasses.VerifyRequest
 import com.ritika.voy.api.dataclasses.VerifyResponse
@@ -28,6 +30,7 @@ import com.ritika.voy.api.dataclasses.resendOTPRequest
 import com.ritika.voy.api.dataclasses.resendPhoneOTP
 import com.ritika.voy.api.dataclasses.resendPhoneRequest
 import okhttp3.MultipartBody
+import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -41,6 +44,9 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
+
+    @POST("auth/register/")
+    fun signUp(@Body request: SignUpRequest): Call<SignUpResponse>
 
     @POST("auth/login/")
     suspend fun login(@Body loginRequest: LoginRequest): LoginResponse
@@ -134,12 +140,13 @@ interface ApiService {
     suspend fun requestRide(
         @Header("Authorization") authHeader: String,
         @Path("passengerId") passengerId: Int,
-        @Body rideRequest: JsonObject
+        @Body rideRequest: JsonObject,
     ): RideRequestResponse
 
     @GET("rides/ride-history/")
     suspend fun getRideHistory(
         @Header("Authorization") authHeader: String,
     ): RideHistoryResponse
+
 
 }

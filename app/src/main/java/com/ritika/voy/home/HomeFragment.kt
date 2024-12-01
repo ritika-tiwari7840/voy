@@ -42,17 +42,17 @@ class HomeFragment : Fragment() {
 
         val user = sharedViewModel.user
         if (user != null) {
-            if (user.first_name != null) {
+            if (user.first_name != null && user.first_name != "") {
                 firstName = user.first_name
             } else {
-                firstName = "hello User"
+                firstName = "User"
             }
             if (user.is_driver_verified != null) {
                 isDiverVerified = user.is_driver_verified
             } else {
                 isDiverVerified = false
             }
-            binding.homeGreetingText.text = "hello, ${user.first_name}"
+            binding.homeGreetingText.text = "hello, ${firstName}"
         }
 
         return binding.root

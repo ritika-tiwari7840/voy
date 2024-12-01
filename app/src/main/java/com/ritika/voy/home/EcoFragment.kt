@@ -41,7 +41,11 @@ class EcoFragment : Fragment() {
 
         val user = sharedViewModel.user
         if (user != null) {
-            binding.userName.text = user.first_name
+            if (user.first_name != null && user.first_name != "") {
+                binding.userName.text = user.first_name
+            } else {
+                binding.userName.text = "User Name"
+            }
         }
 
         return binding.root

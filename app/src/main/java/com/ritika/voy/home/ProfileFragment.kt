@@ -43,12 +43,16 @@ class ProfileFragment : Fragment() {
         val sharedViewModel: SharedViewModel by activityViewModels()
         val user = sharedViewModel.user
         if (user != null) {
-            binding.userName.text = user.full_name
+            if (user.full_name != null && user.full_name != "") {
+                binding.userName.text = user.full_name
+            }else{
+                binding.userName.text = "User Name"
+            }
             setSpannableText(binding.ratingAsHost, "${user.rating_as_driver} \nAs Host")
             setSpannableText(binding.ratingAsGuest, "${user.rating_as_passenger} \nAs Host")
             setSpannableText(
                 binding.totalRatings,
-                "${(user.rating_as_driver + user.rating_as_passenger ?: 0.0).div(2)} \nRatings"
+                "${(user?.rating_as_driver?.plus(user.rating_as_passenger!!) ?: 0.0).div(2)} \nRatings"
             )
             val imageUrl = user.profile_photo.toString()
             val textView = binding.userName

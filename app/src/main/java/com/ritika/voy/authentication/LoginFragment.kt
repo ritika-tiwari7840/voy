@@ -39,8 +39,11 @@ import java.io.IOException
 import retrofit2.HttpException
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.google.gson.Gson
+import com.ritika.voy.KeyboardUtils
 import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.dataclasses.GetUserResponse
+import com.ritika.voy.api.dataclasses.LoginResponse
 import kotlinx.coroutines.flow.first
 
 class LoginFragment : BaseFragment() {
@@ -49,12 +52,15 @@ class LoginFragment : BaseFragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
     private var bundle = Bundle()
+    lateinit var keyboardUtils: KeyboardUtils
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        val scrollView = binding.scrollView
+        keyboardUtils = KeyboardUtils(scrollView.id)
         return binding.root
     }
 
@@ -115,7 +121,7 @@ class LoginFragment : BaseFragment() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val email = s.toString()
-                if (email.contains("@")) {
+                if (isValidEmail(email)) {
                     emailEditText.background =
                         ContextCompat.getDrawable(requireContext(), R.drawable.edit_text_background)
                     emailErrorTextView.visibility = View.GONE
@@ -205,12 +211,11 @@ class LoginFragment : BaseFragment() {
                             }
                         }
                     }
-
                     Toast.makeText(requireContext(), "${response.message}", Toast.LENGTH_SHORT)
                         .show()
-                    navController.navigate(R.id.action_loginFragment_to_homeActivity,bundle)
+                    navController.navigate(R.id.action_loginFragment_to_homeActivity, bundle)
                 } else {
-                    Log.e("LoginFragment", "Error: ${response.message}")
+                    Log.e("LoginFragment", "Error: ${response.message} ")
                     Toast.makeText(
                         requireContext(),
                         " ${response.message}",
@@ -218,9 +223,53 @@ class LoginFragment : BaseFragment() {
                     ).show()
                 }
             } catch (e: HttpException) {
-                Log.e("LoginFragment", "Error: ${e.message()}")
-                Toast.makeText(requireContext(), "${e.message()}", Toast.LENGTH_SHORT)
-                    .show()
+                when (e.code()) {
+                    400 -> {
+                        try {
+                            val errorBody = e.response()?.errorBody()?.string()
+                            val gson = Gson()
+                            val errorResponse = gson.fromJson(
+                                errorBody,
+                                LoginResponse::class.java
+                            ) // Replace with your response class
+                            Toast.makeText(
+                                requireContext(),
+                                errorResponse.message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            Log.e("CreateAccount", "Bad Request: ${errorResponse.message}")
+                        } catch (parseException: Exception) {
+                            Log.e(
+                                "CreateAccount",
+                                "Error parsing response: ${parseException.message}",
+                                parseException
+                            )
+                            Toast.makeText(
+                                requireContext(),
+                                "Invalid input. Please check your details.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+
+                    401 -> {
+                        Log.e("LoginFragment", "Unauthorized: ${e.message()}")
+                        Toast.makeText(
+                            requireContext(),
+                            "Unauthorized access. Please check your credentials.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    else -> {
+                        Log.e("LoginFragment", "HTTP Error: ${e.code()} - ${e.message()}")
+                        Toast.makeText(
+                            requireContext(),
+                            "Unexpected error occurred: ${e.message()}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             } catch (e: IOException) {
                 Log.e("LoginFragment", "Error: ${e.message}")
                 Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT).show()
@@ -247,4 +296,11 @@ class LoginFragment : BaseFragment() {
     private suspend fun getUserData(accessToken: String): GetUserResponse {
         return RetrofitInstance.api.getUserData("Bearer $accessToken")
     }
+
+    private fun isValidEmail(email: String): Boolean {
+        val emailRegex =
+            "^[A-Za-z0-9_+&*-]+(?:\\.[A-Za-z0-9_+&*-]+)*@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
+        return email.matches(emailRegex)
+    }
+
 }

@@ -83,10 +83,22 @@ class EditInfo : Fragment() {
         sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
         val user = sharedViewModel.user
         if (user != null) {
-            binding.name.text = user.full_name
+            if (user.full_name != null && user.full_name != "") {
+                binding.name.text = user.full_name
+            } else {
+                binding.name.text = "User Name"
+            }
             binding.phoneNumber.text = user.phone_number
-            binding.gender.text = user.gender
-            binding.emergencyContact.text = user.emergency_contact_phone
+            if (user.gender != null && user.gender != "") {
+                binding.gender.text = user.gender
+            } else {
+                binding.gender.text = "Not Specified"
+            }
+            if (user.emergency_contact_phone != null && user.emergency_contact_phone != "") {
+                binding.emergencyContact.text = user.emergency_contact_phone
+            } else {
+                binding.emergencyContact.text = "Not Specified"
+            }
             binding.email.text = user.email
             binding.firstName.setText(user.first_name)
             binding.lastName.setText(user.last_name)
@@ -106,12 +118,8 @@ class EditInfo : Fragment() {
             val textView = binding.setProfile
             Log.d("Image", "onLoadCleared:  $imageUrl")
 
-            Glide.with(requireContext())
-                .load(imageUrl)
-                .placeholder(R.drawable.profile_image)
-                .error(R.drawable.profile_image)
-                .transform(CircleCrop())
-                .into(binding.setProfile)
+            Glide.with(requireContext()).load(imageUrl).placeholder(R.drawable.profile_image)
+                .error(R.drawable.profile_image).transform(CircleCrop()).into(binding.setProfile)
 
         }
 

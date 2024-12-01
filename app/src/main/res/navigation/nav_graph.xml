@@ -9,73 +9,72 @@
         android:id="@+id/splashFragment"
         android:name="com.ritika.voy.SplashFragment"
         android:label="fragment_splash"
-        tools:layout="@layout/fragment_splash" >
+        tools:layout="@layout/fragment_splash">
         <action
             android:id="@+id/action_splashFragment_to_continueWithEmail"
             app:destination="@id/continueWithEmail"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
         <action
             android:id="@+id/action_splashFragment_to_mapActivity"
             app:destination="@id/mapActivity"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
         <action
             android:id="@+id/action_splashFragment_to_homeActivity"
             app:destination="@id/homeActivity"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"
-            />
+            app:popExitAnim="@anim/exit_to_left" />
     </fragment>
     <fragment
         android:id="@+id/continueWithEmail"
         android:name="com.ritika.voy.ContinueWithEmail"
         android:label="fragment_continue_with_email"
-        tools:layout="@layout/fragment_continue_with_email" >
+        tools:layout="@layout/fragment_continue_with_email">
         <action
             android:id="@+id/action_continueWithEmail_to_loginFragment"
             app:destination="@id/loginFragment"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.ritika.voy.authentication.LoginFragment"
-        android:label="LoginFragment" >
+        android:label="LoginFragment">
         <action
             android:id="@+id/action_loginFragment_to_forgotPasswordFragment"
             app:destination="@id/forgotPasswordFragment"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
         <action
             android:id="@+id/action_loginFragment_to_createAccount"
             app:destination="@id/createAccount"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
         <action
             android:id="@+id/action_loginFragment_to_continueWithEmail"
             app:destination="@id/continueWithEmail"
             app:enterAnim="@anim/enter_from_left"
             app:exitAnim="@anim/exit_to_right"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
         <action
             android:id="@+id/action_loginFragment_to_mapActivity"
             app:destination="@id/mapActivity"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
         <action
             android:id="@+id/action_loginFragment_to_homeActivity"
             app:destination="@id/homeActivity" />
@@ -84,130 +83,148 @@
         android:id="@+id/forgotPasswordFragment"
         android:name="com.ritika.voy.authentication.ForgotPasswordFragment"
         android:label="fragment_forgot_password"
-        tools:layout="@layout/fragment_forgot_password" >
+        tools:layout="@layout/fragment_forgot_password">
         <action
             android:id="@+id/action_forgotPasswordFragment_to_otpFragment"
             app:destination="@id/otpFragment"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
         <action
             android:id="@+id/action_forgotPasswordFragment_to_loginFragment"
             app:destination="@id/loginFragment"
             app:enterAnim="@anim/enter_from_left"
             app:exitAnim="@anim/exit_to_right"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
     </fragment>
     <fragment
         android:id="@+id/otpFragment"
         android:name="com.ritika.voy.authentication.OtpFragment"
         android:label="fragment_otp"
-        tools:layout="@layout/fragment_otp" >
+        tools:layout="@layout/fragment_otp">
         <action
             android:id="@+id/action_otpFragment_to_resetPassword"
             app:destination="@id/resetPassword"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
         <action
             android:id="@+id/action_otpFragment_to_forgotPasswordFragment"
             app:destination="@id/forgotPasswordFragment"
             app:enterAnim="@anim/enter_from_left"
             app:exitAnim="@anim/exit_to_right"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
     </fragment>
     <fragment
         android:id="@+id/resetPassword"
         android:name="com.ritika.voy.authentication.ResetPassword"
         android:label="fragment_reset_password"
-        tools:layout="@layout/fragment_reset_password" >
+        tools:layout="@layout/fragment_reset_password">
         <action
             android:id="@+id/action_resetPassword_to_otpFragment"
             app:destination="@id/otpFragment"
             app:enterAnim="@anim/enter_from_left"
             app:exitAnim="@anim/exit_to_right"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
         <action
             android:id="@+id/action_resetPassword_to_loginFragment"
             app:destination="@id/loginFragment"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
     </fragment>
     <fragment
         android:id="@+id/createAccount"
         android:name="com.ritika.voy.authentication.CreateAccount"
-        android:label="CreateAccount" >
+        android:label="CreateAccount">
         <action
             android:id="@+id/action_createAccount_to_verifyEmailFragment"
             app:destination="@id/verifyEmailFragment"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
         <action
             android:id="@+id/action_createAccount_to_loginFragment"
             app:destination="@id/loginFragment"
             app:enterAnim="@anim/enter_from_left"
             app:exitAnim="@anim/exit_to_right"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
+        <action
+            android:id="@+id/action_createAccount_to_verifyPhoneFragment"
+            app:destination="@id/verifyPhoneFragment"
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left" />
     </fragment>
     <fragment
         android:id="@+id/verifyEmailFragment"
         android:name="com.ritika.voy.authentication.VerifyEmailFragment"
         android:label="fragment_verify_email"
-        tools:layout="@layout/fragment_verify_email" >
+        tools:layout="@layout/fragment_verify_email">
         <action
             android:id="@+id/action_verifyEmailFragment_to_verifyPhoneFragment"
             app:destination="@id/verifyPhoneFragment"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
         <action
             android:id="@+id/action_verifyEmailFragment_to_createAccount"
             app:destination="@id/createAccount"
             app:enterAnim="@anim/enter_from_left"
             app:exitAnim="@anim/exit_to_right"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
     </fragment>
     <fragment
         android:id="@+id/verifyPhoneFragment"
         android:name="com.ritika.voy.authentication.VerifyPhoneFragment"
         android:label="fragment_verify_phone"
-        tools:layout="@layout/fragment_verify_phone" >
+        tools:layout="@layout/fragment_verify_phone">
         <action
             android:id="@+id/action_verifyPhoneFragment_to_createAccount"
             app:destination="@id/createAccount"
             app:enterAnim="@anim/enter_from_left"
             app:exitAnim="@anim/exit_to_right"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
         <action
             android:id="@+id/action_verifyPhoneFragment_to_verifyEmailFragment"
             app:destination="@id/verifyEmailFragment"
             app:enterAnim="@anim/enter_from_left"
             app:exitAnim="@anim/exit_to_right"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
         <action
             android:id="@+id/action_verifyPhoneFragment_to_mapActivity"
             app:destination="@id/mapActivity"
             app:enterAnim="@anim/enter_from_right"
             app:exitAnim="@anim/exit_to_left"
             app:popEnterAnim="@anim/enter_from_right"
-            app:popExitAnim="@anim/exit_to_left"/>
+            app:popExitAnim="@anim/exit_to_left" />
         <action
             android:id="@+id/action_verifyPhoneFragment_to_homeActivity"
-            app:destination="@id/homeActivity" />
+            app:destination="@id/homeActivity"
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:popEnterAnim="@anim/enter_from_right"
+            app:popExitAnim="@anim/exit_to_left" />
+        <action
+            android:id="@+id/action_verifyPhoneFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:enterAnim="@anim/enter_from_left"
+            app:exitAnim="@anim/exit_to_right"
+            app:popEnterAnim="@anim/enter_from_left"
+            app:popExitAnim="@anim/exit_to_right" />
     </fragment>
     <activity
         android:id="@+id/mapActivity"
