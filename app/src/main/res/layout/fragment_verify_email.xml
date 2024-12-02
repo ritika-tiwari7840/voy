@@ -45,13 +45,13 @@
             android:id="@+id/tvForgotSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
             android:fontFamily="@font/poppinsmedium"
             android:text="Complete your email verification to proceed to \n phone number verification."
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:layout_marginTop="32dp"
             app:layout_constraintEnd_toStartOf="@+id/guideline5"
             app:layout_constraintStart_toStartOf="@+id/guideline4"
             app:layout_constraintTop_toBottomOf="@id/tvOtpTitle" />
@@ -163,6 +163,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/otpBox5"
             app:layout_constraintTop_toTopOf="@+id/enter_otp" />
+
+        <TextView
+            android:id="@+id/otp_not_correct"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/poppinsmedium"
+            android:paddingStart="4dp"
+            android:text="Otp is not correct"
+            android:textColor="#B12F24"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@+id/guideline4"
+            app:layout_constraintTop_toBottomOf="@+id/otpBox1" />
 
         <ImageView
             android:id="@+id/ivOtpErrorIcon"

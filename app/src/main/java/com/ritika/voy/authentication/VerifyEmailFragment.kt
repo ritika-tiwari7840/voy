@@ -46,6 +46,7 @@ class VerifyEmailFragment : BaseFragment() {
     private lateinit var resendTimer: CountDownTimer
     private var UserId: String? = null
     lateinit var keyboardUtils: KeyboardUtils
+    private val TAG: String = "VerifyEmailFragment"
 
     private val otpFields: List<EditText> by lazy {
         listOf(
@@ -320,9 +321,6 @@ class VerifyEmailFragment : BaseFragment() {
                                         .show()
                                 }
                             } else if (errorResponse.errors.containsKey("email_otp")) {
-                                binding.tvOtpError.visibility = View.VISIBLE
-                                binding.ivOtpErrorIcon.visibility = View.VISIBLE
-                                binding.tvOtpError.text = errorResponse.errors["email_otp"]?.get(0)
                                 view?.let {
                                     Snackbar.make(
                                         it,
@@ -340,10 +338,10 @@ class VerifyEmailFragment : BaseFragment() {
                                     ).show()
                                 }
                             }
-                            Log.e("CreateAccount", "Bad Request: ${errorResponse.message}")
+                            Log.e(TAG, "Bad Request: ${errorResponse.message}")
                         } catch (parseException: Exception) {
                             Log.e(
-                                "CreateAccount",
+                                TAG,
                                 "Error parsing response: ${parseException.message}",
                                 parseException
                             )
@@ -358,7 +356,7 @@ class VerifyEmailFragment : BaseFragment() {
                     }
 
                     401 -> {
-                        Log.e("LoginFragment", "Unauthorized: ${e.message()}")
+                        Log.e(TAG, "Unauthorized: ${e.message()}")
                         view?.let {
                             Snackbar.make(
                                 it,
@@ -369,19 +367,19 @@ class VerifyEmailFragment : BaseFragment() {
                     }
 
                     else -> {
-                        Log.e("LoginFragment", "HTTP Error: ${e.code()} - ${e.message()}")
+                        Log.e(TAG, "HTTP Error: ${e.code()} - ${e.message()}")
                         view?.let {
                             Snackbar.make(it, "${e.message}", Snackbar.LENGTH_LONG).show()
                         }
                     }
                 }
             } catch (e: IOException) {
-                Log.e("LoginFragment", "Error: ${e.message}")
+                Log.e(TAG, "Error: ${e.message}")
                 view?.let {
                     Snackbar.make(it, "Network error", Snackbar.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
-                Log.e("LoginFragment", "Error: ${e.message}")
+                Log.e(TAG, "Error: ${e.message}")
                 view?.let {
                     Snackbar.make(it, "${e.message}", Snackbar.LENGTH_LONG).show()
                 }
@@ -430,4 +428,26 @@ class VerifyEmailFragment : BaseFragment() {
             Snackbar.make(it, message, Snackbar.LENGTH_LONG).show()
         }
     }
+
+    private fun setOtpErrorState(errorMessage: String) {
+        // Highlight OTP boxes with red border
+        val otpFields = listOf(
+            binding.otpBox1,
+            binding.otpBox2,
+            binding.otpBox3,
+            binding.otpBox4,
+            binding.otpBox5,
+            binding.otpBox6
+        )
+
+        otpFields.forEach { otpBox ->
+            otpBox.background = requireContext().getDrawable(R.drawable.edit_text_background_error)
+        }
+
+        // Set the helper text with the error message
+        binding.tvOtpError.visibility = View.VISIBLE
+        binding.ivOtpErrorIcon.visibility = View.VISIBLE
+        binding.tvOtpError.text = errorMessage
+    }
+
 }

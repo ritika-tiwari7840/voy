@@ -35,6 +35,7 @@ import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.EmailVerifyResponse
 import com.ritika.voy.api.dataclasses.GetUserResponse
 import com.ritika.voy.api.dataclasses.PhoneVerifyRequest
+import com.ritika.voy.api.dataclasses.phoneVerifyResponseX
 import com.ritika.voy.api.dataclasses.resendPhoneRequest
 import com.ritika.voy.databinding.FragmentVerifyPhoneBinding
 import kotlinx.coroutines.flow.first
@@ -311,7 +312,7 @@ class VerifyPhoneFragment : BaseFragment() {
                             val gson = Gson()
                             val errorResponse = gson.fromJson(
                                 errorBody,
-                                EmailVerifyResponse::class.java
+                                phoneVerifyResponseX::class.java
                             ) // Replace with your response class
                             if (errorResponse.errors.containsKey("user_id")) {
                                 view?.let {
@@ -323,13 +324,10 @@ class VerifyPhoneFragment : BaseFragment() {
                                         .show()
                                 }
                             } else if (errorResponse.errors.containsKey("phone_otp")) {
-                                binding.tvOtpError.visibility = View.VISIBLE
-                                binding.ivOtpErrorIcon.visibility = View.VISIBLE
-                                binding.tvOtpError.text = errorResponse.errors["phone_otp"]?.get(0)
                                 view?.let {
                                     Snackbar.make(
                                         it,
-                                        errorResponse.errors["phone_otp"]!![0],
+                                        "${errorResponse.errors["phone_otp"]?.get(0)}",
                                         Snackbar.LENGTH_LONG
                                     )
                                         .show()

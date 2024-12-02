@@ -17,6 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -26,6 +27,7 @@ import androidx.navigation.Navigation
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.ritika.voy.BaseFragment
+import com.ritika.voy.KeyboardUtils
 import com.ritika.voy.R
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.VerifyRequest
@@ -42,6 +44,7 @@ class OtpFragment : BaseFragment() {
     private var _binding: FragmentOtpBinding? = null
     private val binding get() = _binding!!
     private lateinit var resendTimer: CountDownTimer
+    lateinit var keyboardUtils: KeyboardUtils
     private val TAG: String = "OtpFragment"
 
 
@@ -55,6 +58,8 @@ class OtpFragment : BaseFragment() {
     ): View {
         // Inflate the layout for this fragment
         _binding = FragmentOtpBinding.inflate(inflater, container, false)
+        val scrollView: ScrollView = binding.scrollView
+        keyboardUtils = KeyboardUtils(scrollView.id)
         return binding.root
     }
 
@@ -70,7 +75,7 @@ class OtpFragment : BaseFragment() {
         params.topMargin = topMargin
         bottomSection.layoutParams = params
 
-        val resendTextview = view.findViewById<TextView>(R.id.resendTextView)
+        val resendTextview = binding.resendTextView
         startResendTimer()
         val resendText = "Didn’t receive any code? Resend Code"
         val spannable = SpannableString(resendText)
@@ -116,8 +121,8 @@ class OtpFragment : BaseFragment() {
         setupBackspace(otpBox6, otpBox5)
 
 
-        val otpErrorTextView = view.findViewById<TextView>(R.id.tvOtpError)
-        val otpErrorIcon = view.findViewById<ImageView>(R.id.ivOtpErrorIcon)
+        val otpErrorTextView = binding.tvOtpError
+        val otpErrorIcon = binding.ivOtpErrorIcon
 
         val otpFields = listOf(otpBox1, otpBox2, otpBox3, otpBox4, otpBox5, otpBox6)
 
@@ -280,10 +285,7 @@ class OtpFragment : BaseFragment() {
                             val gson = Gson()
                             val errorResponse = gson.fromJson(
                                 errorBody, VerifyResponse::class.java
-                            ) // Replace with your response class
-                            binding.tvOtpError.visibility = View.VISIBLE
-                            binding.ivOtpErrorIcon.visibility = View.VISIBLE
-                            binding.tvOtpError.text = errorResponse.errors["otp"]?.get(0).toString()
+                            )
                             view?.let {
                                 Snackbar.make(
                                     it,
@@ -413,4 +415,5 @@ class OtpFragment : BaseFragment() {
     override fun onBackPressed() {
         navController.navigate(R.id.action_otpFragment_to_forgotPasswordFragment)
     }
+
 }

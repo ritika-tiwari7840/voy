@@ -226,14 +226,15 @@ class LoginFragment : BaseFragment() {
                                 errorBody,
                                 LoginResponse::class.java
                             ) // Replace with your response class
+                            Log.e(TAG, "Bad Request: ${errorResponse.message}")
+
                             view?.let {
                                 Snackbar.make(it, "${errorResponse.message}", Snackbar.LENGTH_LONG)
                                     .show()
                             }
-                            Log.e("CreateAccount", "Bad Request: ${errorResponse.message}")
                         } catch (parseException: Exception) {
                             Log.e(
-                                "CreateAccount",
+                                TAG,
                                 "Error parsing response: ${parseException.message}",
                                 parseException
                             )
@@ -248,7 +249,7 @@ class LoginFragment : BaseFragment() {
                     }
 
                     401 -> {
-                        Log.e("LoginFragment", "Unauthorized: ${e.message()}")
+                        Log.e(TAG, "Unauthorized: ${e.message()}")
                         view?.let {
                             Snackbar.make(
                                 it,
@@ -259,19 +260,19 @@ class LoginFragment : BaseFragment() {
                     }
 
                     else -> {
-                        Log.e("LoginFragment", "HTTP Error: ${e.code()} - ${e.message()}")
+                        Log.e(TAG, "HTTP Error: ${e.code()} - ${e.message()}")
                         view?.let {
                             Snackbar.make(it, "${e.message}", Snackbar.LENGTH_LONG).show()
                         }
                     }
                 }
             } catch (e: IOException) {
-                Log.e("LoginFragment", "Error: ${e.message}")
+                Log.e(TAG, "Error: ${e.message}")
                 view?.let {
                     Snackbar.make(it, "Network error", Snackbar.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
-                Log.e("LoginFragment", "Error: ${e.message}")
+                Log.e(TAG, "Error: ${e.message}")
                 view?.let {
                     Snackbar.make(it, "${e.message}", Snackbar.LENGTH_LONG).show()
                 }

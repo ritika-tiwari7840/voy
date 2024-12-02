@@ -185,7 +185,7 @@ class CreateAccount : BaseFragment() {
                 progressDialog.dismiss()
                 when (e.code()) {
                     400 -> {
-                        Log.e("CreateAccount", "Bad Request: ${e.message()}", e)
+                        Log.e(TAG, "Bad Request: ${e.message()}", e)
                         view?.let {
                             Snackbar.make(
                                 it,
@@ -196,7 +196,7 @@ class CreateAccount : BaseFragment() {
                     }
 
                     404 -> {
-                        Log.e("CreateAccount", "Not Found: ${e.message()}", e)
+                        Log.e(TAG, "Not Found: ${e.message()}", e)
                         view?.let {
                             Snackbar.make(
                                 it,
@@ -207,7 +207,7 @@ class CreateAccount : BaseFragment() {
                     }
 
                     409 -> {
-                        Log.e("CreateAccount", "Conflict: ${e.message()}", e)
+                        Log.e(TAG, "Conflict: ${e.message()}", e)
                         view?.let {
                             Snackbar.make(
                                 it,
@@ -218,7 +218,7 @@ class CreateAccount : BaseFragment() {
                     }
 
                     else -> {
-                        Log.e("CreateAccount", "HTTP Error: ${e.code()} - ${e.message()}", e)
+                        Log.e(TAG, "HTTP Error: ${e.code()} - ${e.message()}", e)
                         view?.let {
                             Snackbar.make(it, "Please try again", Snackbar.LENGTH_LONG).show()
                         }
