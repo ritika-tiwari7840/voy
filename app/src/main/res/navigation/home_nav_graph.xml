@@ -60,6 +60,12 @@
             app:destination="@id/settingsFragment"
             app:popUpTo="@id/profile"
             app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_profile_to_myRidesFragment"
+            app:destination="@id/myRidesFragment"
+            app:popUpTo="@id/profile"
+            app:popUpToInclusive="false" />
+
     </fragment>
 
     <!-- Fragments outside bottom navigation -->
@@ -179,4 +185,8 @@
             app:popUpTo="@id/safetyToolsFragment"
             app:popUpToInclusive="true" />
     </fragment>
+    <fragment
+        android:id="@+id/myRidesFragment"
+        android:name="com.ritika.voy.home.MyRidesFragment"
+        android:label="MyRidesFragment" />
 </navigation>

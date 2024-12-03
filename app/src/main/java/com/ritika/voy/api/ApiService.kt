@@ -12,6 +12,8 @@ import com.ritika.voy.api.dataclasses.ResetResponse
 import com.ritika.voy.api.dataclasses.EmailVerifyRequest
 import com.ritika.voy.api.dataclasses.EmailVerifyResponse
 import com.ritika.voy.api.dataclasses.GetUserResponse
+import com.ritika.voy.api.dataclasses.OfferRideRequest
+import com.ritika.voy.api.dataclasses.OfferRideResponse
 import com.ritika.voy.api.dataclasses.mapsDataClasses.RoutesRequest
 import com.ritika.voy.api.dataclasses.mapsDataClasses.RoutesResponse
 import com.ritika.voy.api.dataclasses.PhoneVerifyRequest
@@ -142,6 +144,12 @@ interface ApiService {
         @Path("passengerId") passengerId: Int,
         @Body rideRequest: JsonObject,
     ): RideRequestResponse
+
+    @POST("rides/driver/create/")
+    suspend fun offerRide(
+        @Header("Authorization") authHeader: String,
+        @Body rideRequest: OfferRideRequest
+    ): OfferRideResponse
 
     @GET("rides/ride-history/")
     suspend fun getRideHistory(

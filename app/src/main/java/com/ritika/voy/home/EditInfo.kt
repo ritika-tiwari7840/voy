@@ -81,6 +81,7 @@ class EditInfo : Fragment() {
     ): View {
         _binding = FragmentEditInfoBinding.inflate(inflater, container, false)
         sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+
         val user = sharedViewModel.user
         if (user != null) {
             if (user.full_name != null && user.full_name != "") {
@@ -100,8 +101,16 @@ class EditInfo : Fragment() {
                 binding.emergencyContact.text = "Not Specified"
             }
             binding.email.text = user.email
-            binding.firstName.setText(user.first_name)
-            binding.lastName.setText(user.last_name)
+            if (user.first_name != null && user.first_name != "") {
+                binding.firstName.setText(user.first_name)
+            } else {
+                binding.firstName.hint = "Enter first name"
+            }
+            if (user.last_name != null && user.last_name != "") {
+                binding.lastName.setText(user.last_name)
+            } else {
+                binding.lastName.hint = "Enter last name"
+            }
             selectedGender = user.gender
             if (selectedGender != null) {
                 if (selectedGender == "FEMALE") {
@@ -151,18 +160,6 @@ class EditInfo : Fragment() {
     private fun setupClickListeners() {
         with(binding) {
             btnBack.setOnClickListener {
-                if (updatedName.isNotEmpty()) {
-                    val updatedUser = sharedViewModel.user?.copy(
-                        full_name = updatedName,
-                    )
-                    sharedViewModel.user = updatedUser
-                }
-                if (updatedImage.isNotEmpty()) {
-                    val updatedUser = sharedViewModel.user?.copy(
-                        profile_photo = updatedImage,
-                    )
-                    sharedViewModel.user = updatedUser
-                }
                 navController.navigate(R.id.action_editInfo_to_profile)
             }
             setProfile.setOnClickListener {
@@ -539,7 +536,10 @@ class EditInfo : Fragment() {
                 withContext(Dispatchers.Main) {
                     if (response.success) {
                         showToast("Profile updated successfully")
-                        updatedImage = response.user.profile_photo.toString()
+                        val updatedUser = sharedViewModel.user?.copy(
+                            profile_photo = response.user.profile_photo.toString()
+                        )
+                        sharedViewModel.user = updatedUser
                         Log.d(TAG, "Update response: $response \n file path is $filePath")
                     } else {
                         showToast("Error updating profile: ${response.message}")
@@ -618,6 +618,10 @@ class EditInfo : Fragment() {
                                         binding.other.isChecked = true
                                     }
                                 }
+                                val updatedUser = sharedViewModel.user?.copy(
+                                    gender = response.user.gender
+                                )
+                                sharedViewModel.user = updatedUser
                             } else {
                                 binding.gender.text = "Not Specified"
                             }
@@ -652,9 +656,15 @@ class EditInfo : Fragment() {
                         if (response.success) {
                             showToast("UserName updated successfully")
                             Log.d(TAG, "Update response: $response")
-                            updatedName = response.user.full_name
                             binding.firstName.setText(response.user.first_name)
                             binding.lastName.setText(response.user.last_name)
+                            val updatedUser = sharedViewModel.user?.copy(
+                                full_name = response.user.full_name,
+                                first_name = response.user.first_name,
+                                last_name = response.user.last_name,
+                            )
+                            sharedViewModel.user = updatedUser
+
                         } else {
                             Log.e(TAG, "Error updating gender: ${response.message} ")
                             showToast("Error updating gender: ${response.message}")
@@ -686,6 +696,11 @@ class EditInfo : Fragment() {
                         if (response.success) {
                             showToast("Emergency Contact updated successfully")
                             Log.d(TAG, "Update response: $response, $emergencyContactNo")
+
+                            val updatedUser = sharedViewModel.user?.copy(
+                                emergency_contact_phone = response.user.emergency_contact_phone
+                            )
+                            sharedViewModel.user = updatedUser
                         } else {
                             Log.e(TAG, "Error Adding Emergency Contact: ${response.message} ")
                             showToast("Error Adding Emergency Contact: ${response.message}")
@@ -727,10 +742,19 @@ class EditInfo : Fragment() {
     }
 
     override fun onResume() {
+
         super.onResume()
     }
 
     override fun onDestroyView() {
+
+
+        if (updatedImage.isNotEmpty()) {
+            val updatedUser = sharedViewModel.user?.copy(
+                profile_photo = updatedImage,
+            )
+            sharedViewModel.user = updatedUser
+        }
         super.onDestroyView()
         uploadJob?.cancel()
         _binding = null

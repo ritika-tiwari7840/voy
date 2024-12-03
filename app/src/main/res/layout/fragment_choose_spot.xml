@@ -1,216 +1,231 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    tools:context=".home.ChooseSpotFragment">
+    android:fillViewport="true"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
 
-
-    <ImageView
-        android:id="@+id/btn_back"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/back_button"
-        app:layout_constraintLeft_toRightOf="@id/guide_left"
-        app:layout_constraintTop_toTopOf="@id/first" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="24dp"
-        android:fontFamily="@font/semibold"
-        android:text="Choose Spot"
-        android:textColor="@color/white"
-        android:textSize="24sp"
-        android:lineSpacingExtra="-11sp"
-        app:layout_constraintLeft_toRightOf="@id/btn_back"
-        app:layout_constraintTop_toTopOf="@id/btn_back"
-        app:layout_constraintBottom_toBottomOf="@id/btn_back"
-        />
-
-
-    <LinearLayout
-        android:id="@+id/start_layout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/location_input_background"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        app:layout_constraintBottom_toTopOf="@id/destination_layout"
-        app:layout_constraintLeft_toLeftOf="@id/guide_left"
-        app:layout_constraintRight_toRightOf="@id/guide_right"
-        app:layout_constraintTop_toBottomOf="@id/second">
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background"
+        tools:context=".home.ChooseSpotFragment">
 
         <ImageView
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginHorizontal="10dp"
-            android:contentDescription="Image"
-            android:src="@drawable/destination_location"
-            app:tint="@color/theme_color" />
+            android:id="@+id/btn_back"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="38.2dp"
+            android:src="@drawable/back_button"
+            app:layout_constraintLeft_toRightOf="@id/guide_left"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/choose_spot"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="16dp"
-            android:orientation="vertical">
+            android:layout_marginLeft="24dp"
+            android:fontFamily="@font/semibold"
+            android:lineSpacingExtra="-11sp"
+            android:text="Choose Spot"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="@id/btn_back"
+            app:layout_constraintLeft_toRightOf="@id/btn_back"
+            app:layout_constraintTop_toTopOf="@id/btn_back" />
 
-            <TextView
+
+        <LinearLayout
+            android:id="@+id/start_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="43dp"
+            android:background="@drawable/location_input_background"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            app:layout_constraintBottom_toTopOf="@id/destination_layout"
+            app:layout_constraintLeft_toLeftOf="@id/guide_left"
+            app:layout_constraintRight_toRightOf="@id/guide_right"
+            app:layout_constraintTop_toBottomOf="@id/choose_spot">
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginHorizontal="10dp"
+                android:contentDescription="Image"
+                android:src="@drawable/destination_location"
+                app:tint="@color/theme_color" />
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/medium"
-                android:text="Start"
-                android:textColor="@android:color/white"
-                android:textSize="20sp" />
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/start"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:fontFamily="@font/light"
-                android:hint="Pickup Location"
-                android:textColorHint="@color/white"
-                android:textSize="16sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/medium"
+                    android:text="Start"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp" />
+
+                <EditText
+                    android:id="@+id/start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:fontFamily="@font/light"
+                    android:hint="Pickup Location"
+                    android:textColorHint="@color/white"
+                    android:textSize="16sp" />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
 
 
-    <LinearLayout
-        android:id="@+id/destination_layout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/location_input_background"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        app:layout_constraintBottom_toTopOf="@id/set_on_map"
-        app:layout_constraintLeft_toLeftOf="@id/guide_left"
-        app:layout_constraintRight_toRightOf="@id/guide_right"
-        app:layout_constraintTop_toBottomOf="@id/start_layout">
+        <LinearLayout
+            android:id="@+id/destination_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="19dp"
+            android:background="@drawable/location_input_background"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            app:layout_constraintLeft_toLeftOf="@id/guide_left"
+            app:layout_constraintRight_toRightOf="@id/guide_right"
+            app:layout_constraintTop_toBottomOf="@id/start_layout">
 
-        <ImageView
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginHorizontal="10dp"
-            android:contentDescription="Image"
-            android:src="@drawable/destination_location"
-            android:tint="@color/theme_color"
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginHorizontal="10dp"
+                android:contentDescription="Image"
+                android:src="@drawable/destination_location"
+                app:tint="@color/theme_color" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/medium"
+                    android:text="Destination"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp" />
+
+                <EditText
+                    android:id="@+id/destination"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:fontFamily="@font/light"
+                    android:hint="Drop Location"
+                    android:textColorHint="@color/white"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/set_on_map"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:drawableLeft="@drawable/map"
+            android:drawablePadding="10dp"
+            android:fontFamily="@font/medium"
+            android:text="Set on map"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toRightOf="@id/guide_left"
+            app:layout_constraintTop_toBottomOf="@id/destination_layout"
+
             />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/done_button"
+            android:layout_width="174dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="16dp"
-            android:orientation="vertical">
+            android:layout_marginTop="43dp"
+            android:background="@drawable/button_background"
+            android:text="Done"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintLeft_toRightOf="@id/guide_left"
+            app:layout_constraintRight_toLeftOf="@id/guide_right"
+            app:layout_constraintTop_toBottomOf="@id/set_on_map"
+            app:layout_goneMarginTop="43dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/medium"
-                android:text="Destination"
-                android:textColor="@android:color/white"
-                android:textSize="20sp" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide_left"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.048" />
 
-            <EditText
-                android:id="@+id/destination"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:fontFamily="@font/light"
-                android:hint="Drop Location"
-                android:textColorHint="@color/white"
-                android:textSize="16sp" />
-        </LinearLayout>
-    </LinearLayout>
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide_right"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.952" />
 
-    <TextView
-        android:id="@+id/set_on_map"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableLeft="@drawable/map"
-        android:drawablePadding="10dp"
-        android:fontFamily="@font/medium"
-        android:text="Set on map"
-        android:textColor="@android:color/white"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@id/third"
-        app:layout_constraintLeft_toRightOf="@id/guide_left"
-        app:layout_constraintTop_toBottomOf="@id/destination_layout"
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/first"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.0703" />
 
-        />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/second"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.151" />
 
-    <Button
-        android:id="@+id/done_button"
-        android:layout_width="174dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/button_background"
-        android:text="Done"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        app:layout_constraintLeft_toRightOf="@id/guide_left"
-        app:layout_constraintRight_toLeftOf="@id/guide_right"
-        app:layout_constraintTop_toBottomOf="@id/third" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/third"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5578112" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guide_left"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.048" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/start_recycler_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/guide_right"
+            app:layout_constraintStart_toStartOf="@id/guide_left"
+            app:layout_constraintTop_toBottomOf="@id/start_layout" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guide_right"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.952" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/first"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.0703" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/second"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.151" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/third"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.5578112" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/start_recycler_view"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@id/guide_right"
-        app:layout_constraintStart_toStartOf="@id/guide_left"
-        app:layout_constraintTop_toBottomOf="@id/start_layout" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/destination_recycler_view"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@id/guide_right"
-        app:layout_constraintStart_toStartOf="@id/guide_left"
-        app:layout_constraintTop_toBottomOf="@id/destination_layout" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/destination_recycler_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_text_background"
+            android:backgroundTint="@color/divider_color"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/guide_right"
+            app:layout_constraintStart_toStartOf="@id/guide_left"
+            app:layout_constraintTop_toBottomOf="@id/destination_layout" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

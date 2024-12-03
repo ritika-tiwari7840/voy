@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.foundation.layout.android)
     implementation(libs.cronet.embedded)
+    implementation(libs.androidx.material3.android)
 
     //navigation dependencies
     val nav_version = "2.8.3"

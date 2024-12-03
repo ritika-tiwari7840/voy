@@ -16,6 +16,7 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.ritika.voy.BuildConfig
+import com.ritika.voy.KeyboardUtils
 import com.ritika.voy.R
 import com.ritika.voy.databinding.FragmentChooseSpotBinding
 
@@ -24,6 +25,8 @@ class ChooseSpotFragment : Fragment() {
     private lateinit var binding: FragmentChooseSpotBinding
     private lateinit var navController: NavController
     private lateinit var role:String
+    lateinit var keyboardUtils: KeyboardUtils
+
     private val placesClient by lazy { Places.createClient(requireContext()) }
     private val startAdapter by lazy {
         SuggestionsAdapter { suggestion ->
@@ -48,6 +51,8 @@ class ChooseSpotFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentChooseSpotBinding.inflate(inflater, container, false)
+        val scrollView = binding.scrollView
+        keyboardUtils = KeyboardUtils(scrollView.id)
         return binding.root
     }
 

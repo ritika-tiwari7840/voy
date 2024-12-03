@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/background"
     tools:context=".home.VehicleDetailsFragment">
 
@@ -11,11 +22,11 @@
         android:id="@+id/btn_back"
         android:layout_width="25dp"
         android:layout_height="25dp"
+        android:layout_marginTop="25.2dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Back button"
-        app:layout_constraintBottom_toTopOf="@id/guide_two"
         app:layout_constraintLeft_toLeftOf="@id/guide_left"
-        app:layout_constraintTop_toBottomOf="@+id/guide_one"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/back_button" />
 
 
@@ -42,8 +53,9 @@
         android:text="Model"
         android:textColor="@color/white"
         android:textSize="18sp"
+        android:layout_marginTop="50dp"
         app:layout_constraintStart_toStartOf="@+id/guide_left"
-        app:layout_constraintTop_toBottomOf="@id/guide_three" />
+        app:layout_constraintTop_toBottomOf="@id/vehicle_details_heading_text" />
 
 
     <EditText
@@ -217,9 +229,11 @@
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="18sp"
+        android:layout_marginBottom="32dp"
         app:layout_constraintEnd_toEndOf="@id/guide_right"
         app:layout_constraintStart_toStartOf="@+id/guide_left"
-        app:layout_constraintTop_toTopOf="@id/guide_four" />
+        app:layout_constraintBottom_toBottomOf="parent"
+/>
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -265,6 +279,6 @@
         app:layout_constraintGuide_percent="0.952" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
-
+</ScrollView>
 
 

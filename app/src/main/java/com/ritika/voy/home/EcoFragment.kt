@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 class EcoFragment : Fragment() {
     lateinit var _binding: FragmentEcoBinding
     private val binding get() = _binding!!
+    private lateinit var sharedViewModel: SharedViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +38,7 @@ class EcoFragment : Fragment() {
         // Inflate the layout for this fragment
         _binding = FragmentEcoBinding.inflate(inflater, container, false)
 
-        val sharedViewModel: SharedViewModel by activityViewModels()
+        sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
 
         val user = sharedViewModel.user
         if (user != null) {

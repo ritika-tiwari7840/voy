@@ -2,12 +2,15 @@ package com.ritika.voy.home
 
 import com.ritika.voy.api.datamodels.SharedViewModel
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.ritika.voy.R
+import com.ritika.voy.api.dataclasses.MyRideItem
 import com.ritika.voy.api.dataclasses.UserXX
 import com.ritika.voy.databinding.ActivityHomeBinding
 
@@ -57,6 +60,40 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         }
+        if (intent.getBooleanExtra("show_dialog", false)) {
+            showRideReachedDialog()
+        }
+    }
+
+    private fun showRideReachedDialog() {
+        val dialogBuilder = AlertDialog.Builder(this)
+        val rides =
+            intent.getSerializableExtra("rideItems") as? ArrayList<MyRideItem> // Get ride data
+
+        dialogBuilder.apply {
+            setTitle("Ride Created")
+            setMessage("Your ride has been successfully created!")
+            setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+
+                // Pass data to MyRidesFragment
+                val bundle = Bundle()
+                rides?.let {
+                    bundle.putSerializable("rideItems", it) // Pass ride details
+                }
+
+                // Navigate to MyRidesFragment
+                navController.navigate(R.id.myRidesFragment, bundle)
+            }
+
+            // Optional: Show first ride details in the message
+            rides?.firstOrNull()?.let { ride ->
+                setMessage("Ride from ${ride.startLocation} to ${ride.endLocation}")
+            }
+        }
+
+        val dialog = dialogBuilder.create()
+        dialog.show()
     }
 
     override fun onBackPressed() {

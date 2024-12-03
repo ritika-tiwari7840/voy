@@ -27,6 +27,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material3.ModalBottomSheet
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -209,18 +210,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     } else {
                         binding.bottomWidget.visibility = View.GONE
                         val modalBottomSheet = ModalBottomSheet()
-
                         val bundle = Bundle()
-                        bundle.putString("startLocation", startLocation ?: "Unknown Start")
-                        bundle.putString(
-                            "destinationLocation", destinationLocation ?: "Unknown Destination"
+
+                        bundle.putParcelable(
+                            "firstMarkerLatLng",
+                            firstMarkerLatLng ?: LatLng(0.0, 0.0)
                         )
-                        bundle.putString(
-                            "firstMarkerLatLng", firstMarkerLatLng?.toString() ?: "No First Marker"
-                        )
-                        bundle.putString(
+
+                        bundle.putParcelable(
                             "secondMarkerLatLng",
-                            secondMarkerLatLng?.toString() ?: "No Second Marker"
+                            secondMarkerLatLng ?: LatLng(0.0, 0.0)
                         )
 
                         Log.d(
@@ -236,7 +235,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         "reverseGeoCoding",
                         "geocoding while setOnMap $firstMarkerLatLng $secondMarkerLatLng"
                     )
-
                     lifecycleScope.launch {
                         try {
                             if (firstMarkerLatLng != null && secondMarkerLatLng != null) {
@@ -262,6 +260,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                             )
                         }
                     }
+
                 }
             }
         }
@@ -1048,7 +1047,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                         if (firstMarkerLatLng != null && secondMarkerLatLng != null) {
                                             isRouteAllowed = true
                                             getOptimalRoute()
-
                                             binding.confirmButton.visibility = View.GONE
                                             binding.satellite.visibility = View.GONE
                                             binding.descText.visibility = View.GONE
@@ -1070,28 +1068,21 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                                 val modalBottomSheet = ModalBottomSheet()
 
                                                 val bundle = Bundle()
-                                                bundle.putString(
-                                                    "startLocation",
-                                                    startLocation ?: "Unknown Start"
-                                                )
-                                                bundle.putString(
-                                                    "destinationLocation",
-                                                    destinationLocation ?: "Unknown Destination"
-                                                )
-                                                bundle.putString(
+
+                                                bundle.putParcelable(
                                                     "firstMarkerLatLng",
-                                                    firstMarkerLatLng?.toString()
-                                                        ?: "No First Marker"
+                                                    firstMarkerLatLng ?: LatLng(0.0, 0.0)
                                                 )
-                                                bundle.putString(
+
+                                                bundle.putParcelable(
                                                     "secondMarkerLatLng",
-                                                    secondMarkerLatLng?.toString()
-                                                        ?: "No Second Marker"
+                                                    secondMarkerLatLng ?: LatLng(0.0, 0.0)
                                                 )
+
 
                                                 Log.d(
                                                     "MainActivity",
-                                                    "Sending data: $startLocation, $destinationLocation, $firstMarkerLatLng, $secondMarkerLatLng"
+                                                    "Sending data: $firstMarkerLatLng, $secondMarkerLatLng"
                                                 )
 
                                                 modalBottomSheet.arguments = bundle
@@ -1125,7 +1116,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                                         binding.routeView.root.findViewById<TextView>(
                                                             R.id.drop_address
                                                         )?.text = destinationAddress
-
                                                     }
                                                 } catch (e: Exception) {
                                                     Log.e(

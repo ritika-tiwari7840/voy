@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import com.ritika.voy.KeyboardUtils
 import com.ritika.voy.R
 import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.RetrofitInstance
@@ -38,6 +39,7 @@ class VehicleDetailsFragment : Fragment() {
     private var vehicleModel: String? = null
     private var vehicleNumber: String? = null
     private var totalSeats: String? = null
+    lateinit var keyboardUtils: KeyboardUtils
 
     private lateinit var selectedText: String
     private val filePath: String = ""
@@ -52,6 +54,10 @@ class VehicleDetailsFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentVehicleDetailsBinding.inflate(inflater, container, false)
+
+        val scrollView = binding.scrollView
+        keyboardUtils = KeyboardUtils(scrollView.id)
+
         return binding.root
     }
 

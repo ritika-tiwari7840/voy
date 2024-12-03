@@ -14,6 +14,7 @@ import com.ritika.voy.adapter.RideHistoryAdapter
 import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.RideDetails
+import com.ritika.voy.api.datamodels.SharedViewModel
 import com.ritika.voy.databinding.FragmentHistoryBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -23,6 +24,8 @@ class HistoryFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RideHistoryAdapter
+    private lateinit var sharedViewModel: SharedViewModel
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

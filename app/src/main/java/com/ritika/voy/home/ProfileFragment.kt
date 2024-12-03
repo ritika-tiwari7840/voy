@@ -30,6 +30,8 @@ class ProfileFragment : Fragment() {
     lateinit var _binding: FragmentProfileBinding
     private val binding get() = _binding!!
     lateinit var navController: NavController
+    private lateinit var sharedViewModel: SharedViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -40,16 +42,18 @@ class ProfileFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
-        val sharedViewModel: SharedViewModel by activityViewModels()
+
+        sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+
         val user = sharedViewModel.user
         if (user != null) {
             if (user.full_name != null && user.full_name != "") {
                 binding.userName.text = user.full_name
-            }else{
+            } else {
                 binding.userName.text = "User Name"
             }
             setSpannableText(binding.ratingAsHost, "${user.rating_as_driver} \nAs Host")
-            setSpannableText(binding.ratingAsGuest, "${user.rating_as_passenger} \nAs Host")
+            setSpannableText(binding.ratingAsGuest, "${user.rating_as_passenger} \nAs Guest")
             setSpannableText(
                 binding.totalRatings,
                 "${(user?.rating_as_driver?.plus(user.rating_as_passenger!!) ?: 0.0).div(2)} \nRatings"
@@ -95,13 +99,15 @@ class ProfileFragment : Fragment() {
         }
         binding.contributionText.setOnClickListener {
             navController.navigate(R.id.action_profile_to_eco)
-
         }
         binding.btnBack.setOnClickListener {
             navController.navigate(R.id.action_profile_to_home)
         }
         binding.settings.setOnClickListener {
             navController.navigate(R.id.action_profile_to_settingsFragment)
+        }
+        binding.myRides.setOnClickListener {
+            navController.navigate(R.id.action_profile_to_myRidesFragment)
         }
     }
 

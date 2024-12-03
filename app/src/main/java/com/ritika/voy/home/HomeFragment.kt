@@ -28,6 +28,8 @@ class HomeFragment : Fragment() {
     lateinit var navController: NavController
     private lateinit var firstName: String
     private var isDiverVerified: Boolean? = null ?: false
+    private lateinit var sharedViewModel: SharedViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -38,7 +40,7 @@ class HomeFragment : Fragment() {
     ): View? {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        val sharedViewModel: SharedViewModel by activityViewModels()
+        sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
 
         val user = sharedViewModel.user
         if (user != null) {
