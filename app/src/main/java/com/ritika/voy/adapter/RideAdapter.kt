@@ -1,46 +1,121 @@
 package com.ritika.voy.adapter
 
+import CarDetails
+import DataX
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import retrofit2.HttpException
-import okhttp3.ResponseBody
 import com.ritika.voy.R
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.Data
 import com.ritika.voy.api.dataclasses.ErrorResponse
 import com.ritika.voy.api.dataclasses.RideRequestResponse
-import kotlinx.coroutines.CoroutineScope
+import com.ritika.voy.home.RideDetailsBottomSheetFragment
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class RideAdapter(
     private var rides: List<Data>,
     private val authToken: String,
+    val bundle: Bundle,
     private val onRideRequested: (RideRequestResponse?) -> Unit,
-) : RecyclerView.Adapter<RideAdapter.RideViewHolder>() {
 
+    ) : RecyclerView.Adapter<RideAdapter.RideViewHolder>() {
     // ViewHolder class to hold and bind view elements
     class RideViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val startLocationTV: TextView = itemView.findViewById(R.id.start_location)
         val endLocationTV: TextView = itemView.findViewById(R.id.end_location)
-        val startTimeTV: TextView = itemView.findViewById(R.id.start_time)
-        val availableSeatsTV: TextView = itemView.findViewById(R.id.available_seats)
+        val startTimeTV: TextView = itemView.findViewById(R.id.time)
+        val rating: TextView = itemView.findViewById(R.id.rating)
         val driverNameTV: TextView = itemView.findViewById(R.id.driver_name)
+        val modal: TextView = itemView.findViewById(R.id.car_modal)
+        val profile: ImageView = itemView.findViewById(R.id.profile_photo)
 
         fun bind(ride: Data) {
             startLocationTV.text = ride.data.start_location
             endLocationTV.text = ride.data.end_location
-            startTimeTV.text = ride.data.start_time
-            availableSeatsTV.text = "Available Seats: ${ride.data.available_seats}"
-            driverNameTV.text = "Driver: ${ride.data.driver_name}"
+            val timeInIso = convertUtcToLocalTime(
+                ride.data.start_time, "yyyy-MM-dd'T'HH:mm:ss'Z'"
+            )
+            val (time, dateFormatted) = convertDateTime(timeInIso)
+            startTimeTV.text = time
+            rating.text = ride.data.driver_rating.toString()
+            driverNameTV.text = ride.data.driver_name
+            modal.text = ride.data.car_details.car_modal
+
+            Log.d("API", "bind: ${ride.data.driver_profile_photo}")
+
+            val imageUrl = ride.data.driver_profile_photo
+            Log.d("Image", "onLoadCleared:  $imageUrl")
+            try {
+                Glide.with(itemView.context).load(imageUrl).placeholder(R.drawable.profile_image)
+                    .error(R.drawable.profile_image).transform(CircleCrop()).into(profile)
+            } catch (e: Exception) {
+                Log.d("Image", "onLoadCleared:  $e")
+            }
         }
+
+        private fun convertUtcToLocalTime(
+            utcTime: String,
+            inputFormat: String = "yyyy-MM-dd'T'HH:mm:ssZ",
+            outputFormat: String = "yyyy-MM-dd HH:mm:ss",
+        ): String {
+            return try {
+                // Formatter to parse the UTC input time
+                val utcFormatter =
+                    DateTimeFormatter.ofPattern(inputFormat).withZone(ZoneId.of("UTC"))
+
+                // Parse the input string to an Instant
+                val instant = Instant.from(utcFormatter.parse(utcTime))
+
+                // Formatter to convert Instant to local time
+                val localFormatter =
+                    DateTimeFormatter.ofPattern(outputFormat).withZone(ZoneId.systemDefault())
+
+                // Format the Instant to local time
+                localFormatter.format(instant)
+            } catch (e: Exception) {
+                Log.e("ConvertTime", "Error converting UTC to local time", e)
+                "Invalid time format"
+            }
+        }
+
+        fun convertDateTime(input: String): Pair<String, String> {
+            try {
+                val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                val outputTimeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
+                val outputDateFormat = SimpleDateFormat("EEEE, d MMMM", Locale.getDefault())
+
+                val date = inputFormat.parse(input)
+
+                val time = outputTimeFormat.format(date)
+                val dateFormatted = outputDateFormat.format(date)
+
+                return Pair(time, dateFormatted)
+            } catch (e: Exception) {
+                Log.d("DateAndTime", "convertDateTime: $e")
+            }
+            return Pair("", "")
+        }
+
     }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RideViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.ride_item, parent, false)
@@ -49,97 +124,68 @@ class RideAdapter(
 
     override fun onBindViewHolder(holder: RideViewHolder, position: Int) {
         val ride = rides[position]
-        holder.bind(ride)
+        holder.bind(ride) // Bind data to the ViewHolder
 
-        // Set click listener
         holder.itemView.setOnClickListener {
-            CoroutineScope(Dispatchers.Main).launch {
-                val response =
-                    fetchRideRequestApiResponse(authToken, rides[position].data.driver.toInt())
-                onRideRequested(response)
-            }
+            // Use the `ride` object to pass data to the BottomSheet
+            val rideDetails = DataX(
+                available_seats = ride.data.available_seats,
+                created_at = ride.data.created_at,
+                driver = ride.data.driver,
+                driver_name = ride.data.driver_name,
+                driver_rating = ride.data.driver_rating,
+                start_location = ride.data.start_location,
+                end_location = ride.data.end_location,
+                end_point = ride.data.end_point,
+                id = ride.data.id,
+                start_point = ride.data.start_point,
+                start_time = convertUtcToLocalTime(
+                    ride.data.start_time, "yyyy-MM-dd'T'HH:mm:ss'Z'"
+                ),
+                status = ride.data.status,
+                car_details = CarDetails(
+                    car_modal = ride.data.car_details.car_modal,
+                    car_number = ride.data.car_details.car_number
+                ),
+                driver_profile_photo = ride.data.driver_profile_photo
+            )
+            val bottomSheet = RideDetailsBottomSheetFragment.newInstance(rideDetails,bundle)
+            bottomSheet.show(
+                (holder.itemView.context as FragmentActivity).supportFragmentManager,
+                bottomSheet.tag
+            )
         }
     }
+
+    private fun convertUtcToLocalTime(
+        utcTime: String,
+        inputFormat: String = "yyyy-MM-dd'T'HH:mm:ssZ",
+        outputFormat: String = "yyyy-MM-dd HH:mm:ss",
+    ): String {
+        return try {
+            // Formatter to parse the UTC input time
+            val utcFormatter =
+                DateTimeFormatter.ofPattern(inputFormat).withZone(ZoneId.of("UTC"))
+            val instant = Instant.from(utcFormatter.parse(utcTime))
+            val localFormatter =
+                DateTimeFormatter.ofPattern(outputFormat).withZone(ZoneId.systemDefault())
+            localFormatter.format(instant)
+        } catch (e: Exception) {
+            Log.e("ConvertTime", "Error converting UTC to local time", e)
+            "Invalid time format"
+        }
+    }
+
 
     override fun getItemCount() = rides.size
-
-    // Method to update the list of rides
     fun updateRides(newRides: List<Data>) {
         this.rides = newRides
-        notifyDataSetChanged()  // Notify adapter to refresh the list
+        notifyDataSetChanged()
     }
 
-    // Method to clear the list of rides
     fun clearRides() {
         this.rides = emptyList()
-        notifyDataSetChanged()  // Notify adapter to refresh the list
+        notifyDataSetChanged()
     }
 
-    private suspend fun fetchRideRequestApiResponse(
-        authToken: String,
-        passengerId: Int,
-    ): RideRequestResponse? {
-        // Same implementation as before
-        // Create the request body as a Map
-        val rideRequestBody = mapOf(
-            "pickup_location" to "Central Park",
-            "dropoff_location" to "JFK Terminal 4",
-            "pickup_point" to mapOf(
-                "type" to "Point", "coordinates" to listOf(28.676932700000002, 77.5019882)
-            ),
-            "dropoff_point" to mapOf(
-                "type" to "Point", "coordinates" to listOf(28.66469254331024, 77.48862951993942)
-            ),
-            "seats_needed" to 2
-        )
-
-        // Convert the Map to JsonObject
-        val gson = Gson()
-        val jsonObject = gson.toJsonTree(rideRequestBody).asJsonObject
-
-        Log.d("API", "Sending ride request: $jsonObject")
-        return withContext(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.api.requestRide(
-                    authHeader = "Bearer $authToken",
-                    passengerId = passengerId,
-                    rideRequest = jsonObject // Pass the JsonObject here
-                )
-
-                if (response.success) {
-                    Log.d("API", "Ride request successful: ${response.data}")
-                    response
-                } else {
-                    Log.e("API", "Ride request failed: ${response.message}")
-                    null
-                }
-            } catch (e: HttpException) {
-                if (e.code() == 400) {
-                    // If it's a 400 error, fetch the error body
-                    val errorBody = e.response()?.errorBody()
-                    val errorMessage = errorBody?.string()
-
-                    // Deserialize the error message
-                    val errorResponse = try {
-                        Gson().fromJson(errorMessage, ErrorResponse::class.java)
-                    } catch (ex: Exception) {
-                        null
-                    }
-
-                    // Log the error body
-                    Log.e(
-                        "API",
-                        "Bad request (400): ${errorResponse?.non_field_errors?.joinToString(", ")}"
-                    )
-                    null
-                } else {
-                    Log.e("API", "Exception during API call: ${e.localizedMessage}", e)
-                    null
-                }
-            } catch (e: Exception) {
-                Log.e("API", "Exception during API call: ${e.localizedMessage}", e)
-                null
-            }
-        }
-    }
 }

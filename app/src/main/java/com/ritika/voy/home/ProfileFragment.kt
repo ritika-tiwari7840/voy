@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -31,6 +32,7 @@ class ProfileFragment : Fragment() {
     private val binding get() = _binding!!
     lateinit var navController: NavController
     private lateinit var sharedViewModel: SharedViewModel
+    private var TAG="Profile"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,7 +109,15 @@ class ProfileFragment : Fragment() {
             navController.navigate(R.id.action_profile_to_settingsFragment)
         }
         binding.myRides.setOnClickListener {
-            navController.navigate(R.id.action_profile_to_myRidesFragment)
+            // Create a bundle to pass current rides
+            val bundle = Bundle().apply {
+                putSerializable("rideItems",
+                    ArrayList(sharedViewModel.rideItem.value ?: emptyList())
+                )
+            }
+            Log.d(TAG, "onViewCreated: ${sharedViewModel.rideItem.value}")
+            Toast.makeText(requireContext(), " ${sharedViewModel.rideItem.value}", Toast.LENGTH_SHORT).show()
+            navController.navigate(R.id.action_profile_to_myRidesFragment, bundle)
         }
     }
 

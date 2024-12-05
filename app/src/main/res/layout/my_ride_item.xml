@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/edit_text_background"
+    android:layout_marginTop="20dp"
+    android:background="@drawable/my_ride_background"
     android:paddingHorizontal="23dp"
     android:paddingVertical="16dp">
 

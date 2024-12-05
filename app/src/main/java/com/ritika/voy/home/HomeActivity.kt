@@ -1,45 +1,50 @@
 package com.ritika.voy.home
 
-import com.ritika.voy.api.datamodels.SharedViewModel
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.ritika.voy.R
+import com.ritika.voy.api.datamodels.SharedViewModel
 import com.ritika.voy.api.dataclasses.MyRideItem
 import com.ritika.voy.api.dataclasses.UserXX
 import com.ritika.voy.databinding.ActivityHomeBinding
+import kotlin.math.log
 
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var navController: NavController
-    private lateinit var firstName: String
+    private lateinit var sharedViewModel: SharedViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//      enableEdgeToEdge()
+        sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
 
-        // Retrieve data from Intent
+        // Retrieve user data from Intent and update ViewModel if necessary
         val user: UserXX? = intent.getParcelableExtra("user_details")
-        // Initialize ViewModel
-        var sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
-        sharedViewModel.user = user
-
-
+        if (user != null && sharedViewModel.user == null) {
+            sharedViewModel.user = user
+        }
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container_view) as NavHostFragment
         navController = navHostFragment.navController
-
         binding.bottomNavMenu.setupWithNavController(navController)
+        handleIntentExtras(intent)
+        setupNavigationListeners()
+    }
 
+    private fun setupNavigationListeners() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.home, R.id.history, R.id.eco, R.id.profile -> {
@@ -60,50 +65,40 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         }
-        if (intent.getBooleanExtra("show_dialog", false)) {
-            showRideReachedDialog()
+    }
+
+    private fun handleIntentExtras(intent: Intent) {
+        val showDialog = intent.getBooleanExtra("show_dialog", false)
+        val rides = intent.getSerializableExtra("rideItems") as? ArrayList<MyRideItem>
+
+        if (showDialog) {
+            showRideReachedDialog(intent)
         }
     }
 
-    private fun showRideReachedDialog() {
-        val dialogBuilder = AlertDialog.Builder(this)
-        val rides =
-            intent.getSerializableExtra("rideItems") as? ArrayList<MyRideItem> // Get ride data
+    private fun showRideReachedDialog(intent: Intent) {
+        val rides = intent.getSerializableExtra("rideItems") as? ArrayList<MyRideItem>
+        Log.d("Rides", "showRideReachedDialog: $rides")
 
-        dialogBuilder.apply {
-            setTitle("Ride Created")
-            setMessage("Your ride has been successfully created!")
-            setPositiveButton("OK") { dialog, _ ->
-                dialog.dismiss()
-
-                // Pass data to MyRidesFragment
-                val bundle = Bundle()
-                rides?.let {
-                    bundle.putSerializable("rideItems", it) // Pass ride details
-                }
-
-                // Navigate to MyRidesFragment
-                navController.navigate(R.id.myRidesFragment, bundle)
+        val customView = LayoutInflater.from(this).inflate(R.layout.ride_posted, null)
+        val dialog =
+            AlertDialog.Builder(this, R.style.TransparentDialog).setView(customView).create()
+        customView.setOnClickListener {
+            dialog.dismiss()
+            rides?.let {
+                sharedViewModel.addRideItems(it)
             }
-
-            // Optional: Show first ride details in the message
-            rides?.firstOrNull()?.let { ride ->
-                setMessage("Ride from ${ride.startLocation} to ${ride.endLocation}")
-            }
+            navController.navigate(R.id.myRidesFragment)
         }
-
-        val dialog = dialogBuilder.create()
         dialog.show()
     }
 
+
     override fun onBackPressed() {
         if (navController.currentDestination?.id == R.id.home) {
-            // Exit the app when at the "home" destination
-            finishAffinity() // Exits the app completely
+            finishAffinity() // Exit the app completely
         } else {
             super.onBackPressed()
         }
     }
-
-
 }

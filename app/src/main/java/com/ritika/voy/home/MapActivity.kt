@@ -33,6 +33,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -65,10 +66,14 @@ import com.ritika.voy.api.RetrofitInstance.mapApi
 import com.ritika.voy.api.dataclasses.AvailableRides
 import com.ritika.voy.api.dataclasses.AvailableRidesSearchRequest
 import com.ritika.voy.api.dataclasses.LocationPoint
+import com.ritika.voy.api.dataclasses.User
+import com.ritika.voy.api.dataclasses.UserXX
+import com.ritika.voy.api.dataclasses.UserXXX
 import com.ritika.voy.api.dataclasses.mapsDataClasses.OriginDestination
 import com.ritika.voy.api.dataclasses.mapsDataClasses.Route
 import com.ritika.voy.api.dataclasses.mapsDataClasses.RouteModifiers
 import com.ritika.voy.api.dataclasses.mapsDataClasses.RoutesRequest
+import com.ritika.voy.api.datamodels.SharedViewModel
 import com.ritika.voy.databinding.ActivityMapBinding
 import com.ritika.voy.geocoding_helper.GeocodingHelper
 import com.ritika.voy.geocoding_helper.GeocodingResult
@@ -105,12 +110,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var role: String
     private lateinit var authToken: String
     private lateinit var recyclerView: RecyclerView
-    private lateinit var rideAdapter: RideAdapter
+    private lateinit var user: UserXX
+    private var TAG = "MapActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
         binding = ActivityMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
@@ -130,23 +135,25 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val bundle = intent.extras
         startLocation = bundle?.getString("startLocation")
         destinationLocation = bundle?.getString("destinationLocation")
+        user = bundle?.getParcelable<UserXX>("user")!!
         role = bundle?.getString("role") ?: "passenger"
-        Toast.makeText(this, "Your role is $role", Toast.LENGTH_SHORT).show()
-        Log.d("Bundle", " Bundle:  from  $startLocation to $destinationLocation")
+
+//        Toast.makeText(this, "Your role is $role", Toast.LENGTH_SHORT).show()
+        Log.d(TAG, " Bundle:  from  $startLocation to $destinationLocation $user")
 
         //calling geocoding to convert address in string to LatLng
         lifecycleScope.launch {
             try {
                 startLatLng = geoCodeAddress(startLocation ?: "")
                 destinationLatLng = geoCodeAddress(destinationLocation ?: "")
-                Log.d("geocode-address", "geocodeAddress: from $startLatLng to $destinationLatLng")
+                Log.d(TAG, "geocodeAddress: from $startLatLng to $destinationLatLng")
 
                 // Set initial markers if both locations are available
                 if (startLatLng != null && destinationLatLng != null && !hasSetInitialLocations) {
                     setInitialLocations()
                 }
             } catch (e: Exception) {
-                Log.e("geocode-address", "Error geocoding: ${e.message}")
+                Log.e(TAG, "Error geocoding: ${e.message}")
             }
         }
 
@@ -199,7 +206,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     binding.routeView.root.visibility = View.VISIBLE
 
                     if (role == "passenger") {
-                        Toast.makeText(this@MapActivity, " hii $role", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(this@MapActivity, " hii $role", Toast.LENGTH_SHORT).show()
                         binding.bottomWidgetText.visibility = View.VISIBLE
                         binding.button1.visibility = View.VISIBLE
                         binding.button2.visibility = View.VISIBLE
@@ -221,9 +228,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                             "secondMarkerLatLng",
                             secondMarkerLatLng ?: LatLng(0.0, 0.0)
                         )
+                        bundle.putParcelable("user", user)
 
                         Log.d(
-                            "MainActivity",
+                            TAG,
                             "Sending data: $startLocation, $destinationLocation, $firstMarkerLatLng, $secondMarkerLatLng"
                         )
 
@@ -232,7 +240,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
 
                     Log.d(
-                        "reverseGeoCoding",
+                        TAG,
                         "geocoding while setOnMap $firstMarkerLatLng $secondMarkerLatLng"
                     )
                     lifecycleScope.launch {
@@ -245,7 +253,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                     secondMarkerLatLng!!.latitude, secondMarkerLatLng!!.longitude
                                 )
                                 Log.d(
-                                    "reverseGeoCodeAddress",
+                                    TAG,
                                     "reverseGeoCodeAddress: from $startAddress to $destinationAddress"
                                 )
                                 binding.routeView.root.findViewById<TextView>(R.id.start_address)?.text =
@@ -255,7 +263,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                             }
                         } catch (e: Exception) {
                             Log.e(
-                                "reverseGeoCodeAddress",
+                                TAG,
                                 "Error during reverse geocoding: ${e.message}"
                             )
                         }
@@ -445,7 +453,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val response = fetchAvailableRideApiResponse(authToken) // Pass the auth token
             if (response != null) {
                 onApiSuccess(response, authToken)
-                Log.d("API", "proceedButtonClicked: ${response.data} ")
+                Log.d(TAG, "proceedButtonClicked: ${response.data} ")
             } else {
                 onApiFailure()
             }
@@ -456,10 +464,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val requestBody = AvailableRidesSearchRequest(
             pickup_point = LocationPoint(
                 type = "Point",
-                coordinates = listOf(firstMarkerLatLng!!.latitude, firstMarkerLatLng!!.longitude)
+                coordinates = listOf(firstMarkerLatLng!!.longitude, firstMarkerLatLng!!.latitude)
             ), destination_point = LocationPoint(
                 type = "Point",
-                coordinates = listOf(secondMarkerLatLng!!.latitude, secondMarkerLatLng!!.longitude)
+                coordinates = listOf(secondMarkerLatLng!!.longitude, secondMarkerLatLng!!.latitude)
             ), seats_needed = selectedButtonValue!!.toInt(), radius = 5000.0
         )
         Log.d("MyLocation", "MyLocation: $firstMarkerLatLng $secondMarkerLatLng ")
@@ -468,12 +476,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 val response =
                     RetrofitInstance.api.getAvailableRides("Bearer $authToken", requestBody)
                 if (response != null && response.success) {
+                    Log.d(TAG, "fetchAvailableRideApiResponse: $response ")
                     response // Return the response if successful
                 } else {
                     null // Return null if the response is unsuccessful
                 }
             } catch (e: Exception) {
-                Log.d("API", "fetchApiResponse: $e")
+                Log.d(TAG, "fetchApiResponse: $e")
                 e.printStackTrace()
                 null // Return null in case of an error
             }
@@ -484,9 +493,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         availableRides.data?.let { rides ->
             if (rides.isNotEmpty()) {
                 if (recyclerView.adapter == null) {
-                    val rideAdapter = RideAdapter(rides, authToken) { rideRequestResponse ->
+                    binding.findingRidersText.text = "Ride Requested"
+                    binding.findingRidersDesc.text = "Matching Ride Givers"
+                    val bundle = Bundle().apply {
+                        putParcelable("start_location", firstMarkerLatLng)
+                        putParcelable("end_location", secondMarkerLatLng)
+                        putString("seats",selectedButtonValue)
+                    }
+                    val rideAdapter = RideAdapter(rides, authToken, bundle) { rideRequestResponse ->
                         rideRequestResponse?.let {
-                            Log.d("RideRequest", "Response: $it")
+                            Log.d(TAG, "Ride Request Response: $it")
                         } ?: run {
                             Toast.makeText(this, "Failed to request ride", Toast.LENGTH_SHORT)
                                 .show()
@@ -531,7 +547,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // Send the response status (e.g., navigate to the next screen or show a toast)
         if (status) {
             Toast.makeText(this, "API call successful", Toast.LENGTH_SHORT).show()
-            Log.d("API", "sendResponseStatus: $status ")
+            Log.d(TAG, "sendResponseStatus: $status ")
         } else {
             Toast.makeText(this, "API call failed", Toast.LENGTH_SHORT).show()
         }
@@ -550,11 +566,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 )
                 LatLng(result.latitude, result.longitude)
             } else {
-                Log.e("Geocoding", "Failed to geocode address: ${result.errorMessage}")
+                Log.e(TAG, "Failed to geocode address: ${result.errorMessage}")
                 handleUnknownLocation(address)
             }
         } catch (e: Exception) {
-            Log.e("Geocoding", "Exception during geocoding: ${e.message}")
+            Log.e(TAG, "Exception during geocoding: ${e.message}")
             return handleUnknownLocation(address)
         }
     }
@@ -572,7 +588,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     referenceLocation = LatLng(location.latitude, location.longitude)
                 }
             } catch (e: Exception) {
-                Log.e("Location", "Error getting last location: ${e.message}")
+                Log.e(TAG, "Error getting last location: ${e.message}")
             }
         }
 
@@ -593,7 +609,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     return LatLng(it.latitude, it.longitude)
                 }
             } catch (e: Exception) {
-                Log.e("NearbySearch", "Error finding nearby addresses: ${e.message}")
+                Log.e(TAG, "Error finding nearby addresses: ${e.message}")
             }
         }
 
@@ -666,14 +682,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         return try {
             val result = geocodingHelper.reverseGeocode(latitude, longitude)
             if (result.success) {
-                Log.d("Reverse Geocoding", "Address: ${result.formattedAddress}")
+                Log.d(TAG, " reverse Coding Address: ${result.formattedAddress}")
                 result.formattedAddress
             } else {
-                Log.e("Reverse Geocoding", "Failed to reverse geocode: ${result.errorMessage}")
+                Log.e(TAG, "Failed to reverse geocode: ${result.errorMessage}")
                 "Unknown address" // Return a fallback value
             }
         } catch (e: Exception) {
-            Log.e("Reverse Geocoding", "Exception during reverse geocoding: ${e.message}")
+            Log.e(TAG, "Exception during reverse geocoding: ${e.message}")
             "Error retrieving address" // Return an error message
         }
     }
@@ -798,7 +814,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 Activity.RESULT_OK -> {
                     data?.let {
                         val place = Autocomplete.getPlaceFromIntent(it)
-                        Log.i("HomeActivity", "Place: ${place.name}, ${place.latLng}")
+                        Log.i(TAG, "Place: ${place.name}, ${place.latLng}")
 
                         place.latLng?.let { latLng ->
                             // Handle the selected place
@@ -815,7 +831,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     // Handle the error
                     data?.let {
                         val status = Autocomplete.getStatusFromIntent(it)
-                        Log.e("HomeActivity", "Error: ${status.statusMessage}")
+                        Log.e(TAG, "Error: ${status.statusMessage}")
                     }
                     binding.searchBar.clearFocus()
                     binding.searchBar.setText("")
@@ -955,10 +971,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style)
             )
             if (!success) {
-                Log.e("HomeActivity", "Style parsing failed.")
+                Log.e(TAG, "Style parsing failed.")
             }
         } catch (e: Resources.NotFoundException) {
-            Log.e("HomeActivity", "Can't find style. Error: ", e)
+            Log.e(TAG, "Can't find style. Error: ", e)
         }
 
         checkLocationPermission()
@@ -1079,9 +1095,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                                     secondMarkerLatLng ?: LatLng(0.0, 0.0)
                                                 )
 
+                                                bundle.putParcelable("user", user)
 
                                                 Log.d(
-                                                    "MainActivity",
+                                                    TAG,
                                                     "Sending data: $firstMarkerLatLng, $secondMarkerLatLng"
                                                 )
 
@@ -1091,7 +1108,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                                 )
                                             }
                                             Log.d(
-                                                "hii",
+                                                TAG,
                                                 "onCreate: $firstMarkerLatLng $secondMarkerLatLng"
                                             )
 
@@ -1107,7 +1124,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                                             secondMarkerLatLng!!.longitude
                                                         )
                                                         Log.d(
-                                                            "reverseGeoCodeAddress",
+                                                            TAG,
                                                             "reverseGeoCodeAddress: from $startAddress to $destinationAddress"
                                                         )
                                                         binding.routeView.root.findViewById<TextView>(
@@ -1119,7 +1136,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                                     }
                                                 } catch (e: Exception) {
                                                     Log.e(
-                                                        "reverseGeoCodeAddress",
+                                                        TAG,
                                                         "Error during reverse geocoding: ${e.message}"
                                                     )
                                                 }

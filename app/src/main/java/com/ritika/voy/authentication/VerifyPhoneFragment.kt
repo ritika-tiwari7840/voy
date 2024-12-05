@@ -19,7 +19,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ScrollView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
@@ -148,8 +147,9 @@ class VerifyPhoneFragment : BaseFragment() {
             val phone = arguments?.getString("phone")
 
             if (phone_otp.length != 6) {
-                Toast.makeText(requireContext(), "Please enter a valid otp", Toast.LENGTH_SHORT)
-                    .show()
+                view?.let {
+                    Snackbar.make(it, "Please enter a valid OTP", Snackbar.LENGTH_LONG).show()
+                }
                 return@setOnClickListener
             } else {
                 phoneVerify(user_id ?: "", phone_otp)
@@ -230,14 +230,19 @@ class VerifyPhoneFragment : BaseFragment() {
                 Log.e(tag, "Phone number: $phone_number")
                 val response = RetrofitInstance.api.resendPhoneOtp(resendPhoneRequest(phone_number))
                 if (response.success) {
-                    Toast.makeText(requireContext(), "OTP sent successfully", Toast.LENGTH_SHORT)
-                        .show()
+                    view?.let {
+                        Snackbar.make(it, "OTP sent successfully", Snackbar.LENGTH_LONG).show()
+                    }
                 } else {
-                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
+                    view?.let {
+                        Snackbar.make(it, response.message, Snackbar.LENGTH_LONG).show()
+                    }
                 }
             } catch (e: Exception) {
                 Log.e(tag, "Error: ${e.message}")
-                Toast.makeText(requireContext(), "Failed to Resend OTP", Toast.LENGTH_SHORT).show()
+                view?.let {
+                    Snackbar.make(it, "Failed to send OTP", Snackbar.LENGTH_LONG).show()
+                }
             } finally {
                 progressDialog.dismiss()
             }

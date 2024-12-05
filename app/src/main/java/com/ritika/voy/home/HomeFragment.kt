@@ -26,7 +26,7 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var role: String
     lateinit var navController: NavController
-    private lateinit var firstName: String
+    private var firstName: String? = "User"
     private var isDiverVerified: Boolean? = null ?: false
     private lateinit var sharedViewModel: SharedViewModel
 
@@ -116,7 +116,6 @@ class HomeFragment : Fragment() {
         binding.whereTo.setOnClickListener {
             val bundle = Bundle()
             bundle.putString("role", role)
-            Toast.makeText(requireContext(), "You are $role", Toast.LENGTH_SHORT).show()
             navController.navigate(R.id.action_home_to_chooseSpotFragment, bundle)
         }
     }

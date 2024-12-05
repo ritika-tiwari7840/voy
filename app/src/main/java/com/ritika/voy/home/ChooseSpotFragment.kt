@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,14 +19,17 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.ritika.voy.BuildConfig
 import com.ritika.voy.KeyboardUtils
 import com.ritika.voy.R
+import com.ritika.voy.api.dataclasses.UserXX
+import com.ritika.voy.api.datamodels.SharedViewModel
 import com.ritika.voy.databinding.FragmentChooseSpotBinding
 
 class ChooseSpotFragment : Fragment() {
 
     private lateinit var binding: FragmentChooseSpotBinding
     private lateinit var navController: NavController
-    private lateinit var role:String
+    private lateinit var role: String
     lateinit var keyboardUtils: KeyboardUtils
+    private lateinit var sharedViewModel: SharedViewModel
 
     private val placesClient by lazy { Places.createClient(requireContext()) }
     private val startAdapter by lazy {
@@ -52,9 +56,11 @@ class ChooseSpotFragment : Fragment() {
     ): View {
         binding = FragmentChooseSpotBinding.inflate(inflater, container, false)
         val scrollView = binding.scrollView
+        sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
         keyboardUtils = KeyboardUtils(scrollView.id)
         return binding.root
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -80,17 +86,21 @@ class ChooseSpotFragment : Fragment() {
                 Toast.makeText(requireContext(), "Please enter both the fields", Toast.LENGTH_SHORT)
                     .show()
             } else {
+                val user: UserXX = sharedViewModel.user!!
                 val bundle = Bundle()
                 bundle.putString("startLocation", binding.start.text.toString())
                 bundle.putString("destinationLocation", binding.destination.text.toString())
-                bundle.putString("role",role)
+                bundle.putString("role", role)
+                bundle.putParcelable("user", user)
                 navController.navigate(R.id.action_chooseSpotFragment_to_mapActivity, bundle)
             }
         }
         binding.setOnMap.setOnClickListener {
             val bundle = Bundle()
-            bundle.putString("role",role)
-            navController.navigate(R.id.action_chooseSpotFragment_to_mapActivity,bundle)
+            val user: UserXX = sharedViewModel.user!!
+            bundle.putString("role", role)
+            bundle.putParcelable("user", user)
+            navController.navigate(R.id.action_chooseSpotFragment_to_mapActivity, bundle)
         }
     }
 

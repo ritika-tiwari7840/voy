@@ -15,6 +15,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -29,6 +30,8 @@ import com.ritika.voy.api.dataclasses.MyRideItem
 import com.ritika.voy.api.dataclasses.OfferRideRequest
 import com.ritika.voy.api.dataclasses.OfferRideResponse
 import com.ritika.voy.api.dataclasses.StartPoint
+import com.ritika.voy.api.dataclasses.UserXX
+import com.ritika.voy.api.datamodels.SharedViewModel
 import com.ritika.voy.geocoding_helper.GeocodingHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -39,6 +42,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
+import kotlin.math.log
 
 
 class ModalBottomSheet : BottomSheetDialogFragment() {
@@ -53,6 +57,7 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
     private var destinationAddress: String? = null
     private var firstMarkerLatLng: LatLng? = null
     private var secondMarkerLatLng: LatLng? = null
+    private var user: UserXX? = null
     private lateinit var geocodingHelper: GeocodingHelper
     private var TAG: String = "BottomSheet"
 
@@ -63,7 +68,9 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
         // Retrieve LatLng objects from arguments
         firstMarkerLatLng = arguments?.getParcelable("firstMarkerLatLng")
         secondMarkerLatLng = arguments?.getParcelable("secondMarkerLatLng")
-        Log.d(TAG, "onCreate: $firstMarkerLatLng $secondMarkerLatLng")
+        user = arguments?.getParcelable("user")
+
+        Log.d(TAG, "onCreate: $firstMarkerLatLng $secondMarkerLatLng $user")
 
         // Perform reverse geocoding
         lifecycleScope.launch {
@@ -75,8 +82,7 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
                     reverseGeoCode(it.latitude, it.longitude)
                 }
                 Log.d(
-                    TAG,
-                    "Locations: $startAddress to $destinationAddress"
+                    TAG, "Locations: $startAddress to $destinationAddress"
                 )
             } catch (e: Exception) {
                 Log.e(TAG, "Error during reverse geocoding: ${e.message}")
@@ -130,14 +136,10 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
         DatePickerDialog(
-            requireContext(),
-            { _, selectedYear, selectedMonth, selectedDay ->
+            requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
                 selectedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
                 showTimePickerDialog()
-            },
-            year,
-            month,
-            day
+            }, year, month, day
         ).apply { setTitle("Select a Date") }.show()
 
     }
@@ -150,8 +152,7 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
         val timePickerDialog = TimePickerDialog(
             requireContext(), { _, selectedHour, selectedMinute ->
                 val amPm = if (selectedHour >= 12) "PM" else "AM"
-                val hourIn12Format = if (selectedHour > 12) selectedHour - 12 else selectedHour
-                selectedTime = String.format("%02d:%02d %s", hourIn12Format, selectedMinute, amPm)
+                selectedTime = String.format("%02d:%02d %s", selectedHour, selectedMinute, amPm)
                 dateTimePicker.text = "$selectedDate $selectedTime"
             }, hour, minute, false // Set is24HourView to false for AM/PM
         )
@@ -185,18 +186,24 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
 
     private fun setupProceedButton(view: View) {
         view.findViewById<Button>(R.id.proceed_button).setOnClickListener {
-            formattedDateTime = formatToIso8601(selectedDate!!, selectedTime!!)
+            formattedDateTime = selectedDate?.let { date ->
+                selectedTime?.let { time ->
+                    formatToIso8601(date, time)
+                }
+            }
 
-            // Show a Toast and Log the current values
-            Toast.makeText(
-                requireContext(),
-                "Proceeding with: $formattedDateTime, $selectedButtonValue, $startAddress -> $destinationAddress",
-                Toast.LENGTH_LONG
-            ).show()
-            Log.d(
-                TAG,
-                "Proceeding with: $formattedDateTime, $selectedButtonValue, $startAddress -> $destinationAddress"
-            )
+            // Validate the fields before proceeding
+            if (!areFieldsValid()) {
+                Toast.makeText(
+                    requireContext(),
+                    "Please fill all required fields: Date, Time, Seat, Start, and Destination addresses.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Log.d(TAG, "setupProceedButton: Validation failed.")
+                return@setOnClickListener // Exit early if fields are invalid
+            }
+
+            // Prevent duplicate ride creation
             if (formattedDateTime == lastFormattedDateTime) {
                 Toast.makeText(
                     requireContext(),
@@ -207,63 +214,51 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
                 return@setOnClickListener // Exit early if time is the same
             }
 
-            if (areFieldsValid()) {
-                lifecycleScope.launch {
-                    try {
-                        val authToken =
-                            DataStoreManager.getToken(requireContext(), "access").first()
-                        if (!authToken.isNullOrEmpty()) {
-                            val response = offerRide(authToken)
+            // Proceed with ride creation
+            lifecycleScope.launch {
+                try {
+                    val authToken = DataStoreManager.getToken(requireContext(), "access").first()
+                    if (!authToken.isNullOrEmpty()) {
+                        val response = offerRide(authToken)
 
-                            // Dismiss the bottom sheet
-                            dismiss()
-                            val rides = response?.data?.let { data ->
-                                listOf(
-                                    MyRideItem(
-                                        driverName = data.driver_name,
-                                        startLocation = data.start_location,
-                                        endLocation = data.end_location,
-                                        startTime = data.start_time,
-                                        status = data.status,
-                                        id = data.id,
-                                        driver = data.driver
-                                    )
+                        // Dismiss the bottom sheet
+                        dismiss()
+                        val rides = response?.data?.let { data ->
+                            listOf(
+                                MyRideItem(
+                                    driverName = data.driver_name,
+                                    startLocation = data.start_location,
+                                    endLocation = data.end_location,
+                                    startTime = data.start_time,
+                                    status = data.status,
+                                    id = data.id,
+                                    driver = data.driver
                                 )
-                            } ?: emptyList()
+                            )
+                        } ?: emptyList()
 
-                            val bundle = Bundle().apply {
-                                putSerializable("rideItems", ArrayList(rides))
-                            }
-
-                            val intent = Intent(requireContext(), HomeActivity::class.java).apply {
-                                // Pass any necessary data
-                                putExtra("show_dialog", true)
-                                putExtra("rideItems", ArrayList(rides))
-                                flags =
-                                    Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                            }
-                            startActivity(intent)
-                            activity?.finish()
+                        val intent = Intent(requireContext(), HomeActivity::class.java).apply {
+                            // Pass any necessary data
+                            putExtra("show_dialog", true)
+                            putExtra("rideItems", ArrayList(rides))
+                            putExtra("user_details", user)
                         }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error occurred while creating ride", e)
-                        Toast.makeText(
-                            requireContext(),
-                            "Failed to create ride: ${e.localizedMessage}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        startActivity(intent)
                     }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error occurred while creating ride", e)
+                    Toast.makeText(
+                        requireContext(),
+                        "Failed to create ride: ${e.localizedMessage}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
     }
 
     private fun areFieldsValid(): Boolean {
-        return !selectedDate.isNullOrEmpty() &&
-                !selectedTime.isNullOrEmpty() &&
-                !startAddress.isNullOrEmpty() &&
-                !destinationAddress.isNullOrEmpty() &&
-                !selectedButtonValue.isNullOrEmpty()
+        return !selectedDate.isNullOrEmpty() && !selectedTime.isNullOrEmpty() && !startAddress.isNullOrEmpty() && !destinationAddress.isNullOrEmpty() && !selectedButtonValue.isNullOrEmpty()
     }
 
     private fun createSelectedButtonDrawable(): GradientDrawable {
@@ -275,6 +270,7 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
     }
 
     fun formatToIso8601(date: String, time: String): String {
+        Log.d(TAG, "formatToIso8601: $date $time")
         val inputDateFormat = SimpleDateFormat("dd/MM/yyyyHH:mm", Locale.getDefault())
         val inputDate = inputDateFormat.parse("$date$time")
         val iso8601Format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
@@ -308,7 +304,7 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
             start_time = formattedDateTime ?: "Unknown Start Time",
             available_seats = selectedButtonValue!!.toInt()
         )
-        Log.d("MyLocation", "MyLocation: $firstMarkerLatLng $secondMarkerLatLng ")
+        Log.d(TAG, "MyLocation: $firstMarkerLatLng $secondMarkerLatLng ")
         Log.d(TAG, "offerRide: $requestBody")
         return withContext(Dispatchers.IO) {
             try {

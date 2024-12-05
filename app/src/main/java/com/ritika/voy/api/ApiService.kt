@@ -3,6 +3,7 @@ package com.ritika.voy.api
 import com.google.gson.JsonObject
 import com.ritika.voy.api.dataclasses.AvailableRides
 import com.ritika.voy.api.dataclasses.AvailableRidesSearchRequest
+import com.ritika.voy.api.dataclasses.DriverRequestList
 import com.ritika.voy.api.dataclasses.ForgotRequest
 import com.ritika.voy.api.dataclasses.ForgotResponse
 import com.ritika.voy.api.dataclasses.LoginRequest
@@ -150,6 +151,13 @@ interface ApiService {
         @Header("Authorization") authHeader: String,
         @Body rideRequest: OfferRideRequest
     ): OfferRideResponse
+
+    @POST("rides/driver/requests/{driverId}/")
+    suspend fun driverListRequest(
+        @Header("Authorization") authHeader: String,
+        @Path("driverId") driverId: Int,
+    ): DriverRequestList
+
 
     @GET("rides/ride-history/")
     suspend fun getRideHistory(

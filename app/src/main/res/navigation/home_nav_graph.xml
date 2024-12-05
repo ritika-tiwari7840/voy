@@ -188,5 +188,17 @@
     <fragment
         android:id="@+id/myRidesFragment"
         android:name="com.ritika.voy.home.MyRidesFragment"
-        android:label="MyRidesFragment" />
+        android:label="MyRidesFragment" >
+        <action
+            android:id="@+id/action_myRidesFragment_to_matchingMyRidesFragment"
+            app:destination="@id/matchingMyRidesFragment"
+            app:popUpTo="@id/myRidesFragment"
+            app:popUpToInclusive="false"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/matchingMyRidesFragment"
+        android:name="com.ritika.voy.home.MatchingMyRidesFragment"
+        android:label="fragment_matching_my_rides"
+        tools:layout="@layout/fragment_matching_my_rides" />
 </navigation>

@@ -156,9 +156,9 @@ class EditInfo : Fragment() {
         }
     }
 
-
     private fun setupClickListeners() {
         with(binding) {
+            sharedViewModel.user = sharedViewModel.user
             btnBack.setOnClickListener {
                 navController.navigate(R.id.action_editInfo_to_profile)
             }

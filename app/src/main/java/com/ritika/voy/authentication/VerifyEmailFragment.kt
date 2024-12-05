@@ -18,7 +18,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ScrollView
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -290,11 +289,9 @@ class VerifyEmailFragment : BaseFragment() {
 
                     }
                     Log.e("VerifyEmailFragment", "Phone Number : $phoneNumber")
-                    Toast.makeText(
-                        requireContext(),
-                        "Email verified Successfully, Please Verify Phone Number.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    view?.let {
+                        Snackbar.make(it, "Email Verified Successfully, please verify phone number.", Snackbar.LENGTH_LONG).show()
+                    }
                     navController.navigate(
                         R.id.action_verifyEmailFragment_to_verifyPhoneFragment, userBundle
                     )

@@ -85,4 +85,5 @@ class UserData private constructor(private val context: Context) {
             preferences.clear()
         }
     }
+
 }
