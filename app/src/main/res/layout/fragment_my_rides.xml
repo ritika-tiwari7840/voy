@@ -64,11 +64,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:background="@drawable/find_pool_background"
+            android:backgroundTint="@color/white"
             android:fontFamily="@font/regular"
             android:padding="16dp"
             android:text="Find Rides"
             android:textAllCaps="false"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintEnd_toStartOf="@+id/offer_pool"
             app:layout_constraintHorizontal_chainStyle="packed"
@@ -81,12 +82,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:background="@drawable/offer_pool_background"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="@color/theme_color"
             android:fontFamily="@font/regular"
             android:padding="16dp"
             android:text="Offered Rides"
             android:textAllCaps="false"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -128,7 +129,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

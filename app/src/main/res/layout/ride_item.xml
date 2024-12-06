@@ -33,6 +33,7 @@
             android:fontFamily="@font/medium"
             android:paddingBottom="10dp"
             android:text="Rating"
+            android:drawablePadding="3dp"
             android:textColor="@color/white"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@id/profile_photo"
@@ -93,20 +94,21 @@
             android:src="@drawable/from_to"
             app:layout_constraintStart_toEndOf="@id/govt_id_proved"
             app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/start_location"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="2dp"
             android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:maxLines="3"
             android:text="Start Location"
             android:textColor="@color/helper_text"
             android:textSize="10sp"
-            android:maxLines="3"
-            android:ellipsize="end"
             app:layout_constrainedWidth="true"
-            app:layout_constraintStart_toEndOf="@id/from_to"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/from_to"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -116,14 +118,14 @@
             android:layout_marginStart="2dp"
             android:layout_marginTop="26dp"
             android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:maxLines="3"
             android:text="End Location"
             android:textColor="@color/helper_text"
             android:textSize="10sp"
-            android:maxLines="3"
-            android:ellipsize="end"
             app:layout_constrainedWidth="true"
-            app:layout_constraintStart_toEndOf="@id/from_to"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/from_to"
             app:layout_constraintTop_toBottomOf="@id/start_location" />
 
 

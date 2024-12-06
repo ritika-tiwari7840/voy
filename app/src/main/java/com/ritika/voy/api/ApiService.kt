@@ -3,6 +3,7 @@ package com.ritika.voy.api
 import com.google.gson.JsonObject
 import com.ritika.voy.api.dataclasses.AvailableRides
 import com.ritika.voy.api.dataclasses.AvailableRidesSearchRequest
+import com.ritika.voy.api.dataclasses.DriverManageRequestResponse
 import com.ritika.voy.api.dataclasses.DriverRequestList
 import com.ritika.voy.api.dataclasses.ForgotRequest
 import com.ritika.voy.api.dataclasses.ForgotResponse
@@ -139,25 +140,31 @@ interface ApiService {
         @Body requestBody: AvailableRidesSearchRequest,
     ): AvailableRides
 
-    @POST("rides/passenger/{passengerId}/request/")
+    @POST("rides/passenger/{requestId}/request/")
     suspend fun requestRide(
         @Header("Authorization") authHeader: String,
-        @Path("passengerId") passengerId: Int,
+        @Path("requestId") requestId: Int,
         @Body rideRequest: JsonObject,
     ): RideRequestResponse
 
     @POST("rides/driver/create/")
     suspend fun offerRide(
         @Header("Authorization") authHeader: String,
-        @Body rideRequest: OfferRideRequest
+        @Body rideRequest: OfferRideRequest,
     ): OfferRideResponse
 
-    @POST("rides/driver/requests/{driverId}/")
+    @GET("rides/driver/requests/{driverId}/")
     suspend fun driverListRequest(
         @Header("Authorization") authHeader: String,
         @Path("driverId") driverId: Int,
     ): DriverRequestList
 
+    @POST("rides/driver/manage-request/{requestId}/")
+    suspend fun driverManageRequest(
+        @Header("Authorization") authHeader: String,
+        @Path("requestId") driverId: Int,
+        @Body manageRequest: JsonObject,
+    ): DriverManageRequestResponse
 
     @GET("rides/ride-history/")
     suspend fun getRideHistory(

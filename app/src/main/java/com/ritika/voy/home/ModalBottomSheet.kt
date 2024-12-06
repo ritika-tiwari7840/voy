@@ -149,16 +149,37 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
 
-        val timePickerDialog = TimePickerDialog(
-            requireContext(), { _, selectedHour, selectedMinute ->
+        // Create and show the TimePickerDialog
+        TimePickerDialog(
+            requireContext(),
+            { _, selectedHour, selectedMinute ->
+                // Determine AM/PM and convert to 12-hour format
                 val amPm = if (selectedHour >= 12) "PM" else "AM"
-                selectedTime = String.format("%02d:%02d %s", selectedHour, selectedMinute, amPm)
-                dateTimePicker.text = "$selectedDate $selectedTime"
-            }, hour, minute, false // Set is24HourView to false for AM/PM
-        )
-        timePickerDialog.setTitle("Select Time")
-        timePickerDialog.show()
+                val hourIn12Format = if (selectedHour % 12 == 0) 12 else selectedHour % 12
+                selectedTime = String.format("%02d:%02d %s", hourIn12Format, selectedMinute, amPm)
+                val dateTimeString = "$selectedDate $selectedTime"
+                dateTimePicker.text = formatDateTime(dateTimeString)
+            },
+            hour,
+            minute,
+            false
+        ).apply {
+            setTitle("Select Time")
+        }.show()
     }
+
+    private fun formatDateTime(dateTime: String?): String {
+        return try {
+            val inputFormat = SimpleDateFormat("dd/M/yyyy hh:mm a", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("EEE, MMM dd, hh:mm a", Locale.getDefault())
+            val date = inputFormat.parse(dateTime ?: return "")
+            outputFormat.format(date ?: return "")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            dateTime ?: ""
+        }
+    }
+
 
     private fun setupSeatButtons(view: View) {
         val buttons = listOf(
@@ -175,9 +196,6 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
                 selectedButtonValue = (index + 1).toString()
                 button.background = createSelectedButtonDrawable()
                 previousButton = button
-                Toast.makeText(
-                    requireContext(), "Selected Seat: $selectedButtonValue", Toast.LENGTH_SHORT
-                ).show()
             }
         }
     }
@@ -275,6 +293,7 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
         val inputDate = inputDateFormat.parse("$date$time")
         val iso8601Format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
         iso8601Format.timeZone = TimeZone.getTimeZone("UTC")
+        Log.d(TAG, "formatToIso8601:  ${iso8601Format.format(inputDate!!)}")
         return iso8601Format.format(inputDate!!)
     }
 

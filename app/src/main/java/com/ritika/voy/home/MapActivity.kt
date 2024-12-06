@@ -4,6 +4,7 @@ import android.Manifest
 import android.animation.ObjectAnimator
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
@@ -30,6 +31,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.ModalBottomSheet
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -143,6 +145,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         //calling geocoding to convert address in string to LatLng
         lifecycleScope.launch {
+            val progressDialog = ProgressDialog(this@MapActivity)
+            progressDialog.setMessage("Loading...")
+            progressDialog.setCancelable(false)
+            progressDialog.show()
             try {
                 startLatLng = geoCodeAddress(startLocation ?: "")
                 destinationLatLng = geoCodeAddress(destinationLocation ?: "")
@@ -154,6 +160,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error geocoding: ${e.message}")
+            } finally {
+                progressDialog.dismiss()
             }
         }
 
@@ -244,6 +252,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         "geocoding while setOnMap $firstMarkerLatLng $secondMarkerLatLng"
                     )
                     lifecycleScope.launch {
+                        val progressDialog = ProgressDialog(this@MapActivity)
+                        progressDialog.setMessage("Loading...")
+                        progressDialog.setCancelable(false)
+                        progressDialog.show()
                         try {
                             if (firstMarkerLatLng != null && secondMarkerLatLng != null) {
                                 val startAddress = reverseGeoCode(
@@ -266,6 +278,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                 TAG,
                                 "Error during reverse geocoding: ${e.message}"
                             )
+                        } finally {
+                            progressDialog.dismiss()
                         }
                     }
 
@@ -498,7 +512,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     val bundle = Bundle().apply {
                         putParcelable("start_location", firstMarkerLatLng)
                         putParcelable("end_location", secondMarkerLatLng)
-                        putString("seats",selectedButtonValue)
+                        putString("seats", selectedButtonValue)
                     }
                     val rideAdapter = RideAdapter(rides, authToken, bundle) { rideRequestResponse ->
                         rideRequestResponse?.let {
@@ -546,10 +560,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun sendResponseStatus(status: Boolean) {
         // Send the response status (e.g., navigate to the next screen or show a toast)
         if (status) {
-            Toast.makeText(this, "API call successful", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "API call successful", Toast.LENGTH_SHORT).show()
             Log.d(TAG, "sendResponseStatus: $status ")
         } else {
-            Toast.makeText(this, "API call failed", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "API call failed", Toast.LENGTH_SHORT).show()
         }
     }
 

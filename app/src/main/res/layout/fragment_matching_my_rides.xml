@@ -8,7 +8,7 @@
     tools:context=".home.MatchingMyRidesFragment">
 
     <ImageButton
-        android:id="@+id/btn_back"
+        android:id="@+id/btnBack"
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:layout_marginTop="25.2dp"
@@ -29,9 +29,9 @@
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_back"
-        app:layout_constraintStart_toEndOf="@+id/btn_back"
-        app:layout_constraintTop_toTopOf="@+id/btn_back" />
+        app:layout_constraintBottom_toBottomOf="@+id/btnBack"
+        app:layout_constraintStart_toEndOf="@+id/btnBack"
+        app:layout_constraintTop_toTopOf="@+id/btnBack" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewMyRides"
@@ -45,17 +45,37 @@
         app:layout_constraintStart_toStartOf="@id/guide_left"
         app:layout_constraintTop_toBottomOf="@id/my_rides_matching_heading_text" />
 
-    <TextView
-        android:id="@+id/emptyStateView"
+    <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No rides available"
-        android:textColor="@color/white"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/emptyStateView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guide_right"
+        app:layout_constraintStart_toStartOf="@id/guide_left"
+        app:layout_constraintTop_toBottomOf="@id/my_rides_matching_heading_text">
+
+        <TextView
+            android:id="@+id/emptyStateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No one has requested till now."
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guide_left"

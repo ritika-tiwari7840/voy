@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -24,7 +23,6 @@ class MyRidesFragment : Fragment(), MyRidesAdapter.OnItemClickListener {
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var navController: NavController
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -37,65 +35,60 @@ class MyRidesFragment : Fragment(), MyRidesAdapter.OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         navController = findNavController()
+        setupUI()
+        setupRecyclerView()
+        setupViewModel()
+    }
+
+    private fun setupUI() {
         binding.findPool.setOnClickListener {
-            binding.findPool.backgroundTintList =
-                ContextCompat.getColorStateList(requireContext(), R.color.theme_color)
-            binding.findPool.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-            binding.offerPool.backgroundTintList =
-                ContextCompat.getColorStateList(requireContext(), R.color.white)
-            binding.offerPool.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+            updateButtonAppearance(binding.findPool, binding.offerPool)
         }
         binding.offerPool.setOnClickListener {
-            Toast.makeText(requireContext(), "You are Driver now", Toast.LENGTH_SHORT).show()
-            binding.offerPool.backgroundTintList =
-                ContextCompat.getColorStateList(requireContext(), R.color.theme_color)
-            binding.offerPool.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.white
-                )
-            )
-            binding.findPool.backgroundTintList =
-                ContextCompat.getColorStateList(requireContext(), R.color.white)
-            binding.findPool.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.black
-                )
-            )
+            updateButtonAppearance(binding.offerPool, binding.findPool)
         }
+        binding.btnBack.setOnClickListener {
+            navController.navigate(R.id.action_myRidesFragment_to_home)
+        }
+    }
+
+    private fun updateButtonAppearance(selectedButton: View, unselectedButton: View) {
+        selectedButton.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.theme_color)
+        (selectedButton as? android.widget.Button)?.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        unselectedButton.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.white)
+        (unselectedButton as? android.widget.Button)?.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+    }
+
+    private fun setupRecyclerView() {
         binding.recyclerViewMyRides.layoutManager = LinearLayoutManager(context)
         adapter = MyRidesAdapter(this)
         binding.recyclerViewMyRides.adapter = adapter
+    }
+
+    private fun setupViewModel() {
         sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
+
         arguments?.getSerializable("rideItems")?.let { initialRides ->
             @Suppress("UNCHECKED_CAST")
             val rideList = initialRides as? ArrayList<MyRideItem>
             rideList?.let {
-                sharedViewModel.addRideItems(it)
+                sharedViewModel.updateRidesFromResponse(it)
             }
         }
 
-        // Observe ride items and update adapter
         sharedViewModel.rideItem.observe(viewLifecycleOwner) { rides ->
-            // Submit list to adapter
             adapter.submitList(rides)
-
-            // Update visibility of empty state
             updateEmptyState(rides)
         }
-
     }
 
-    // Implement optional click handler
     override fun onItemClick(ride: MyRideItem) {
         val bundle = Bundle()
-        bundle.putSerializable("driverId", ride.driver)
+        bundle.putSerializable("id", ride.id)
         navController.navigate(R.id.action_myRidesFragment_to_matchingMyRidesFragment, bundle)
     }
 
     private fun updateEmptyState(rides: List<MyRideItem>) {
-        // Show/hide views based on ride list
         binding.recyclerViewMyRides.visibility = if (rides.isEmpty()) View.GONE else View.VISIBLE
         binding.emptyStateView.visibility = if (rides.isEmpty()) View.VISIBLE else View.GONE
     }
@@ -105,3 +98,4 @@ class MyRidesFragment : Fragment(), MyRidesAdapter.OnItemClickListener {
         _binding = null
     }
 }
+

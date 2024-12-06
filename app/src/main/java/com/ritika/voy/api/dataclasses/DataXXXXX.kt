@@ -13,5 +13,6 @@ data class DataXXXXX(
     val pickup_point: PickupPointX,
     val ride: Int,
     val seats_needed: Int,
-    val status: String
+    val status: String,
+    val passenger_rating: Double,
 )

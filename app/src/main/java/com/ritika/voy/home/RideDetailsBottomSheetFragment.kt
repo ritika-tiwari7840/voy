@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
@@ -25,13 +26,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.Address
 import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-import kotlin.math.log
-import kotlin.properties.Delegates
 
 class RideDetailsBottomSheetFragment : BottomSheetDialogFragment() {
     private var rideDetails: DataX? = null
@@ -69,14 +67,12 @@ class RideDetailsBottomSheetFragment : BottomSheetDialogFragment() {
                             endLocation!!.latitude, endLocation!!.longitude
                         ).toString()
                         Log.d(
-                            TAG,
-                            "reverseGeoCodeAddress: from $startAddress to $destinationAddress"
+                            TAG, "reverseGeoCodeAddress: from $startAddress to $destinationAddress"
                         )
                     }
                 } catch (e: Exception) {
                     Log.e(
-                        TAG,
-                        "Error during reverse geocoding: ${e.message}"
+                        TAG, "Error during reverse geocoding: ${e.message}"
                     )
                 } finally {
                     Log.d(TAG, "Finally block executed")
@@ -100,7 +96,6 @@ class RideDetailsBottomSheetFragment : BottomSheetDialogFragment() {
             val (time, dateFormatted) = convertDateTime(it.start_time)
             Log.d(TAG, "DateAndTime: $time, $dateFormatted")
 
-            // Populate the BottomSheet views with `rideDetails`
             view.findViewById<TextView>(R.id.driver_name).text = it.driver_name
             view.findViewById<TextView>(R.id.rating).text = it.driver_rating.toString()
             view.findViewById<TextView>(R.id.car_modal).text = it.car_details.car_modal
@@ -108,7 +103,7 @@ class RideDetailsBottomSheetFragment : BottomSheetDialogFragment() {
             view.findViewById<TextView>(R.id.drop_address).text = it.end_location
             view.findViewById<TextView>(R.id.start_time).text = time
             view.findViewById<TextView>(R.id.no_of_seats).text =
-                "Max ${it.available_seats.toString()} in the back"
+                "Max ${it.available_seats} in the back"
             view.findViewById<TextView>(R.id.date).text = dateFormatted
             val profile: ImageView = view.findViewById(R.id.profile_photo)
             id = it.id
@@ -137,7 +132,7 @@ class RideDetailsBottomSheetFragment : BottomSheetDialogFragment() {
                         )
                         val response = fetchRideRequestApiResponse(
                             "$authToken",
-                            it.id,
+                            id!!,
                             startAddress,
                             destinationAddress,
                             startLocation!!,
@@ -147,11 +142,23 @@ class RideDetailsBottomSheetFragment : BottomSheetDialogFragment() {
                         if (response != null) {
                             if (response.success) {
                                 Log.d(TAG, "Ride request successful: ${response.data}")
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Ride Requested Successfully",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             } else {
-                                Log.e(TAG, "Ride request failed: ${response.message}")
+                                Log.e(
+                                    TAG, "Ride request failed: ${response.error?.non_field_errors}"
+                                )
                             }
                         } else {
-                            Log.e(TAG, "Ride request failed: ${response?.message}")
+                            Log.e(TAG, "Ride request failed: ${response?.error?.non_field_errors}")
+                            Toast.makeText(
+                                requireContext(),
+                                "You have already requested for this ride",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     } catch (e: Exception) {
                         Log.d(TAG, "Error: $e")
@@ -225,13 +232,11 @@ class RideDetailsBottomSheetFragment : BottomSheetDialogFragment() {
         val gson = Gson()
         val jsonObject = gson.toJsonTree(rideRequestBody).asJsonObject
 
-        Log.d("API", "Sending ride request: $jsonObject")
+        Log.d("API", "Sending ride request: $jsonObject $id")
         return withContext(Dispatchers.IO) {
             try {
                 val response = RetrofitInstance.api.requestRide(
-                    authHeader = "Bearer $authToken",
-                    passengerId = id,
-                    rideRequest = jsonObject
+                    authHeader = "Bearer $authToken", requestId = id, rideRequest = jsonObject
                 )
 
                 if (response.success) {
@@ -251,14 +256,15 @@ class RideDetailsBottomSheetFragment : BottomSheetDialogFragment() {
                     // Deserialize the error message
                     val errorResponse = try {
                         Gson().fromJson(errorMessage, ErrorResponse::class.java)
-                    } catch (ex: Exception) {
+                    } catch (e: Exception) {
+                        Log.e(
+                            "API", "Bad request (400): $e"
+                        )
                         null
                     }
-
                     // Log the error body
                     Log.e(
-                        "API",
-                        "Bad request (400): ${errorResponse?.non_field_errors?.joinToString(", ")}"
+                        "API", "Bad request (400): ${errorResponse?.non_field_errors}"
                     )
                     null
                 } else {

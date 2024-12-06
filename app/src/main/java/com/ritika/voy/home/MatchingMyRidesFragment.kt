@@ -1,6 +1,5 @@
 package com.ritika.voy.home
 
-import android.app.ProgressDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,7 +12,6 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.JsonParseException
-import com.ritika.voy.R
 import com.ritika.voy.adapter.MatchingRidesAdapter
 import com.ritika.voy.api.DataStoreManager
 import com.ritika.voy.api.RetrofitInstance
@@ -34,7 +32,7 @@ class MatchingMyRidesFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentMatchingMyRidesBinding.inflate(inflater, container, false)
         return binding.root
@@ -47,8 +45,18 @@ class MatchingMyRidesFragment : Fragment() {
         setupRecyclerView()
         setupBackButton()
 
-        val driverId = arguments?.getString("driverId")
-        fetchDriverRequestList(driverId)
+        val id = when (val serializedId = arguments?.getSerializable("id")) {
+            is String -> serializedId
+            is Int -> serializedId.toString()
+            else -> null
+        }
+
+        Log.d(TAG, "onViewCreated: id=$id")
+
+        id?.let { fetchDriverRequestList(it) } ?: run {
+            Log.e(TAG, "onViewCreated: id is null, cannot fetch driver request list")
+            showEmptyState("No driver ID provided")
+        }
     }
 
     private fun setupRecyclerView() {
@@ -65,44 +73,49 @@ class MatchingMyRidesFragment : Fragment() {
         }
     }
 
-    private fun fetchDriverRequestList(driverId: String?) {
-        lifecycleScope.launch {
+    private fun fetchDriverRequestList(driverId: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
+                showLoading(true)
                 val authToken = DataStoreManager.getToken(requireContext(), "access").first()
-                if (!authToken.isNullOrEmpty() && !driverId.isNullOrEmpty()) {
-                    val response = getDriverRequestedList(authToken, driverId.toInt())
+                if (authToken.isNullOrEmpty()) {
+                    throw Exception("Authentication token is null or empty")
+                }
+                val response = getDriverRequestedList("Bearer $authToken", driverId.toInt())
+                withContext(Dispatchers.Main) {
                     response?.let {
                         if (it.success && it.data.isNotEmpty()) {
                             adapter.updateRides(it.data)
                             showRecyclerView()
                         } else {
-                            showEmptyState()
+                            showEmptyState("No matching rides found")
                         }
-                    } ?: showEmptyState()
+                    } ?: showEmptyState("Failed to fetch driver request list")
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error occurred while fetching driver request list", e)
-                Toast.makeText(
-                    requireContext(),
-                    "Failed to fetch rides: ${e.localizedMessage}",
-                    Toast.LENGTH_SHORT
-                ).show()
-                showEmptyState()
+                withContext(Dispatchers.Main) {
+                    showEmptyState("An error occurred: ${e.localizedMessage}")
+                    Toast.makeText(
+                        context,
+                        "Failed to load rides: ${e.localizedMessage}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            } finally {
+                showLoading(false)
             }
         }
     }
 
     private suspend fun getDriverRequestedList(
         authToken: String,
-        driverId: Int
+        driverId: Int,
     ): DriverRequestList? {
         return withContext(Dispatchers.IO) {
-            val progressDialog = ProgressDialog(requireContext())
-            progressDialog.setMessage("Loading...")
-            progressDialog.setCancelable(false)
-            progressDialog.show()
+            Log.d(TAG, "getDriverRequestedList: authToken=$authToken, driverId=$driverId")
             try {
-                val response = RetrofitInstance.api.driverListRequest("Bearer $authToken", driverId)
+                val response = RetrofitInstance.api.driverListRequest("$authToken", driverId)
                 Log.d(TAG, "Driver request list: $response")
                 response
             } catch (e: IOException) {
@@ -114,9 +127,13 @@ class MatchingMyRidesFragment : Fragment() {
             } catch (e: Exception) {
                 Log.e(TAG, "Unexpected Error: ${e.localizedMessage}")
                 null
-            } finally {
-                progressDialog.dismiss()
             }
+        }
+    }
+
+    private suspend fun showLoading(isLoading: Boolean) {
+        withContext(Dispatchers.Main) {
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         }
     }
 
@@ -125,9 +142,10 @@ class MatchingMyRidesFragment : Fragment() {
         binding.emptyStateView.visibility = View.GONE
     }
 
-    private fun showEmptyState() {
+    private fun showEmptyState(message: String) {
         binding.recyclerViewMyRides.visibility = View.GONE
         binding.emptyStateView.visibility = View.VISIBLE
+        binding.emptyStateText.text = message
     }
 
     override fun onDestroyView() {

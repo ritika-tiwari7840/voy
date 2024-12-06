@@ -81,8 +81,11 @@ class HomeActivity : AppCompatActivity() {
         Log.d("Rides", "showRideReachedDialog: $rides")
 
         val customView = LayoutInflater.from(this).inflate(R.layout.ride_posted, null)
-        val dialog =
-            AlertDialog.Builder(this, R.style.TransparentDialog).setView(customView).create()
+        val dialog = AlertDialog.Builder(this, R.style.TransparentDialog)
+            .setView(customView)
+            .setCancelable(false)
+            .create()
+
         customView.setOnClickListener {
             dialog.dismiss()
             rides?.let {
@@ -92,6 +95,7 @@ class HomeActivity : AppCompatActivity() {
         }
         dialog.show()
     }
+
 
 
     override fun onBackPressed() {
