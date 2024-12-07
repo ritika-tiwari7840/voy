@@ -406,7 +406,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.riderImage.visibility = View.VISIBLE
         binding.cancelButton.visibility = View.VISIBLE
         binding.backButton.visibility = View.GONE
-        binding.routeView.swapButton.visibility = View.GONE
+//        binding.routeView.swapButton.visibility = View.GONE
 
     }
 

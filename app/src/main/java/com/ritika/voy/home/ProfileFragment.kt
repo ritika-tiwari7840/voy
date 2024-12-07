@@ -32,7 +32,7 @@ class ProfileFragment : Fragment() {
     private val binding get() = _binding!!
     lateinit var navController: NavController
     private lateinit var sharedViewModel: SharedViewModel
-    private var TAG="Profile"
+    private var TAG = "Profile"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,12 +111,13 @@ class ProfileFragment : Fragment() {
         binding.myRides.setOnClickListener {
             // Create a bundle to pass current rides
             val bundle = Bundle().apply {
-                putSerializable("rideItems",
+                putSerializable(
+                    "rideItems",
                     ArrayList(sharedViewModel.rideItem.value ?: emptyList())
                 )
             }
             Log.d(TAG, "onViewCreated: ${sharedViewModel.rideItem.value}")
-            Toast.makeText(requireContext(), " ${sharedViewModel.rideItem.value}", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(requireContext(), " ${sharedViewModel.rideItem.value}", Toast.LENGTH_SHORT).show()
             navController.navigate(R.id.action_profile_to_myRidesFragment, bundle)
         }
     }

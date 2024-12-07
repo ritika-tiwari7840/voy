@@ -60,6 +60,7 @@ class MatchingRidesAdapter(private var rides: List<DataXXXX>) :
                 Toast.makeText(holder.itemView.context, "Ride accepted", Toast.LENGTH_SHORT).show()
                 try {
                     manageDriverRequest("accept", rideId, holder.itemView.context)
+                    holder.acceptButton.setBackgroundResource(R.drawable.button_background)
                 } catch (e: Exception) {
                     Log.d("MatchingRidesAdapter", "Error: ${e.message}")
                 }
@@ -82,6 +83,7 @@ class MatchingRidesAdapter(private var rides: List<DataXXXX>) :
             if (flag == 1) {
                 try {
                     manageDriverRequest("reject", rideId, holder.itemView.context)
+                    holder.acceptButton.setBackgroundResource(R.drawable.reject_button_background)
                 } catch (e: Exception) {
                     Log.d("MatchingRidesAdapter", "Error: ${e.message}")
                 }
@@ -124,7 +126,14 @@ class MatchingRidesAdapter(private var rides: List<DataXXXX>) :
                 )
 
                 // Log the response or handle it as needed
-                Log.d("ManageRequest", "Request successfully handled. Response: ${response.success}")
+                if (response.success) {
+                    Log.d(
+                        "ManageRequest",
+                        "Request successfully handled. Response: ${response.success}"
+                    )
+                } else {
+                    Log.d("ManageRequest", "Request failed. Response: ${response.success}")
+                }
 
             } catch (e: Exception) {
                 // Log the error

@@ -30,6 +30,7 @@ import com.ritika.voy.BaseFragment
 import com.ritika.voy.KeyboardUtils
 import com.ritika.voy.R
 import com.ritika.voy.api.DataStoreManager
+import com.ritika.voy.api.MyRidesDataStore
 import com.ritika.voy.api.RetrofitInstance
 import com.ritika.voy.api.dataclasses.EmailVerifyResponse
 import com.ritika.voy.api.dataclasses.GetUserResponse
@@ -287,6 +288,25 @@ class VerifyPhoneFragment : BaseFragment() {
                                 Log.d(tag, "User Details: ${userResponse.user}")
                                 val bundle = Bundle().apply {
                                     putParcelable("user_details", userResponse.user)
+                                }
+
+                                lifecycleScope.launch {
+                                    val progressDialog = ProgressDialog(requireContext())
+                                    progressDialog.setMessage("Loading...")
+                                    progressDialog.setCancelable(false)
+                                    progressDialog.show()
+
+                                    try {
+                                        val myRidesDataStore = MyRidesDataStore(requireContext())
+                                        myRidesDataStore.clearRides()
+                                    } catch (e: Exception) {
+                                        Log.e(
+                                            "VerifyPhoneFragment",
+                                            "Error clearing rides: ${e.message}"
+                                        )
+                                    } finally {
+                                        progressDialog.dismiss()
+                                    }
                                 }
                                 navController.navigate(
                                     R.id.action_verifyPhoneFragment_to_homeActivity, bundle

@@ -4,8 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -79,7 +77,9 @@ class HomeActivity : AppCompatActivity() {
     private fun showRideReachedDialog(intent: Intent) {
         val rides = intent.getSerializableExtra("rideItems") as? ArrayList<MyRideItem>
         Log.d("Rides", "showRideReachedDialog: $rides")
-
+        rides?.let {
+            sharedViewModel.addRideItems(it)
+        }
         val customView = LayoutInflater.from(this).inflate(R.layout.ride_posted, null)
         val dialog = AlertDialog.Builder(this, R.style.TransparentDialog)
             .setView(customView)
@@ -88,14 +88,10 @@ class HomeActivity : AppCompatActivity() {
 
         customView.setOnClickListener {
             dialog.dismiss()
-            rides?.let {
-                sharedViewModel.addRideItems(it)
-            }
             navController.navigate(R.id.myRidesFragment)
         }
         dialog.show()
     }
-
 
 
     override fun onBackPressed() {

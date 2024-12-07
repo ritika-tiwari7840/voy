@@ -30,5 +30,10 @@ class MyRidesDataStore(private val context: Context) {
         val type = object : TypeToken<List<MyRideItem>>() {}.type
         Gson().fromJson(json, type)
     }
+    suspend fun clearRides() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(MY_RIDES_KEY) // Remove the key
+        }
+    }
 }
 

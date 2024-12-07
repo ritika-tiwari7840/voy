@@ -71,9 +71,11 @@
             android:id="@+id/emptyStateText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/medium"
             android:text="No one has requested till now."
-            android:textColor="@color/white"
-            android:textSize="18sp" />
+            android:textColor="@color/divider_color"
+            android:textSize="16sp"
+         />
 
     </LinearLayout>
 

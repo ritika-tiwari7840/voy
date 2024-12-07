@@ -96,6 +96,7 @@ class UploadLicenseFragment : BaseFragment() {
         binding.btnBack.setOnClickListener {
             navController.navigate(action_uploadLicenseFragment_to_driverVerificationFragment)
         }
+
         binding.capturePhoto.setOnClickListener {
             var layoutParams =
                 binding.driverVerificationLayoutImage.layoutParams as ViewGroup.MarginLayoutParams

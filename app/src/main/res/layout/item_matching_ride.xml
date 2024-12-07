@@ -116,7 +116,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:background="@drawable/button_background"
+                android:background="@drawable/reject_button_background"
                 android:fontFamily="@font/medium"
                 android:text="Accept"
                 android:textAllCaps="false"
