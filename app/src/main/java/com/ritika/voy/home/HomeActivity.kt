@@ -79,6 +79,7 @@ class HomeActivity : AppCompatActivity() {
         Log.d("Rides", "showRideReachedDialog: $rides")
         rides?.let {
             sharedViewModel.addRideItems(it)
+            sharedViewModel.rideId = it[0].id
         }
         val customView = LayoutInflater.from(this).inflate(R.layout.ride_posted, null)
         val dialog = AlertDialog.Builder(this, R.style.TransparentDialog)

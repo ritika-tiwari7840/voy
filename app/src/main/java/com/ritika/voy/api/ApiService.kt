@@ -23,6 +23,7 @@ import com.ritika.voy.api.dataclasses.RideHistoryResponse
 import com.ritika.voy.api.dataclasses.RideRequestResponse
 import com.ritika.voy.api.dataclasses.SignUpRequest
 import com.ritika.voy.api.dataclasses.SignUpResponse
+import com.ritika.voy.api.dataclasses.UpdateRideStatusResponse
 import com.ritika.voy.api.dataclasses.UserResponseData
 import com.ritika.voy.api.dataclasses.VerifyRequest
 import com.ritika.voy.api.dataclasses.VerifyResponse
@@ -171,5 +172,17 @@ interface ApiService {
         @Header("Authorization") authHeader: String,
     ): RideHistoryResponse
 
+    @POST("rides/driver/{requestId}/status/")
+    suspend fun driverUpdateRideStatus(
+        @Header("Authorization") authHeader: String,
+        @Path("requestId") requestId: Int,
+        @Body updateRequest: JsonObject,
+    ): UpdateRideStatusResponse
+
+    @GET("rides/emissions-savings/{rideId}/")
+    suspend fun eco(
+        @Header("Authorization") authHeader: String,
+        @Path("rideId") rideId: Int,
+    ): DriverRequestList
 
 }

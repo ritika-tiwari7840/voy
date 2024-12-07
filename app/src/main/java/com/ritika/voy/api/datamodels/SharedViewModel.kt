@@ -15,6 +15,8 @@ import kotlinx.coroutines.launch
 
 class SharedViewModel(application: Application) : AndroidViewModel(application) {
     var user: UserXX? = null
+    var rideId:Int = 0
+
     private val dataStore = MyRidesDataStore(application)
     private val _rideItem = MutableLiveData<List<MyRideItem>>(emptyList())
     val rideItem: LiveData<List<MyRideItem>> = _rideItem

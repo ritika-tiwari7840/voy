@@ -1,6 +1,7 @@
 package com.ritika.voy.adapter
 
 import android.app.AlertDialog
+import android.app.ProgressDialog
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,16 @@ import com.ritika.voy.api.dataclasses.MyRideItem
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
+import android.graphics.Color
+import android.widget.Toast
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import com.google.gson.JsonObject
+import com.ritika.voy.api.DataStoreManager
+import com.ritika.voy.api.RetrofitInstance
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+
 
 class MyRidesAdapter(
     private val onItemClickListener: OnItemClickListener? = null,
@@ -49,15 +60,12 @@ class MyRidesAdapter(
 
         init {
             val button = itemView.findViewById<Button>(R.id.see_who_matches)
-            button.setOnClickListener {
-                currentRide?.let { ride ->
-                    onItemClickListener?.onItemClick(ride)
-                }
-            }
+
         }
 
 
         fun bind(ride: MyRideItem) {
+            val TAG: String = "MyRidesAdapter"
             val timeInISO = convertUTCToISO(ride.startTime)
             Log.d("Time", "$timeInISO")
             val time = formatDateTime(timeInISO)
@@ -67,6 +75,63 @@ class MyRidesAdapter(
             endLocationText.text = ride.endLocation
             startTimeText.text = time
             statusText.text = ride.status
+
+
+            statusText.setOnClickListener {
+                // Define states
+                val states = listOf(
+                    "Pending" to "#F28B82",
+                    "Completed" to "#46A14B",
+                    "Ongoing" to "#FFD700" // Yellow
+                )
+                val currentIndex = statusText.tag as? Int ?: 0
+                val nextIndex = (currentIndex + 1) % states.size
+                val (status, color) = states[nextIndex]
+                statusText.text = status
+                statusText.setTextColor(Color.parseColor(color))
+                statusText.tag = nextIndex
+                val builder = AlertDialog.Builder(itemView.context)
+                builder.setTitle("Ride Status")
+                builder.setMessage("Your ride is $status")
+                builder.setPositiveButton("OK") { dialog, _ ->
+                    val context = itemView.context
+                    if (context is LifecycleOwner) {
+                        context.lifecycleScope.launch {
+                            val progressDialog = ProgressDialog(itemView.context)
+                            progressDialog.setMessage("Loading...")
+                            progressDialog.setCancelable(false)
+                            progressDialog.show()
+                            try {
+                                val authToken = DataStoreManager.getToken(context, "access").first()
+                                if (authToken.isNullOrEmpty()) {
+                                    throw Exception("Authentication token is null or empty")
+                                }
+                                if (status == "Completed") {
+                                    updateStatus("Bearer $authToken", "COMPLETED", currentRide?.id)
+                                } else if (status == "Ongoing") {
+                                    updateStatus("Bearer $authToken", "ONGOING", currentRide?.id)
+                                }
+                            } catch (e: Exception) {
+                                Log.e(
+                                    TAG,
+                                    "Error fetching token or updating status: ${e.message}"
+                                )
+                            } finally {
+                                dialog.dismiss()
+                                progressDialog.dismiss()
+                            }
+                        }
+                    } else {
+                        Log.e(
+                            TAG,
+                            "Context is not a LifecycleOwner. Unable to launch coroutine."
+                        )
+                        dialog.dismiss()
+                    }
+                }
+
+                builder.show()
+            }
         }
 
         private fun formatDateTime(dateTime: String?): String {
@@ -81,6 +146,38 @@ class MyRidesAdapter(
             }
         }
 
+        private suspend fun updateStatus(authToken: String, status: String, rideId: Int?) {
+            val TAG: String = "MyRidesAdapter"
+            if (rideId == null) {
+                Log.e("Status", "Ride ID cannot be null.")
+                return
+            }
+
+            try {
+                val updateRequest = JsonObject().apply {
+                    addProperty("status", status)
+                }
+
+                Log.d(TAG, "Updating status to $status for ride $rideId")
+                val response = RetrofitInstance.api.driverUpdateRideStatus(
+                    authHeader = authToken,
+                    requestId = rideId,
+                    updateRequest = updateRequest
+                )
+                if (response.success) {
+                    Log.d(TAG, "Status update successful: ${response.data.message}")
+                    Toast.makeText(itemView.context, "${response.data.message}", Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    Log.e(TAG, "Error updating status: ${response.data.message}")
+                    Toast.makeText(itemView.context, "${response.data.message}", Toast.LENGTH_SHORT)
+                        .show()
+                }
+                Log.d(TAG, "Status update successful: $response")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error updating status: ${e.message}")
+            }
+        }
 
         fun convertUTCToISO(utcDate: String): String {
             return try {
@@ -102,8 +199,6 @@ class MyRidesAdapter(
 
     }
 
-
-    // DiffUtil callback to efficiently update the list
     private class RideDiffCallback : DiffUtil.ItemCallback<MyRideItem>() {
         override fun areItemsTheSame(oldItem: MyRideItem, newItem: MyRideItem): Boolean {
             return oldItem.id == newItem.id
